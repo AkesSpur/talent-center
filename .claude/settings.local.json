@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer create-project:*)",
+      "Bash(php artisan:*)",
+      "Bash(where:*)",
+      "Bash(\"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -c \"CREATE DATABASE talent_center;\")",
+      "Bash(PGPASSWORD=password \"/c/Program Files/PostgreSQL/18/bin/psql.exe\":*)"
+    ]
+  }
+}
