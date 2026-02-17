@@ -18,9 +18,9 @@ return new class extends Migration
             $table->text('description');
             $table->text('rules')->nullable();
             $table->string('status', 20)->default('draft')->index();
-            $table->timestamp('applications_start_at');
-            $table->timestamp('applications_end_at');
-            $table->timestamp('evaluation_end_at');
+            $table->dateTime('applications_start_at');
+            $table->dateTime('applications_end_at');
+            $table->dateTime('evaluation_end_at');
             $table->string('diploma_background', 500)->nullable();
             $table->timestamps();
         });

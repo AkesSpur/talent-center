@@ -1,12 +1,12 @@
 # Talent Center — Online Competition Platform
 
 ## Project Overview
-A Laravel + Blade + PostgreSQL web platform for hosting online competitions. Organizations create contests, participants submit entries, judges evaluate and assign places, and the system auto-generates PDF diplomas. This is an MVP build.
+A Laravel + Blade + MySQL web platform for hosting online competitions. Organizations create contests, participants submit entries, judges evaluate and assign places, and the system auto-generates PDF diplomas. This is an MVP build.
 
 ## Tech Stack
 - **Backend:** Laravel 12 (PHP 8.2+)
 - **Frontend:** Blade templates + Tailwind CSS (via Breeze)
-- **Database:** PostgreSQL
+- **Database:** MySQL
 - **Auth:** Laravel Breeze (Blade stack)
 - **PDF Generation:** (Stage 4 — likely dompdf/laravel-dompdf or snappy)
 - **Email:** Laravel Mail (SMTP)
@@ -75,7 +75,7 @@ A participant can create other participant accounts (e.g., parent creates childr
 - **Routes:** RESTful resource routes where possible, named routes always
 
 ### Database
-- PostgreSQL — use `jsonb` for flexible metadata fields
+- MySQL — use `json` for flexible metadata fields
 - Always add foreign key constraints with `->constrained()->cascadeOnDelete()` or `->nullOnDelete()` as appropriate
 - Index all foreign keys and status/role enum columns
 - Use Laravel enums (backed enums in PHP 8.1+) for status fields when possible
@@ -101,12 +101,33 @@ A participant can create other participant accounts (e.g., parent creates childr
 - Org management: `/organizations/*`
 
 ## Stage Roadmap
-| Stage | Focus | Budget |
-|-------|-------|--------|
-| 1 (CURRENT) | Infrastructure, DB architecture, auth, RBAC | 30,000 RUB |
-| 2 | Personal dashboards, profiles, parent-child UI | 30,000 RUB |
-| 3 | Contest CRUD, application submission, status automation | 30,000 RUB |
-| 4 | Evaluation UI, PDF diplomas, email notifications, testing | 30,000 RUB |
+| Stage | Focus | Status | Budget |
+|-------|-------|--------|--------|
+| 1 | Infrastructure & Database Foundation | LARGELY COMPLETE | 30,000 RUB |
+| 2 | Dashboards, Profiles & Organizations | NOT STARTED | 30,000 RUB |
+| 3 | Contests & Application Submission | NOT STARTED | 30,000 RUB |
+| 4 | Evaluation, Diplomas & Notifications | NOT STARTED | 30,000 RUB |
+
+**Full plan details:** See `docs/PROJECT_PLAN.md`
+
+### Stage 1 — What's Built
+- 10 migrations (users, organizations, organization_user, contests, contest_categories, applications, diplomas, action_logs, sessions, password_reset_tokens)
+- 7 Eloquent models with full relationships and enum casts
+- 5 PHP backed enums (UserRole, OrganizationStatus, ContestStatus, ApplicationStatus, FileType)
+- 3 custom middleware (CheckRole, CheckOrgPermission, EnsureOrgVerified)
+- 4 authorization policies (User, Organization, Contest, Application)
+- Auth scaffolding via Breeze (registration with first_name/last_name/patronymic, role-based login redirect, email verification, password reset)
+- Profile editing (first_name, last_name, patronymic, phone, email)
+- 3 dashboard stubs (admin with stats, support with pending orgs count, participant with welcome)
+- Role-aware navigation with colored role badges
+- Flash message component
+- ActionLogService (static logger with polymorphic targets)
+- Seeders (AdminSeeder + TestDataSeeder with test accounts)
+
+### Stage 1 — What Remains
+- Git init + initial commit
+- Production server setup on Reg.ru (client handles)
+- Edge-case testing of auth flows
 
 ## Development Commands
 ```bash
@@ -138,7 +159,7 @@ npm run build      # production build
 
 ## Environment Setup
 Requires `.env` with:
-- `DB_CONNECTION=pgsql` + PostgreSQL credentials
+- `DB_CONNECTION=mysql` + MySQL credentials
 - SMTP mail config for email verification and notifications
 - `APP_URL` set correctly for links in emails
 

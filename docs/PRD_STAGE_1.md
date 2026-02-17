@@ -3,14 +3,14 @@
 **Project:** Talent Center (Online Competition Platform)
 **Stage:** 1 of 4
 **Budget:** 30,000 RUB
-**Stack:** Laravel 12 + Blade + PostgreSQL
+**Stack:** Laravel 12 + Blade + MySQL
 **Version:** 1.0
 
 ---
 
 ## 1. Stage Objective
 
-Set up the complete development infrastructure and design the database architecture to support the full role-based access control (RBAC) system described in the technical specification. By the end of this stage, the project has a working Laravel installation, a fully migrated PostgreSQL database, authentication scaffolding, and the RBAC foundation — ready for Stage 2 to build upon.
+Set up the complete development infrastructure and design the database architecture to support the full role-based access control (RBAC) system described in the technical specification. By the end of this stage, the project has a working Laravel installation, a fully migrated MySQL database, authentication scaffolding, and the RBAC foundation — ready for Stage 2 to build upon.
 
 ---
 
@@ -18,7 +18,7 @@ Set up the complete development infrastructure and design the database architect
 
 ### 2.1 Server & Environment Setup
 - [ ] Laravel 12 project initialized
-- [ ] PostgreSQL database created and connected
+- [ ] MySQL database created and connected
 - [ ] `.env` configured for local development
 - [ ] Production server setup on Reg.ru + ispmanager (deployment-ready)
 - [ ] Git repository initialized with `.gitignore`
@@ -151,7 +151,7 @@ All migrations must be created, tested, and runnable via `php artisan migrate`.
 | action | varchar(255) | e.g. `user.created`, `contest.published` |
 | target_type | varchar(100) | polymorphic — model class |
 | target_id | bigint | polymorphic — model id |
-| metadata | jsonb | nullable, extra context |
+| metadata | json | nullable, extra context |
 | ip_address | varchar(45) | |
 | created_at | timestamp | |
 
@@ -282,7 +282,7 @@ users ──────────┐
 ## 4. Acceptance Criteria
 
 ### Must Pass
-- [ ] `php artisan migrate` runs cleanly on fresh PostgreSQL database
+- [ ] `php artisan migrate` runs cleanly on fresh MySQL database
 - [ ] `php artisan migrate:rollback` rolls back without errors
 - [ ] All Eloquent models exist with correct relationships
 - [ ] User registration, login, logout, email verification, password reset all work
@@ -305,8 +305,8 @@ users ──────────┐
 
 ## 5. Technical Notes
 
-### PostgreSQL-Specific
-- Use `jsonb` for `action_logs.metadata` (native PostgreSQL JSON support)
+### MySQL-Specific
+- Use `json` for `action_logs.metadata` (native MySQL JSON support)
 - Use proper enum types via migrations (Laravel casts)
 - Index foreign keys and frequently queried columns (`status`, `role`, `parent_id`)
 
@@ -317,9 +317,9 @@ users ──────────┐
 
 ### Environment Variables Required
 ```
-DB_CONNECTION=pgsql
+DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=5432
+DB_PORT=3306
 DB_DATABASE=talent_center
 DB_USERNAME=...
 DB_PASSWORD=...

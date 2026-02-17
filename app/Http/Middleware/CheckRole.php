@@ -13,27 +13,20 @@ class CheckRole
     /**
      * Handle an incoming request.
      *
-     * @param  string  ...$roles
+     * @param  string  ...$roles  Allowed roles (e.g. 'admin', 'support')
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user();
 
-        if (! $user) {
-            abort(403, 'Unauthorized.');
+        if (! $user || ! in_array($user->role->value, $roles, true)) {
+            abort(403, 'Unauthorized. Insufficient role.');
         }
 
         if ($user->isBlocked()) {
-            auth()->logout();
             abort(403, 'Your account has been blocked.');
         }
 
-        foreach ($roles as $role) {
-            if ($user->role->value === $role) {
-                return $next($request);
-            }
-        }
-
-        abort(403, 'You do not have the required role to access this resource.');
+        return $next($request);
     }
 }
