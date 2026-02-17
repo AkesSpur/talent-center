@@ -12,7 +12,19 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                serif: ['Playfair Display', ...defaultTheme.fontFamily.serif],
+                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                'primary': '#8B4513',
+                'primary-light': '#A0522D',
+                'primary-dark': '#654321',
+                'gold': '#D4AF37',
+                'gold-light': '#F4D03F',
+                'cream': '#FAF8F5',
+                'cream-dark': '#F5F0EB',
+                'warm-gray': '#9A8B7A',
+                'dark': '#2C2416',
             },
         },
     },

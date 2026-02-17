@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Admin Dashboard') }}
+        <h2 class="font-serif font-semibold text-xl text-dark leading-tight">
+            Панель администратора
         </h2>
     </x-slot>
 
@@ -9,31 +9,31 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <x-flash-message />
 
-            <!-- Stats Grid -->
+            <!-- Статистика -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="text-sm font-medium text-gray-500">{{ __('Users') }}</div>
-                    <div class="mt-1 text-3xl font-semibold text-gray-900">{{ $usersCount }}</div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border-b-4 border-gold">
+                    <div class="text-sm font-medium text-warm-gray"><i class="fas fa-users mr-1"></i> Пользователи</div>
+                    <div class="mt-1 text-3xl font-semibold text-dark">{{ $usersCount }}</div>
                 </div>
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="text-sm font-medium text-gray-500">{{ __('Organizations') }}</div>
-                    <div class="mt-1 text-3xl font-semibold text-gray-900">{{ $organizationsCount }}</div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border-b-4 border-gold">
+                    <div class="text-sm font-medium text-warm-gray"><i class="fas fa-building mr-1"></i> Организации</div>
+                    <div class="mt-1 text-3xl font-semibold text-dark">{{ $organizationsCount }}</div>
                 </div>
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="text-sm font-medium text-gray-500">{{ __('Contests') }}</div>
-                    <div class="mt-1 text-3xl font-semibold text-gray-900">{{ $contestsCount }}</div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border-b-4 border-gold">
+                    <div class="text-sm font-medium text-warm-gray"><i class="fas fa-trophy mr-1"></i> Конкурсы</div>
+                    <div class="mt-1 text-3xl font-semibold text-dark">{{ $contestsCount }}</div>
                 </div>
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="text-sm font-medium text-gray-500">{{ __('Applications') }}</div>
-                    <div class="mt-1 text-3xl font-semibold text-gray-900">{{ $applicationsCount }}</div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border-b-4 border-gold">
+                    <div class="text-sm font-medium text-warm-gray"><i class="fas fa-file-alt mr-1"></i> Заявки</div>
+                    <div class="mt-1 text-3xl font-semibold text-dark">{{ $applicationsCount }}</div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-medium mb-2">{{ __('System Administration') }}</h3>
-                    <p class="text-gray-600">
-                        {{ __('Full admin panel features (user management, org verification, contest oversight) coming in Stage 2 & 3.') }}
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gold/10">
+                <div class="p-6 text-dark">
+                    <h3 class="text-lg font-medium mb-2">Системное администрирование</h3>
+                    <p class="text-warm-gray">
+                        Управление пользователями, верификация организаций и контроль конкурсов появятся на следующих этапах разработки.
                     </p>
                 </div>
             </div>

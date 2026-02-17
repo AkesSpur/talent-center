@@ -86,6 +86,19 @@ A participant can create other participant accounts (e.g., parent creates childr
 - Policies for model-level authorization (`ContestPolicy`, `ApplicationPolicy`, etc.)
 - Gate checks in Blade: `@can`, `@role` directive (custom)
 
+### Language
+- **All user-facing text must be in Russian** — the platform targets Russian users
+- Blade view strings are hardcoded in Russian (no `__()` translation keys — Russian-only MVP)
+- Button labels, headings, placeholder text, flash messages, validation messages — all Russian
+- Exception: technical identifiers (route names, model names, class names) remain in English per Laravel convention
+- Users register with Russian names: фамилия (last_name), имя (first_name), отчество (patronymic)
+
+### Design System
+- **Fonts:** Playfair Display (serif, headings) + Inter (sans, body) via Google Fonts
+- **Icons:** Font Awesome 6.7.2 (CDN)
+- **Colors:** primary (#8B4513 brown), gold (#D4AF37), cream (#FAF8F5), dark (#2C2416), warm-gray (#9A8B7A)
+- **Custom CSS:** `.gradient-gold`, `.hover-lift`, `.pattern-bg`, `.text-shadow` in `resources/css/app.css`
+
 ### Views
 - Master layout: `layouts.app` (authenticated, role-aware nav)
 - Guest layout: `layouts.guest` (login, register)
