@@ -11,17 +11,15 @@
         </div>
     @endif
 
-    <div class="mt-4 flex items-center justify-between">
+    <div class="mt-6 space-y-4">
         <form method="POST" action="{{ route('verification.send') }}">
             @csrf
-            <div>
-                <x-primary-button>
-                    Отправить письмо повторно
-                </x-primary-button>
-            </div>
+            <x-primary-button class="w-full justify-center">
+                Отправить письмо повторно
+            </x-primary-button>
         </form>
 
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('logout') }}" class="text-center">
             @csrf
             <button type="submit" class="underline text-sm text-warm-gray hover:text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 Выйти

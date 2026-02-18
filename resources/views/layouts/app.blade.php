@@ -24,7 +24,7 @@
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-cream-dark shadow-sm border-b border-gold/20">
+                <header class=''>
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>

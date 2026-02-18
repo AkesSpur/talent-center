@@ -13,112 +13,80 @@
                 </div>
             </a>
 
-            <!-- Desktop Nav Links -->
-            <div class="hidden sm:flex sm:items-center sm:space-x-6">
-                @if(auth()->user()->isAdmin())
-                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                        <i class="fas fa-tachometer-alt mr-1.5"></i> Панель администратора
-                    </x-nav-link>
-                @elseif(auth()->user()->isSupport())
-                    <x-nav-link :href="route('support.dashboard')" :active="request()->routeIs('support.dashboard')">
-                        <i class="fas fa-headset mr-1.5"></i> Панель поддержки
-                    </x-nav-link>
-                @else
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        <i class="fas fa-home mr-1.5"></i> Личный кабинет
-                    </x-nav-link>
-                @endif
-            </div>
+            <!-- Right Side: User Dropdown (all screens) -->
+            <x-dropdown align="right" width="72">
+                <x-slot name="trigger">
+                    <button class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
+                        <div class="w-8 h-8 gradient-gold rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-xs"></i>
+                        </div>
+                        <span class="hidden sm:inline">{{ Auth::user()->email }}</span>
+                        <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
+                    </button>
+                </x-slot>
 
-            <!-- Right Side: Role Badge + User Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:space-x-4">
-                <!-- Role Badge -->
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                    @if(auth()->user()->isAdmin()) gradient-gold text-dark
-                    @elseif(auth()->user()->isSupport()) bg-primary/10 text-primary
-                    @else bg-cream-dark text-warm-gray border border-gold/20
-                    @endif">
-                    {{ auth()->user()->role->label() }}
-                </span>
+                <x-slot name="content">
+                    <!-- Personal section -->
+                    <x-dropdown-link :href="route('profile.edit')">
+                        <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Мой профиль
+                    </x-dropdown-link>
+                    <x-dropdown-link href="#">
+                        <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Мои заявки
+                    </x-dropdown-link>
+                    <x-dropdown-link href="#">
+                        <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои награды
+                    </x-dropdown-link>
+                    <x-dropdown-link href="#">
+                        <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Мои участники
+                    </x-dropdown-link>
 
-                <!-- User Dropdown -->
-                <x-dropdown align="right" width="56">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
-                            <div class="w-7 h-7 gradient-gold rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-white text-xs"></i>
-                            </div>
-                            <span>{{ Auth::user()->first_name }}</span>
-                            <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            <i class="fas fa-user-circle mr-2 text-warm-gray"></i> Мой профиль
+                    <!-- Organizer section -->
+                    <div class="border-t border-gold/10 mt-1 pt-1">
+                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор</div>
+                        <x-dropdown-link :href="route('dashboard')">
+                            <i class="fas fa-th-large mr-2 text-warm-gray w-5 text-center"></i> Личный кабинет
                         </x-dropdown-link>
+                        <x-dropdown-link href="#">
+                            <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои конкурсы
+                        </x-dropdown-link>
+                        <x-dropdown-link href="#">
+                            <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Управление организацией
+                        </x-dropdown-link>
+                    </div>
 
+                    <!-- Admin section -->
+                    @if(auth()->user()->isAdmin())
+                        <div class="border-t border-gold/10 mt-1 pt-1">
+                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Администрирование</div>
+                            <x-dropdown-link :href="route('admin.dashboard')">
+                                <i class="fas fa-cog mr-2 text-warm-gray w-5 text-center"></i> Админ-панель
+                            </x-dropdown-link>
+                        </div>
+                    @endif
+
+                    <!-- Support section -->
+                    @if(auth()->user()->isSupport())
+                        <div class="border-t border-gold/10 mt-1 pt-1">
+                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Поддержка</div>
+                            <x-dropdown-link :href="route('support.dashboard')">
+                                <i class="fas fa-headset mr-2 text-warm-gray w-5 text-center"></i> Панель поддержки
+                            </x-dropdown-link>
+                        </div>
+                    @endif
+
+                    <!-- Logout -->
+                    <div class="border-t border-gold/10 mt-1 pt-1">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault(); this.closest('form').submit();"
                                     class="text-red-600 hover:bg-red-50">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Выйти
+                                <i class="fas fa-sign-out-alt mr-2 w-5 text-center"></i> Выйти
                             </x-dropdown-link>
                         </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <!-- Mobile Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = !open" class="inline-flex items-center justify-center p-2 rounded-md text-warm-gray hover:text-primary hover:bg-cream-dark focus:outline-none transition duration-150">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': !open}" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': !open, 'inline-flex': open}" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div :class="{'block': open, 'hidden': !open}" class="hidden sm:hidden bg-cream-dark border-t border-gold/20">
-        <div class="pt-2 pb-3 space-y-1">
-            @if(auth()->user()->isAdmin())
-                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                    <i class="fas fa-tachometer-alt mr-2"></i> Панель администратора
-                </x-responsive-nav-link>
-            @elseif(auth()->user()->isSupport())
-                <x-responsive-nav-link :href="route('support.dashboard')" :active="request()->routeIs('support.dashboard')">
-                    <i class="fas fa-headset mr-2"></i> Панель поддержки
-                </x-responsive-nav-link>
-            @else
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    <i class="fas fa-home mr-2"></i> Личный кабинет
-                </x-responsive-nav-link>
-            @endif
-        </div>
-
-        <div class="pt-4 pb-1 border-t border-gold/20">
-            <div class="px-4 mb-3">
-                <div class="font-medium text-base text-dark">{{ Auth::user()->full_name }}</div>
-                <div class="font-medium text-sm text-warm-gray">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-1 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    <i class="fas fa-user-circle mr-2"></i> Мой профиль
-                </x-responsive-nav-link>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault(); this.closest('form').submit();">
-                        <i class="fas fa-sign-out-alt mr-2 text-red-500"></i> Выйти
-                    </x-responsive-nav-link>
-                </form>
-            </div>
+                    </div>
+                </x-slot>
+            </x-dropdown>
         </div>
     </div>
 </nav>

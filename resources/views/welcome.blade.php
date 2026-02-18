@@ -36,13 +36,83 @@
                 </a>
 
                 <!-- Auth buttons -->
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-4" x-data="{ open: false }">
                     @auth
-                        <span class="text-sm text-warm-gray hidden sm:inline">{{ auth()->user()->first_name }}</span>
-                        <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : (auth()->user()->isSupport() ? route('support.dashboard') : route('dashboard')) }}"
-                           class="px-5 py-2 gradient-gold text-dark font-semibold rounded-lg text-sm hover:opacity-90 transition">
-                            Личный кабинет
-                        </a>
+                        <!-- User Dropdown -->
+                        <div class="relative">
+                            <button @click="open = !open" class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
+                                <div class="w-8 h-8 gradient-gold rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white text-xs"></i>
+                                </div>
+                                <span class="hidden sm:inline">{{ Auth::user()->email }}</span>
+                                <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
+                            </button>
+
+                            <div x-show="open" @click.outside="open = false"
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 class="absolute right-0 z-50 mt-2 w-72 rounded-md shadow-lg origin-top-right"
+                                 style="display: none;">
+                                <div class="rounded-md ring-1 ring-gold/20 py-1 bg-white">
+                                    <a href="{{ route('profile.edit') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                        <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Мой профиль
+                                    </a>
+                                    <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                        <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Мои заявки
+                                    </a>
+                                    <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                        <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои награды
+                                    </a>
+                                    <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                        <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Мои участники
+                                    </a>
+
+                                    <div class="border-t border-gold/10 mt-1 pt-1">
+                                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор</div>
+                                        <a href="{{ route('dashboard') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                            <i class="fas fa-th-large mr-2 text-warm-gray w-5 text-center"></i> Личный кабинет
+                                        </a>
+                                        <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                            <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои конкурсы
+                                        </a>
+                                        <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                            <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Управление организацией
+                                        </a>
+                                    </div>
+
+                                    @if(auth()->user()->isAdmin())
+                                        <div class="border-t border-gold/10 mt-1 pt-1">
+                                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Администрирование</div>
+                                            <a href="{{ route('admin.dashboard') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                                <i class="fas fa-cog mr-2 text-warm-gray w-5 text-center"></i> Админ-панель
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    @if(auth()->user()->isSupport())
+                                        <div class="border-t border-gold/10 mt-1 pt-1">
+                                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Поддержка</div>
+                                            <a href="{{ route('support.dashboard') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                                <i class="fas fa-headset mr-2 text-warm-gray w-5 text-center"></i> Панель поддержки
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    <div class="border-t border-gold/10 mt-1 pt-1">
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="block w-full px-4 py-2 text-start text-sm leading-5 text-red-600 hover:bg-red-50 transition duration-150 whitespace-nowrap">
+                                                <i class="fas fa-sign-out-alt mr-2 w-5 text-center"></i> Выйти
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     @else
                         @if (Route::has('login'))
                             <a href="{{ route('login') }}" class="px-4 py-2 text-primary hover:text-primary-dark font-medium text-sm transition">
@@ -50,7 +120,7 @@
                             </a>
                         @endif
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="px-6 py-2 gradient-gold text-dark font-semibold rounded-lg text-sm hover:opacity-90 transition">
+                            <a href="{{ route('register') }}" class="hidden sm:inline-block px-6 py-2 gradient-gold text-dark font-semibold rounded-lg text-sm hover:opacity-90 transition">
                                 Регистрация
                             </a>
                         @endif

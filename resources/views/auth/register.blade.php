@@ -46,14 +46,16 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
+        <div class="mt-6">
+            <x-primary-button class="w-full justify-center">
+                Зарегистрироваться
+            </x-primary-button>
+        </div>
+
+        <div class="mt-4 text-center">
             <a class="underline text-sm text-warm-gray hover:text-primary rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" href="{{ route('login') }}">
                 Уже зарегистрированы?
             </a>
-
-            <x-primary-button class="ms-4">
-                Зарегистрироваться
-            </x-primary-button>
         </div>
     </form>
 </x-guest-layout>
