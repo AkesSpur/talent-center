@@ -94,16 +94,16 @@
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label for="last_name" class="block text-sm font-medium text-dark mb-2">Фамилия</label>
-                                        <input id="last_name" name="last_name" type="text" value="{{ old('last_name', $user->last_name) }}" required
-                                            class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
-                                        <x-input-error class="mt-2" :messages="$errors->get('last_name')" />
-                                    </div>
-                                    <div>
                                         <label for="first_name" class="block text-sm font-medium text-dark mb-2">Имя</label>
                                         <input id="first_name" name="first_name" type="text" value="{{ old('first_name', $user->first_name) }}" required
                                             class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                                         <x-input-error class="mt-2" :messages="$errors->get('first_name')" />
+                                    </div>
+                                    <div>
+                                        <label for="last_name" class="block text-sm font-medium text-dark mb-2">Фамилия</label>
+                                        <input id="last_name" name="last_name" type="text" value="{{ old('last_name', $user->last_name) }}" required
+                                            class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                                        <x-input-error class="mt-2" :messages="$errors->get('last_name')" />
                                     </div>
                                 </div>
 
@@ -120,6 +120,35 @@
                                             class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                                         <x-input-error class="mt-2" :messages="$errors->get('phone')" />
                                     </div>
+                                </div>
+
+                                <div>
+                                    <label for="bio" class="block text-sm font-medium text-dark mb-2">Биография</label>
+                                    <textarea id="bio" name="bio" rows="3" placeholder="Расскажите о себе, своих увлечениях..."
+                                        class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none">{{ old('bio', $user->bio) }}</textarea>
+                                    <x-input-error class="mt-2" :messages="$errors->get('bio')" />
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="city" class="block text-sm font-medium text-dark mb-2">Город</label>
+                                        <input id="city" name="city" type="text" value="{{ old('city', $user->city) }}"
+                                            class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                                        <x-input-error class="mt-2" :messages="$errors->get('city')" />
+                                    </div>
+                                    <div>
+                                        <label for="country" class="block text-sm font-medium text-dark mb-2">Страна</label>
+                                        <input id="country" name="country" type="text" value="{{ old('country', $user->country) }}"
+                                            class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                                        <x-input-error class="mt-2" :messages="$errors->get('country')" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="education" class="block text-sm font-medium text-dark mb-2">Образование</label>
+                                    <input id="education" name="education" type="text" value="{{ old('education', $user->education) }}" placeholder="Учебное заведение, специальность..."
+                                        class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                                    <x-input-error class="mt-2" :messages="$errors->get('education')" />
                                 </div>
 
                                 <div>

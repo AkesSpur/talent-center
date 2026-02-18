@@ -10,13 +10,22 @@ use Illuminate\Http\Request;
 
 class ParticipantController extends Controller
 {
-    public function store(Request $request): RedirectResponse
+    private function validationRules(): array
     {
-        $validated = $request->validate([
+        return [
             'last_name' => ['required', 'string', 'max:100'],
             'first_name' => ['required', 'string', 'max:100'],
             'patronymic' => ['nullable', 'string', 'max:100'],
-        ]);
+            'birth_date' => ['nullable', 'date'],
+            'organization' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:255'],
+            'group' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate($this->validationRules());
 
         $parent = $request->user();
 
@@ -24,7 +33,11 @@ class ParticipantController extends Controller
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'patronymic' => $validated['patronymic'] ?? null,
-            'email' => $this->generateChildEmail($parent, $validated['first_name'], $validated['last_name']),
+            'birth_date' => $validated['birth_date'] ?? null,
+            'organization' => $validated['organization'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'group' => $validated['group'] ?? null,
+            'email' => 'child.' . $parent->id . '.' . time() . '.' . mt_rand(100, 999) . '@talentcenter.local',
             'password' => bcrypt(str()->random(32)),
             'role' => 'participant',
             'parent_id' => $parent->id,
@@ -41,11 +54,7 @@ class ParticipantController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
-            'last_name' => ['required', 'string', 'max:100'],
-            'first_name' => ['required', 'string', 'max:100'],
-            'patronymic' => ['nullable', 'string', 'max:100'],
-        ]);
+        $validated = $request->validate($this->validationRules());
 
         $participant->update($validated);
 
@@ -65,10 +74,5 @@ class ParticipantController extends Controller
         return redirect()->route('profile.edit')
             ->with('status', 'participant-deleted')
             ->with('active_tab', 'participants');
-    }
-
-    private function generateChildEmail(User $parent, string $firstName, string $lastName): string
-    {
-        return 'child.' . $parent->id . '.' . time() . '.' . mt_rand(100, 999) . '@talentcenter.local';
     }
 }

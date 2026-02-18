@@ -14,8 +14,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
-// class User extends Authenticatable implements MustVerifyEmail
+// class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -34,6 +34,13 @@ class User extends Authenticatable
         'patronymic',
         'email',
         'phone',
+        'bio',
+        'city',
+        'country',
+        'education',
+        'birth_date',
+        'organization',
+        'group',
         'password',
         'role',
         'parent_id',
@@ -56,6 +63,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'birth_date' => 'date',
             'password' => 'hashed',
             'role' => UserRole::class,
             'email_notifications' => 'boolean',
