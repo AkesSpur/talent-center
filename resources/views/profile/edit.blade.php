@@ -56,7 +56,7 @@
                 </div>
 
                 {{-- Right Column: Tabs + Content --}}
-                <div class="lg:col-span-2 space-y-8" x-data="{ tab: '{{ $errors->updatePassword->any() ? 'password' : 'profile' }}' }">
+                <div class="lg:col-span-2 space-y-8" x-data="{ tab: '{{ session('active_tab') ?: ($errors->updatePassword->any() ? 'password' : 'profile') }}' }">
 
                     {{-- Tabs --}}
                     <div class="border-b border-primary/20">

@@ -5,38 +5,37 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ParticipantController extends Controller
 {
-    public function store(Request $request): JsonResponse
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'last_name' => ['required', 'string', 'max:100'],
             'first_name' => ['required', 'string', 'max:100'],
             'patronymic' => ['nullable', 'string', 'max:100'],
-            'birth_date' => ['nullable', 'date'],
-            'organization' => ['nullable', 'string', 'max:255'],
-            'city' => ['nullable', 'string', 'max:255'],
-            'group' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $child = User::create([
+        $parent = $request->user();
+
+        User::create([
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'patronymic' => $validated['patronymic'] ?? null,
-            'email' => $this->generateChildEmail($request->user(), $validated['first_name'], $validated['last_name']),
+            'email' => $this->generateChildEmail($parent, $validated['first_name'], $validated['last_name']),
             'password' => bcrypt(str()->random(32)),
             'role' => 'participant',
-            'parent_id' => $request->user()->id,
+            'parent_id' => $parent->id,
         ]);
 
-        return response()->json(['success' => true, 'participant' => $child], 201);
+        return redirect()->route('profile.edit')
+            ->with('status', 'participant-added')
+            ->with('active_tab', 'participants');
     }
 
-    public function update(Request $request, User $participant): JsonResponse
+    public function update(Request $request, User $participant): RedirectResponse
     {
         if ($participant->parent_id !== $request->user()->id) {
             abort(403);
@@ -50,10 +49,12 @@ class ParticipantController extends Controller
 
         $participant->update($validated);
 
-        return response()->json(['success' => true, 'participant' => $participant->fresh()]);
+        return redirect()->route('profile.edit')
+            ->with('status', 'participant-updated')
+            ->with('active_tab', 'participants');
     }
 
-    public function destroy(Request $request, User $participant): JsonResponse
+    public function destroy(Request $request, User $participant): RedirectResponse
     {
         if ($participant->parent_id !== $request->user()->id) {
             abort(403);
@@ -61,17 +62,13 @@ class ParticipantController extends Controller
 
         $participant->delete();
 
-        return response()->json(['success' => true]);
+        return redirect()->route('profile.edit')
+            ->with('status', 'participant-deleted')
+            ->with('active_tab', 'participants');
     }
 
     private function generateChildEmail(User $parent, string $firstName, string $lastName): string
     {
-        $base = strtolower(transliterator_transliterate(
-            'Any-Latin; Latin-ASCII',
-            $firstName . '.' . $lastName
-        ) ?: $firstName . '.' . $lastName);
-        $base = preg_replace('/[^a-z0-9.]/', '', $base);
-
-        return $base . '.child' . $parent->id . '.' . time() . '@talentcenter.local';
+        return 'child.' . $parent->id . '.' . time() . '.' . mt_rand(100, 999) . '@talentcenter.local';
     }
 }
