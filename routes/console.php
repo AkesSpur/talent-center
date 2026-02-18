@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+
+Schedule::command('queue:work --sleep=3 --timeout=280 --max-time=280')
+    ->everyMinute()
+    ->withoutOverlapping(5) // Lock expires after 5 mins to prevent stuck locks
+    ->runInBackground()
+    ->appendOutputTo(storage_path('logs/queue-work.log'));
