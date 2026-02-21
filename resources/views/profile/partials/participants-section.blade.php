@@ -11,18 +11,6 @@
             </button>
         </div>
 
-        {{-- Success Messages --}}
-        @if(in_array(session('status'), ['participant-added', 'participant-updated', 'participant-deleted']))
-            <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 mb-4">
-                <i class="fas fa-check-circle mr-2"></i>
-                @if(session('status') === 'participant-added') Участник успешно добавлен
-                @elseif(session('status') === 'participant-updated') Данные участника обновлены
-                @else Участник удалён
-                @endif
-            </div>
-        @endif
-
         {{-- Participants List --}}
         @if($participants->count() > 0)
             <div class="space-y-3">

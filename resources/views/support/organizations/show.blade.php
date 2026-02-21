@@ -43,17 +43,6 @@
     <div class="py-8">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            @if(session('status'))
-                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                    class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    @switch(session('status'))
-                        @case('organization-verified') Организация верифицирована @break
-                        @default Изменения сохранены
-                    @endswitch
-                </div>
-            @endif
-
             @if($organization->isBlocked())
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                     <i class="fas fa-ban mr-2"></i>Эта организация заблокирована администратором. Создание конкурсов и приём заявок недоступны.

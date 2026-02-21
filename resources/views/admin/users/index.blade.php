@@ -123,13 +123,6 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            @if(session('status') === 'user-created')
-                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                    class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 mb-6">
-                    <i class="fas fa-check-circle mr-2"></i>Пользователь успешно создан
-                </div>
-            @endif
-
             <div class="bg-white rounded-xl shadow-lg p-6">
 
                 {{-- Search & Filter --}}

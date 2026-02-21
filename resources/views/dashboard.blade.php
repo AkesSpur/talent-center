@@ -7,8 +7,6 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <x-flash-message />
-
             <!-- Приветствие -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gold/10">
                 <div class="p-4 sm:p-6 flex items-center gap-3 sm:gap-4">

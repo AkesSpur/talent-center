@@ -6,7 +6,11 @@
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2 mb-1">
                         <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark break-words">{{ $organization->name }}</h2>
-                        @if($organization->isVerified())
+                        @if($organization->isBlocked())
+                            <span class="text-xs bg-red-100 text-red-700 px-2.5 py-1 rounded-full font-medium shrink-0">
+                                <i class="fas fa-ban mr-1"></i>Заблокирована
+                            </span>
+                        @elseif($organization->isVerified())
                             <span class="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium shrink-0">
                                 <i class="fas fa-check-circle mr-1"></i>Верифицирована
                             </span>
@@ -34,20 +38,6 @@
 
     <div class="py-8">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-
-            @if(session('status') === 'organization-updated')
-                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                    class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 mb-6">
-                    <i class="fas fa-check-circle mr-2"></i>Данные организации обновлены
-                </div>
-            @endif
-
-            @if(session('status') === 'representative-added')
-                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                    class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 mb-6">
-                    <i class="fas fa-check-circle mr-2"></i>Представитель добавлен
-                </div>
-            @endif
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {{-- Left: Org Info --}}
@@ -149,7 +139,9 @@
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between">
                                 <span class="text-warm-gray">Статус:</span>
-                                @if($organization->isVerified())
+                                @if($organization->isBlocked())
+                                    <span class="text-red-600 font-medium">Заблокирована</span>
+                                @elseif($organization->isVerified())
                                     <span class="text-green-600 font-medium">Верифицирована</span>
                                 @else
                                     <span class="text-yellow-600 font-medium">Ожидает проверки</span>
@@ -192,7 +184,12 @@
                         </div>
                     </div>
 
-                    @if(!$organization->isVerified())
+                    @if($organization->isBlocked())
+                        <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+                            <i class="fas fa-ban mr-2"></i>
+                            Организация заблокирована администратором. Создание конкурсов и приём заявок недоступны.
+                        </div>
+                    @elseif(!$organization->isVerified())
                         <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-700">
                             <i class="fas fa-info-circle mr-2"></i>
                             Организация ожидает верификации администратором. После подтверждения вы сможете создавать конкурсы.

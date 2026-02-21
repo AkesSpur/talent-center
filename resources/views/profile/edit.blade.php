@@ -220,14 +220,6 @@
                                     @endif
                                 </div>
 
-                                {{-- Success/Error Messages --}}
-                                @if (session('status') === 'profile-updated')
-                                    <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                                        class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
-                                        <i class="fas fa-check-circle mr-2"></i>Профиль успешно обновлён
-                                    </div>
-                                @endif
-
                                 <div class="flex gap-4">
                                     <button type="submit"
                                         class="px-6 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
@@ -276,13 +268,6 @@
                                     </div>
                                 </div>
 
-                                @if (session('status') === 'password-updated')
-                                    <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                                        class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
-                                        <i class="fas fa-check-circle mr-2"></i>Пароль успешно изменён
-                                    </div>
-                                @endif
-
                                 <div>
                                     <button type="submit"
                                         class="px-6 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
@@ -292,7 +277,8 @@
                             </form>
                         </div>
 
-                        {{-- Delete Account --}}
+                        {{-- Delete Account (participants only) --}}
+                        @if(auth()->user()->isParticipant())
                         <div class="bg-white rounded-xl shadow-lg p-6 border border-red-100">
                             <h3 class="font-serif text-xl font-semibold text-dark mb-2">Удаление аккаунта</h3>
                             <p class="text-warm-gray text-sm mb-6">После удаления аккаунта все данные будут безвозвратно удалены. Перед удалением сохраните все важные данные.</p>
@@ -331,6 +317,7 @@
                                 </form>
                             </x-modal>
                         </div>
+                        @endif
                     </div>
                 </div>
             </div>

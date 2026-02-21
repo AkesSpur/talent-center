@@ -27,17 +27,12 @@
         confirmText="{{ $user->is_blocked ? 'Разблокировать' : 'Заблокировать' }}"
         confirmClass="{{ $user->is_blocked ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-red-600 text-white hover:bg-red-700' }}"
         method="PUT"
-    />
+    >
+        <input type="hidden" name="is_blocked" value="{{ $user->is_blocked ? '0' : '1' }}">
+    </x-confirm-modal>
 
     <div class="py-8">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-
-            @if(session('status') === 'user-updated')
-                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                    class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
-                    <i class="fas fa-check-circle mr-2"></i>Данные пользователя обновлены
-                </div>
-            @endif
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-6">
@@ -160,7 +155,6 @@
                     {{-- Block/Unblock --}}
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <h3 class="font-semibold text-dark mb-4">Действия</h3>
-                        <input type="hidden" form="block-user-form" name="is_blocked" value="{{ $user->is_blocked ? '0' : '1' }}">
                         <button type="button"
                             @click="$dispatch('confirm-toggle-block-user', { action: '{{ route('support.users.update', $user) }}' })"
                             class="w-full py-2.5 {{ $user->is_blocked ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700' }} text-white font-medium rounded-lg transition-colors text-sm">

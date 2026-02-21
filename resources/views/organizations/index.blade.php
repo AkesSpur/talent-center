@@ -14,18 +14,11 @@
     <div class="py-8">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            @if(session('status') === 'organization-created')
-                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                    class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 mb-6">
-                    <i class="fas fa-check-circle mr-2"></i>Организация успешно создана
-                </div>
-            @endif
-
             @if($organizations->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @foreach($organizations as $organization)
                         <a href="{{ route('organizations.show', $organization) }}"
-                            class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-gold/10 block">
+                            class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-gold/10 block {{ $organization->isBlocked() ? 'opacity-60' : '' }}">
                             <div class="flex items-start justify-between mb-4">
                                 <div class="flex items-center space-x-3 min-w-0">
                                     <x-org-avatar :organization="$organization" size="sm" />
@@ -34,12 +27,16 @@
                                         <p class="text-warm-gray text-sm">ИНН: {{ $organization->inn }}</p>
                                     </div>
                                 </div>
-                                @if($organization->isVerified())
-                                    <span class="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium">
+                                @if($organization->isBlocked())
+                                    <span class="text-xs bg-red-100 text-red-700 px-2.5 py-1 rounded-full font-medium shrink-0">
+                                        <i class="fas fa-ban mr-1"></i>Заблокирована
+                                    </span>
+                                @elseif($organization->isVerified())
+                                    <span class="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium shrink-0">
                                         <i class="fas fa-check-circle mr-1"></i>Верифицирована
                                     </span>
                                 @else
-                                    <span class="text-xs bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-full font-medium">
+                                    <span class="text-xs bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-full font-medium shrink-0">
                                         <i class="fas fa-clock mr-1"></i>На проверке
                                     </span>
                                 @endif

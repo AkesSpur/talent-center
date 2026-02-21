@@ -14,19 +14,6 @@
     <div class="py-8">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            {{-- Flash Messages --}}
-            @if(session('status'))
-                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                    class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    @switch(session('status'))
-                        @case('representative-added') Представитель добавлен @break
-                        @case('representative-updated') Права представителя обновлены @break
-                        @case('representative-removed') Представитель удалён @break
-                    @endswitch
-                </div>
-            @endif
-
             @if($errors->any())
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                     <i class="fas fa-exclamation-circle mr-2"></i>

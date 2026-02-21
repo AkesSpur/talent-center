@@ -19,15 +19,25 @@
         </div>
     </x-slot>
 
+    {{-- Confirm Block/Unblock Modal --}}
+    <x-confirm-modal
+        name="toggle-block-user"
+        title="{{ $user->is_blocked ? 'Разблокировать пользователя' : 'Заблокировать пользователя' }}"
+        message="{{ $user->is_blocked
+            ? 'Вы уверены, что хотите разблокировать пользователя «' . $user->full_name . '»? Пользователь снова сможет входить в систему.'
+            : 'Вы уверены, что хотите заблокировать пользователя «' . $user->full_name . '»? Пользователь не сможет войти в систему.' }}"
+        icon="{{ $user->is_blocked ? 'fa-unlock' : 'fa-ban' }}"
+        iconColor="{{ $user->is_blocked ? 'text-green-600' : 'text-red-600' }}"
+        iconBg="{{ $user->is_blocked ? 'bg-green-100' : 'bg-red-100' }}"
+        confirmText="{{ $user->is_blocked ? 'Разблокировать' : 'Заблокировать' }}"
+        confirmClass="{{ $user->is_blocked ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-red-600 text-white hover:bg-red-700' }}"
+        method="PUT"
+    >
+        <input type="hidden" name="is_blocked" value="{{ $user->is_blocked ? '0' : '1' }}">
+    </x-confirm-modal>
+
     <div class="py-8">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-
-            @if(session('status') === 'user-updated')
-                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                    class="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
-                    <i class="fas fa-check-circle mr-2"></i>Данные пользователя обновлены
-                </div>
-            @endif
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {{-- Left: User Info --}}
@@ -89,9 +99,16 @@
                             <h3 class="font-serif text-xl font-semibold text-dark mb-4">Организации</h3>
                             <div class="space-y-3">
                                 @foreach($user->organizations as $org)
-                                    <div class="flex items-center justify-between p-3 border border-primary/10 rounded-lg">
+                                    <div class="flex items-center justify-between p-3 border border-primary/10 rounded-lg {{ $org->isBlocked() ? 'opacity-60' : '' }}">
                                         <div>
-                                            <a href="{{ route('admin.organizations.show', $org) }}" class="font-medium text-primary hover:underline">{{ $org->name }}</a>
+                                            <div class="flex items-center gap-2">
+                                                <a href="{{ route('admin.organizations.show', $org) }}" class="font-medium text-primary hover:underline">{{ $org->name }}</a>
+                                                @if($org->isBlocked())
+                                                    <span class="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
+                                                        <i class="fas fa-ban mr-0.5"></i>Заблокирована
+                                                    </span>
+                                                @endif
+                                            </div>
                                             <p class="text-xs text-warm-gray">ИНН: {{ $org->inn }}</p>
                                         </div>
                                         <div class="flex gap-1.5">
@@ -173,7 +190,7 @@
                     </div>
 
                     {{-- Quick Actions --}}
-                    <div class="bg-white rounded-xl shadow-lg p-6 space-y-4">
+                    <div x-data class="bg-white rounded-xl shadow-lg p-6 space-y-4">
                         <h3 class="font-semibold text-dark mb-2">Быстрые действия</h3>
 
                         {{-- Change Role --}}
@@ -194,21 +211,15 @@
                         </form>
 
                         {{-- Block/Unblock --}}
-                        <form method="POST" action="{{ route('admin.users.update', $user) }}"
-                            onsubmit="return confirm('{{ $user->is_blocked ? 'Разблокировать' : 'Заблокировать' }} пользователя {{ addslashes($user->full_name) }}?')">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="is_blocked" value="{{ $user->is_blocked ? '0' : '1' }}">
+                        <button type="button"
+                            @click="$dispatch('confirm-toggle-block-user', { action: '{{ route('admin.users.update', $user) }}' })"
+                            class="w-full py-2.5 {{ $user->is_blocked ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700' }} text-white font-medium rounded-lg transition-colors text-sm">
                             @if($user->is_blocked)
-                                <button type="submit" class="w-full py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors text-sm">
-                                    <i class="fas fa-unlock mr-2"></i>Разблокировать
-                                </button>
+                                <i class="fas fa-unlock mr-2"></i>Разблокировать
                             @else
-                                <button type="submit" class="w-full py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors text-sm">
-                                    <i class="fas fa-ban mr-2"></i>Заблокировать
-                                </button>
+                                <i class="fas fa-ban mr-2"></i>Заблокировать
                             @endif
-                        </form>
+                        </button>
                     </div>
                 </div>
             </div>

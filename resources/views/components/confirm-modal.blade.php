@@ -60,6 +60,8 @@
                     class="px-5 py-2.5 text-warm-gray hover:text-dark border border-primary/20 rounded-lg text-sm transition-colors font-medium">
                     {{ $cancelText }}
                 </button>
+                {{ $slot }}
+
                 <button type="submit"
                     class="px-5 py-2.5 {{ $confirmClass }} font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm">
                     {{ $confirmText }}

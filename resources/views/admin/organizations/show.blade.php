@@ -62,23 +62,6 @@
     <div class="py-8">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-            @if(session('status'))
-                <div x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
-                    class="{{ in_array(session('status'), ['organization-blocked']) ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700' }} border rounded-lg p-4">
-                    <i class="fas {{ in_array(session('status'), ['organization-blocked']) ? 'fa-ban' : 'fa-check-circle' }} mr-2"></i>
-                    @switch(session('status'))
-                        @case('organization-verified') Организация верифицирована @break
-                        @case('organization-updated') Данные организации обновлены @break
-                        @case('organization-blocked') Организация заблокирована @break
-                        @case('organization-unblocked') Организация разблокирована @break
-                        @case('representative-added') Представитель добавлен @break
-                        @case('representative-updated') Права представителя обновлены @break
-                        @case('representative-removed') Представитель удалён @break
-                        @default Изменения сохранены
-                    @endswitch
-                </div>
-            @endif
-
             @if($errors->any())
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
                     <i class="fas fa-exclamation-circle mr-2"></i>{{ $errors->first() }}
