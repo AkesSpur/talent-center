@@ -23,27 +23,27 @@
     <!-- ========== HEADER ========== -->
     <header class="bg-cream shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
+            <div class="flex justify-between items-center h-16 sm:h-20">
                 <!-- Logo -->
-                <a href="/" class="flex items-center space-x-3">
-                    <div class="w-12 h-12 gradient-gold rounded-full flex items-center justify-center shadow-sm">
-                        <i class="fas fa-award text-white text-xl"></i>
+                <a href="/" class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 gradient-gold rounded-full flex items-center justify-center shadow-sm flex-shrink-0">
+                        <i class="fas fa-award text-white text-lg sm:text-xl"></i>
                     </div>
-                    <div>
-                        <h1 class="font-serif text-xl font-bold text-primary">Талант-центр</h1>
-                        <p class="text-xs text-warm-gray">Всероссийский центр талантов</p>
+                    <div class="min-w-0">
+                        <h1 class="font-serif text-lg sm:text-xl font-bold text-primary truncate">Талант-центр</h1>
+                        <p class="text-xs text-warm-gray hidden sm:block">Всероссийский центр талантов</p>
                     </div>
                 </a>
 
                 <!-- Auth buttons -->
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="px-4 py-2 text-primary hover:text-primary-dark font-medium text-sm transition">
-                            <i class="fas fa-th-large mr-1"></i> Личный кабинет
+                        <a href="{{ route('dashboard') }}" class="px-3 sm:px-4 py-2 text-primary hover:text-primary-dark font-medium text-sm transition">
+                            <i class="fas fa-th-large sm:mr-1"></i> <span class="hidden sm:inline">Личный кабинет</span>
                         </a>
                     @else
                         @if (Route::has('login'))
-                            <a href="{{ route('login') }}" class="px-4 py-2 text-primary hover:text-primary-dark font-medium text-sm transition">
+                            <a href="{{ route('login') }}" class="px-3 sm:px-4 py-2 text-primary hover:text-primary-dark font-medium text-sm transition">
                                 Войти
                             </a>
                         @endif
@@ -59,21 +59,21 @@
     </header>
 
     <!-- ========== HERO ========== -->
-    <section class="pattern-bg py-16 sm:py-20 px-4">
+    <section class="pattern-bg py-10 sm:py-16 md:py-20 px-4">
         <div class="max-w-4xl mx-auto text-center">
-            <a href="{{ route('home') }}" class="inline-flex items-center text-sm text-warm-gray hover:text-primary transition-colors mb-6">
+            <a href="{{ route('home') }}" class="inline-flex items-center text-sm text-warm-gray hover:text-primary transition-colors mb-4 sm:mb-6">
                 <i class="fas fa-arrow-left mr-2"></i> Вернуться на главную
             </a>
 
-            <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-6">
+            <h2 class="font-serif text-2xl sm:text-4xl md:text-5xl font-bold text-dark mb-4 sm:mb-6">
                 План развития
             </h2>
 
-            <p class="text-lg text-warm-gray max-w-2xl mx-auto mb-4">
+            <p class="text-base sm:text-lg text-warm-gray max-w-2xl mx-auto mb-4">
                 Платформа «Талант-центр» создаётся в 4 этапа. Здесь вы можете отслеживать прогресс разработки и ознакомиться с подробным отчётом по каждому завершённому этапу.
             </p>
 
-            <div class="inline-flex items-center px-4 py-2 rounded-full bg-gold/10 border border-gold/30 text-sm text-primary font-medium">
+            <div class="inline-flex items-center px-3 sm:px-4 py-2 rounded-full bg-gold/10 border border-gold/30 text-xs sm:text-sm text-primary font-medium">
                 <i class="fas fa-ruble-sign mr-2 text-gold"></i>
                 Общий бюджет: 120 000 ₽
             </div>
