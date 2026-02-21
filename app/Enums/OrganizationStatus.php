@@ -12,8 +12,8 @@ enum OrganizationStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Pending => 'Under Review',
-            self::Verified => 'Verified',
+            self::Pending => 'На проверке',
+            self::Verified => 'Верифицирована',
         };
     }
 }

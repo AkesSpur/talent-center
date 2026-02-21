@@ -104,6 +104,7 @@ A participant can create other participant accounts (e.g., parent creates childr
 - Guest layout: `layouts.guest` (login, register)
 - Use Blade components for reusable UI (`<x-flash-message>`, `<x-nav-sidebar>`)
 - All templates must be responsive (mobile-first via Tailwind)
+- use asset() to display images
 
 ### API / Routes
 - No API for MVP — all server-rendered Blade

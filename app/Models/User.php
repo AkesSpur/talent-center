@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 // class User extends Authenticatable
 class User extends Authenticatable implements MustVerifyEmail
@@ -46,6 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'parent_id',
         'email_notifications',
         'is_blocked',
+        'avatar_path',
     ];
 
     /**
@@ -81,6 +83,20 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return implode(' ', $parts);
+    }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (!$this->avatar_path) {
+            return null;
+        }
+
+        return asset('storage/' . $this->avatar_path);
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        return mb_substr($this->first_name, 0, 1) . mb_substr($this->last_name, 0, 1);
     }
 
     // ── Role Helpers ───────────────────────────────────

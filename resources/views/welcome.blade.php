@@ -41,9 +41,7 @@
                         <!-- User Dropdown -->
                         <div class="relative">
                             <button @click="open = !open" class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
-                                <div class="w-8 h-8 gradient-gold rounded-full flex items-center justify-center">
-                                    <i class="fas fa-user text-white text-xs"></i>
-                                </div>
+                                <x-user-avatar :user="Auth::user()" size="sm" />
                                 <span class="hidden sm:inline">{{ Auth::user()->email }}</span>
                                 <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
                             </button>
@@ -67,7 +65,7 @@
                                     <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
                                         <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои награды
                                     </a>
-                                    <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
+                                    <a href="{{ route('participants.index') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
                                         <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Мои участники
                                     </a>
 

@@ -1,12 +1,12 @@
 <div x-data="participantsManager()" class="space-y-6">
     {{-- Header --}}
     <div class="bg-white rounded-xl shadow-lg p-6">
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <div>
-                <h3 class="font-serif text-xl font-semibold text-dark">Мои участники</h3>
+                <h3 class="font-serif text-lg font-semibold text-dark">Мои участники</h3>
                 <p class="text-warm-gray text-sm mt-1">Управление детьми и подопечными для участия в конкурсах</p>
             </div>
-            <button @click="openAddModal()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+            <button @click="openAddModal()" class="self-start sm:self-auto px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors whitespace-nowrap">
                 <i class="fas fa-plus mr-2"></i>Добавить
             </button>
         </div>

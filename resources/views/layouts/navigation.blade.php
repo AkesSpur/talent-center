@@ -17,9 +17,7 @@
             <x-dropdown align="right" width="72">
                 <x-slot name="trigger">
                     <button class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
-                        <div class="w-8 h-8 gradient-gold rounded-full flex items-center justify-center">
-                            <i class="fas fa-user text-white text-xs"></i>
-                        </div>
+                        <x-user-avatar :user="Auth::user()" size="sm" />
                         <span class="hidden sm:inline">{{ Auth::user()->email }}</span>
                         <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
                     </button>
@@ -36,7 +34,7 @@
                     <x-dropdown-link href="#">
                         <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои награды
                     </x-dropdown-link>
-                    <x-dropdown-link href="#">
+                    <x-dropdown-link :href="route('participants.index')">
                         <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Мои участники
                     </x-dropdown-link>
 
@@ -49,7 +47,7 @@
                         <x-dropdown-link href="#">
                             <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои конкурсы
                         </x-dropdown-link>
-                        <x-dropdown-link href="#">
+                        <x-dropdown-link :href="route('organizations.index')">
                             <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Управление организацией
                         </x-dropdown-link>
                     </div>

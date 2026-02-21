@@ -7,9 +7,26 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ParticipantController extends Controller
 {
+    public function index(Request $request): View
+    {
+        $children = $request->user()->children()->orderBy('last_name')->get();
+
+        return view('participants.index', compact('children'));
+    }
+
+    public function edit(Request $request, User $participant): View
+    {
+        if ($participant->parent_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        return view('participants.edit', compact('participant'));
+    }
+
     private function validationRules(): array
     {
         return [
@@ -43,9 +60,8 @@ class ParticipantController extends Controller
             'parent_id' => $parent->id,
         ]);
 
-        return redirect()->route('profile.edit')
-            ->with('status', 'participant-added')
-            ->with('active_tab', 'participants');
+        return redirect()->route('participants.index')
+            ->with('status', 'participant-added');
     }
 
     public function update(Request $request, User $participant): RedirectResponse
@@ -58,9 +74,8 @@ class ParticipantController extends Controller
 
         $participant->update($validated);
 
-        return redirect()->route('profile.edit')
-            ->with('status', 'participant-updated')
-            ->with('active_tab', 'participants');
+        return redirect()->route('participants.index')
+            ->with('status', 'participant-updated');
     }
 
     public function destroy(Request $request, User $participant): RedirectResponse
@@ -71,8 +86,7 @@ class ParticipantController extends Controller
 
         $participant->delete();
 
-        return redirect()->route('profile.edit')
-            ->with('status', 'participant-deleted')
-            ->with('active_tab', 'participants');
+        return redirect()->route('participants.index')
+            ->with('status', 'participant-deleted');
     }
 }

@@ -17,15 +17,19 @@ class Organization extends Model
 
     protected $fillable = [
         'name',
+        'avatar_path',
         'description',
         'inn',
+        'ogrn',
         'legal_address',
+        'website',
         'contact_email',
         'contact_phone',
         'status',
         'created_by',
         'verified_by',
         'verified_at',
+        'is_blocked',
     ];
 
     protected function casts(): array
@@ -33,7 +37,25 @@ class Organization extends Model
         return [
             'status' => OrganizationStatus::class,
             'verified_at' => 'datetime',
+            'is_blocked' => 'boolean',
         ];
+    }
+
+    // ── Accessors ──────────────────────────────────────
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        return $this->avatar_path ? asset('storage/' . $this->avatar_path) : null;
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        $words = explode(' ', trim($this->name));
+        if (count($words) >= 2) {
+            return mb_strtoupper(mb_substr($words[0], 0, 1) . mb_substr($words[1], 0, 1));
+        }
+
+        return mb_strtoupper(mb_substr($this->name, 0, 2));
     }
 
     // ── Helpers ────────────────────────────────────────
@@ -46,6 +68,11 @@ class Organization extends Model
     public function isPending(): bool
     {
         return $this->status === OrganizationStatus::Pending;
+    }
+
+    public function isBlocked(): bool
+    {
+        return $this->is_blocked;
     }
 
     // ── Relationships ──────────────────────────────────

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <h2 class="font-serif text-3xl font-bold text-dark">Мой профиль</h2>
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark">Мой профиль</h2>
             <p class="text-warm-gray mt-1">Управление личными данными и участниками</p>
         </div>
     </x-slot>
@@ -13,12 +13,58 @@
                 {{-- Left Column: Profile Card + Stats --}}
                 <div class="lg:col-span-1">
                     {{-- Profile Card --}}
-                    <div class="bg-white rounded-xl shadow-lg p-6 text-center mb-6">
-                        <div class="relative inline-block mb-4">
-                            <div class="w-32 h-32 gradient-gold rounded-full flex items-center justify-center mx-auto border-4 border-white shadow-lg">
-                                <i class="fas fa-user text-4xl text-white"></i>
+                    <div class="bg-white rounded-xl shadow-lg p-6 text-center mb-6" x-data="avatarUploader()">
+                        {{-- Avatar Upload Loading Overlay --}}
+                        <div x-show="loading" x-cloak class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                            <div class="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4">
+                                <div class="relative w-16 h-16">
+                                    <svg class="animate-spin w-16 h-16" viewBox="0 0 64 64" fill="none">
+                                        <circle cx="32" cy="32" r="28" stroke="#FAF0E6" stroke-width="6"/>
+                                        <path d="M32 4 a28 28 0 0 1 28 28" stroke="#8B4513" stroke-width="6" stroke-linecap="round"/>
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <i class="fas fa-camera text-primary text-xl"></i>
+                                    </div>
+                                </div>
+                                <p class="text-dark font-medium text-sm" x-text="loadingText"></p>
                             </div>
                         </div>
+
+                        <div class="relative inline-block mb-4">
+                            {{-- Avatar circle --}}
+                            <div class="w-32 h-32 rounded-full mx-auto border-4 border-white shadow-lg overflow-hidden">
+                                <x-user-avatar :user="$user" size="2xl" class="w-full h-full" />
+                            </div>
+
+                            {{-- Camera button - always visible --}}
+                            <label for="avatar-file-input"
+                                class="absolute bottom-0 right-0 w-9 h-9 bg-primary hover:bg-primary/90 text-white rounded-full flex items-center justify-center cursor-pointer shadow-lg transition-colors border-2 border-white"
+                                title="Загрузить фото">
+                                <i class="fas fa-camera text-sm"></i>
+                            </label>
+
+                            {{-- Hidden file input --}}
+                            <form id="avatar-form" method="POST" action="{{ route('profile.avatar.update') }}" enctype="multipart/form-data">
+                                @csrf
+                                <input id="avatar-file-input" type="file" name="avatar" accept="image/*" class="hidden"
+                                    @change="submitAvatar()">
+                            </form>
+
+                            {{-- Delete button if avatar exists --}}
+                            @if($user->avatar_path)
+                                <form method="POST" action="{{ route('profile.avatar.delete') }}" id="avatar-delete-form"
+                                    @submit.prevent="deleteAvatar()">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="absolute top-0 right-0 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow text-xs transition-colors border-2 border-white" title="Удалить фото">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                        @error('avatar')
+                            <p class="text-red-600 text-xs mb-2">{{ $message }}</p>
+                        @enderror
                         <h2 class="font-serif text-xl font-semibold text-dark mb-1">{{ $user->full_name }}</h2>
                         <p class="text-warm-gray text-sm mb-4">
                             @if($user->isAdmin()) Администратор
@@ -290,4 +336,26 @@
             </div>
         </div>
     </div>
+
+<script>
+function avatarUploader() {
+    return {
+        loading: false,
+        loadingText: 'Загрузка фото...',
+        submitAvatar() {
+            const form = document.getElementById('avatar-form');
+            const input = document.getElementById('avatar-file-input');
+            if (!input.files || !input.files[0]) return;
+            this.loadingText = 'Загрузка фото...';
+            this.loading = true;
+            form.submit();
+        },
+        deleteAvatar() {
+            this.loadingText = 'Удаление фото...';
+            this.loading = true;
+            document.getElementById('avatar-delete-form').submit();
+        }
+    }
+}
+</script>
 </x-app-layout>
