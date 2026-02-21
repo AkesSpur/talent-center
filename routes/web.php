@@ -22,6 +22,18 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::get('/development-plan', function () {
+    return view('development-plan.index');
+})->name('development-plan');
+
+Route::get('/development-plan/{stage}', function (string $stage) {
+    $allowed = ['stage-1', 'stage-2', 'stage-3', 'stage-4'];
+    if (!in_array($stage, $allowed, true)) {
+        abort(404);
+    }
+    return view("development-plan.{$stage}");
+})->name('development-plan.stage');
+
 // ── Authenticated (any role) ────────────────────────────
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -95,6 +107,7 @@ Route::middleware(['auth', 'verified', 'role:support'])->prefix('support')->name
     Route::get('/organizations', [SupportOrganizationController::class, 'index'])->name('organizations.index');
     Route::get('/organizations/{organization}', [SupportOrganizationController::class, 'show'])->name('organizations.show');
     Route::post('/organizations/{organization}/verify', [SupportOrganizationController::class, 'verify'])->name('organizations.verify');
+    Route::delete('/organizations/{organization}/representatives/{user}', [SupportOrganizationController::class, 'removeRepresentative'])->name('organizations.representatives.destroy');
 });
 
 // ── Auth routes (Breeze) ────────────────────────────────

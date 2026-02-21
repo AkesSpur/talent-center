@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Support;
 use App\Enums\OrganizationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
+use App\Models\User;
 use App\Services\ActionLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,6 +44,23 @@ class OrganizationController extends Controller
         $organization->load(['representatives', 'createdBy', 'verifiedBy']);
 
         return view('support.organizations.show', compact('organization'));
+    }
+
+    public function removeRepresentative(Organization $organization, User $user): RedirectResponse
+    {
+        if ($organization->created_by === $user->id) {
+            return back()->with('error', 'Нельзя удалить создателя организации из представителей.');
+        }
+
+        $organization->representatives()->detach($user->id);
+
+        ActionLogService::log('representative.removed', $organization, [
+            'user_id' => $user->id,
+            'user_name' => $user->full_name,
+            'removed_by' => 'support',
+        ]);
+
+        return back()->with('status', 'representative-removed');
     }
 
     public function verify(Request $request, Organization $organization): RedirectResponse

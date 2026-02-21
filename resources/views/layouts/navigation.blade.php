@@ -59,6 +59,12 @@
                             <x-dropdown-link :href="route('admin.dashboard')">
                                 <i class="fas fa-cog mr-2 text-warm-gray w-5 text-center"></i> Админ-панель
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.users.index')">
+                                <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Пользователи
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.organizations.index')">
+                                <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Организации
+                            </x-dropdown-link>
                         </div>
                     @endif
 
@@ -68,6 +74,12 @@
                             <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Поддержка</div>
                             <x-dropdown-link :href="route('support.dashboard')">
                                 <i class="fas fa-headset mr-2 text-warm-gray w-5 text-center"></i> Панель поддержки
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('support.users.index')">
+                                <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Пользователи
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('support.organizations.index')">
+                                <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Организации
                             </x-dropdown-link>
                         </div>
                     @endif

@@ -12,6 +12,7 @@ use App\Services\ActionLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class OrganizationController extends Controller
@@ -165,19 +166,23 @@ class OrganizationController extends Controller
 
     public function addRepresentative(Request $request, Organization $organization): RedirectResponse
     {
-        $validated = $request->validate([
-            'email' => ['required', 'email', 'exists:users,email'],
-            'can_create' => ['boolean'],
-            'can_manage' => ['boolean'],
-            'can_evaluate' => ['boolean'],
-        ], [
-            'email.exists' => 'Пользователь с таким email не найден в системе.',
-        ]);
+        try {
+            $validated = $request->validate([
+                'email' => ['required', 'email', 'exists:users,email'],
+                'can_create' => ['boolean'],
+                'can_manage' => ['boolean'],
+                'can_evaluate' => ['boolean'],
+            ], [
+                'email.exists' => 'Пользователь с таким email не найден в системе.',
+            ]);
+        } catch (ValidationException $e) {
+            return back()->withInput()->with('error', $e->validator->errors()->first());
+        }
 
         $newRep = User::where('email', $validated['email'])->first();
 
         if ($organization->representatives()->where('user_id', $newRep->id)->exists()) {
-            return back()->withErrors(['email' => 'Этот пользователь уже является представителем организации.']);
+            return back()->withInput()->with('error', 'Этот пользователь уже является представителем организации.');
         }
 
         $organization->representatives()->attach($newRep->id, [
@@ -223,7 +228,7 @@ class OrganizationController extends Controller
     public function removeRepresentative(Request $request, Organization $organization, User $user): RedirectResponse
     {
         if ($organization->created_by === $user->id) {
-            return back()->withErrors(['general' => 'Нельзя удалить создателя организации из представителей.']);
+            return back()->with('error', 'Нельзя удалить создателя организации из представителей.');
         }
 
         $organization->representatives()->detach($user->id);

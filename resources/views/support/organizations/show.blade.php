@@ -40,7 +40,20 @@
         confirmText="Верифицировать"
     />
 
-    <div class="py-8">
+    {{-- Confirm Remove Representative Modal --}}
+    <x-confirm-modal
+        name="delete-rep"
+        title="Удалить представителя"
+        message="Вы уверены, что хотите удалить этого представителя из организации?"
+        icon="fa-user-minus"
+        iconColor="text-red-600"
+        iconBg="bg-red-100"
+        confirmText="Удалить"
+        confirmClass="bg-red-600 text-white hover:bg-red-700"
+        method="DELETE"
+    />
+
+    <div x-data class="py-8">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @if($organization->isBlocked())
@@ -101,10 +114,21 @@
                                 <div class="p-3 rounded-lg hover:bg-cream/50">
                                     <div class="flex items-center gap-3 mb-1.5">
                                         <x-user-avatar :user="$rep" size="sm" />
-                                        <div class="min-w-0">
+                                        <div class="min-w-0 flex-1">
                                             <a href="{{ route('support.users.show', $rep) }}" class="font-medium text-primary hover:underline text-sm truncate block">{{ $rep->full_name }}</a>
                                             <p class="text-xs text-warm-gray truncate">{{ $rep->email }}</p>
                                         </div>
+                                        @if($organization->created_by !== $rep->id)
+                                            <button type="button"
+                                                @click="$dispatch('confirm-delete-rep', { action: '{{ route('support.organizations.representatives.destroy', [$organization, $rep]) }}' })"
+                                                class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0" title="Удалить">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        @else
+                                            <span class="p-1.5 shrink-0" title="Создатель организации">
+                                                <i class="fas fa-crown text-gold text-sm"></i>
+                                            </span>
+                                        @endif
                                     </div>
                                     @if($rep->pivot->can_create || $rep->pivot->can_manage || $rep->pivot->can_evaluate)
                                         <div class="flex flex-wrap gap-1.5 pl-9">

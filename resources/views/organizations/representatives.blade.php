@@ -11,15 +11,21 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    {{-- Confirm Remove Representative Modal --}}
+    <x-confirm-modal
+        name="delete-rep"
+        title="Удалить представителя"
+        message="Вы уверены, что хотите удалить этого представителя из организации?"
+        icon="fa-user-minus"
+        iconColor="text-red-600"
+        iconBg="bg-red-100"
+        confirmText="Удалить"
+        confirmClass="bg-red-600 text-white hover:bg-red-700"
+        method="DELETE"
+    />
 
-            @if($errors->any())
-                <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
-                    {{ $errors->first() }}
-                </div>
-            @endif
+    <div x-data class="py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             {{-- Add Representative --}}
             <div class="bg-white rounded-xl shadow-lg p-6">
@@ -78,14 +84,11 @@
                                 </div>
                                 {{-- Crown or delete --}}
                                 @if($organization->created_by !== $rep->id)
-                                    <form method="POST" action="{{ route('organizations.representatives.destroy', [$organization, $rep]) }}"
-                                        onsubmit="return confirm('Удалить {{ addslashes($rep->full_name) }} из представителей?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0" title="Удалить">
-                                            <i class="fas fa-trash text-sm"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button"
+                                        @click="$dispatch('confirm-delete-rep', { action: '{{ route('organizations.representatives.destroy', [$organization, $rep]) }}' })"
+                                        class="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0" title="Удалить">
+                                        <i class="fas fa-trash text-sm"></i>
+                                    </button>
                                 @else
                                     <span class="p-2 shrink-0" title="Создатель организации не может быть удалён">
                                         <i class="fas fa-crown text-gold"></i>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Талант-центр — Этап 1</title>
+    <title>Этап 1 — Инфраструктура и база данных — {{ config('app.name', 'Талант-центр') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +24,6 @@
     <header class="bg-cream shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
                 <a href="/" class="flex items-center space-x-3">
                     <div class="w-12 h-12 gradient-gold rounded-full flex items-center justify-center shadow-sm">
                         <i class="fas fa-award text-white text-xl"></i>
@@ -35,82 +34,11 @@
                     </div>
                 </a>
 
-                <!-- Auth buttons -->
-                <div class="flex items-center space-x-4" x-data="{ open: false }">
+                <div class="flex items-center space-x-4">
                     @auth
-                        <!-- User Dropdown -->
-                        <div class="relative">
-                            <button @click="open = !open" class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
-                                <x-user-avatar :user="Auth::user()" size="sm" />
-                                <span class="hidden sm:inline">{{ Auth::user()->email }}</span>
-                                <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
-                            </button>
-
-                            <div x-show="open" @click.outside="open = false"
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0 scale-95"
-                                 x-transition:enter-end="opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-75"
-                                 x-transition:leave-start="opacity-100 scale-100"
-                                 x-transition:leave-end="opacity-0 scale-95"
-                                 class="absolute right-0 z-50 mt-2 w-72 rounded-md shadow-lg origin-top-right"
-                                 style="display: none;">
-                                <div class="rounded-md ring-1 ring-gold/20 py-1 bg-white">
-                                    <a href="{{ route('profile.edit') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                        <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Мой профиль
-                                    </a>
-                                    <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                        <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Мои заявки
-                                    </a>
-                                    <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                        <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои награды
-                                    </a>
-                                    <a href="{{ route('participants.index') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                        <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Мои участники
-                                    </a>
-
-                                    <div class="border-t border-gold/10 mt-1 pt-1">
-                                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор</div>
-                                        <a href="{{ route('dashboard') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                            <i class="fas fa-th-large mr-2 text-warm-gray w-5 text-center"></i> Личный кабинет
-                                        </a>
-                                        <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                            <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои конкурсы
-                                        </a>
-                                        <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                            <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Управление организацией
-                                        </a>
-                                    </div>
-
-                                    @if(auth()->user()->isAdmin())
-                                        <div class="border-t border-gold/10 mt-1 pt-1">
-                                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Администрирование</div>
-                                            <a href="{{ route('admin.dashboard') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                                <i class="fas fa-cog mr-2 text-warm-gray w-5 text-center"></i> Админ-панель
-                                            </a>
-                                        </div>
-                                    @endif
-
-                                    @if(auth()->user()->isSupport())
-                                        <div class="border-t border-gold/10 mt-1 pt-1">
-                                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Поддержка</div>
-                                            <a href="{{ route('support.dashboard') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                                <i class="fas fa-headset mr-2 text-warm-gray w-5 text-center"></i> Панель поддержки
-                                            </a>
-                                        </div>
-                                    @endif
-
-                                    <div class="border-t border-gold/10 mt-1 pt-1">
-                                        <form method="POST" action="{{ route('logout') }}">
-                                            @csrf
-                                            <button type="submit" class="block w-full px-4 py-2 text-start text-sm leading-5 text-red-600 hover:bg-red-50 transition duration-150 whitespace-nowrap">
-                                                <i class="fas fa-sign-out-alt mr-2 w-5 text-center"></i> Выйти
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <a href="{{ route('dashboard') }}" class="px-4 py-2 text-primary hover:text-primary-dark font-medium text-sm transition">
+                            <i class="fas fa-th-large mr-1"></i> Личный кабинет
+                        </a>
                     @else
                         @if (Route::has('login'))
                             <a href="{{ route('login') }}" class="px-4 py-2 text-primary hover:text-primary-dark font-medium text-sm transition">
@@ -128,16 +56,20 @@
         </div>
     </header>
 
-    <!-- ========== HERO ========== -->
+    <!-- ========== BREADCRUMB & HERO ========== -->
     <section class="pattern-bg py-16 sm:py-24 px-4">
         <div class="max-w-4xl mx-auto text-center">
-            <div class="inline-flex items-center px-4 py-2 rounded-full bg-gold/10 border border-gold/30 text-sm text-primary font-medium mb-6">
-                <i class="fas fa-check-circle mr-2 text-gold"></i>
+            <a href="{{ route('development-plan') }}" class="inline-flex items-center text-sm text-warm-gray hover:text-primary transition-colors mb-6">
+                <i class="fas fa-arrow-left mr-2"></i> Вернуться к плану развития
+            </a>
+
+            <div class="inline-flex items-center px-4 py-2 rounded-full bg-green-50 border border-green-200 text-sm text-green-700 font-medium mb-6">
+                <i class="fas fa-check-circle mr-2"></i>
                 Этап 1 завершён
             </div>
 
             <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-6">
-                Фундамент платформы готов
+                Инфраструктура и база данных
             </h2>
 
             <p class="text-lg text-warm-gray max-w-2xl mx-auto mb-12">
@@ -175,7 +107,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Card: База данных -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gold/10 hover-lift">
                     <div class="w-12 h-12 gradient-gold rounded-lg flex items-center justify-center mb-4">
                         <i class="fas fa-database text-white text-lg"></i>
@@ -186,7 +117,6 @@
                     </p>
                 </div>
 
-                <!-- Card: Авторизация -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gold/10 hover-lift">
                     <div class="w-12 h-12 gradient-gold rounded-lg flex items-center justify-center mb-4">
                         <i class="fas fa-lock text-white text-lg"></i>
@@ -197,7 +127,6 @@
                     </p>
                 </div>
 
-                <!-- Card: Роли -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gold/10 hover-lift">
                     <div class="w-12 h-12 gradient-gold rounded-lg flex items-center justify-center mb-4">
                         <i class="fas fa-users-cog text-white text-lg"></i>
@@ -208,7 +137,6 @@
                     </p>
                 </div>
 
-                <!-- Card: Организации -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gold/10 hover-lift">
                     <div class="w-12 h-12 gradient-gold rounded-lg flex items-center justify-center mb-4">
                         <i class="fas fa-building text-white text-lg"></i>
@@ -219,7 +147,6 @@
                     </p>
                 </div>
 
-                <!-- Card: Безопасность -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gold/10 hover-lift">
                     <div class="w-12 h-12 gradient-gold rounded-lg flex items-center justify-center mb-4">
                         <i class="fas fa-shield-alt text-white text-lg"></i>
@@ -230,7 +157,6 @@
                     </p>
                 </div>
 
-                <!-- Card: Инфраструктура -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gold/10 hover-lift">
                     <div class="w-12 h-12 gradient-gold rounded-lg flex items-center justify-center mb-4">
                         <i class="fas fa-cogs text-white text-lg"></i>
@@ -316,7 +242,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Admin -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gold/10 hover-lift">
                     <div class="w-14 h-14 gradient-gold rounded-full flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-crown text-white text-xl"></i>
@@ -330,7 +255,6 @@
                     </ul>
                 </div>
 
-                <!-- Support -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gold/10 hover-lift">
                     <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4 mx-auto">
                         <i class="fas fa-headset text-primary text-xl"></i>
@@ -344,7 +268,6 @@
                     </ul>
                 </div>
 
-                <!-- Participant -->
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gold/10 hover-lift">
                     <div class="w-14 h-14 bg-cream-dark rounded-full flex items-center justify-center mb-4 mx-auto border border-gold/20">
                         <i class="fas fa-user text-warm-gray text-xl"></i>
@@ -361,28 +284,86 @@
         </div>
     </section>
 
-    <!-- ========== WHATS NEXT ========== -->
-    <section class="py-16 sm:py-20 px-4 bg-cream-dark pattern-bg">
-        <div class="max-w-4xl mx-auto text-center">
-            <h3 class="font-serif text-2xl sm:text-3xl font-bold text-dark mb-4">Что дальше</h3>
-            <p class="text-warm-gray max-w-2xl mx-auto mb-10">
-                Впереди ещё три этапа. Следующий шаг — полноценные панели управления, работа с организациями и управление участниками.
-            </p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-gold/10">
-                    <div class="text-2xl font-bold text-gold mb-2">Этап 2</div>
-                    <p class="text-sm text-warm-gray">Панели управления, профили, организации</p>
-                </div>
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-gold/10">
-                    <div class="text-2xl font-bold text-gold mb-2">Этап 3</div>
-                    <p class="text-sm text-warm-gray">Конкурсы и подача заявок</p>
-                </div>
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-gold/10">
-                    <div class="text-2xl font-bold text-gold mb-2">Этап 4</div>
-                    <p class="text-sm text-warm-gray">Оценка, дипломы и уведомления</p>
-                </div>
+    <!-- ========== CHECKLIST ========== -->
+    <section class="py-16 sm:py-20 px-4 bg-cream-dark">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <h3 class="font-serif text-2xl sm:text-3xl font-bold text-dark mb-4">Чек-лист выполнения</h3>
+                <p class="text-warm-gray max-w-xl mx-auto">Полный список задач первого этапа с отметками о выполнении.</p>
             </div>
+
+            <div class="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-gold/10">
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">Laravel 12 проект инициализирован с MySQL</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">10 миграций базы данных</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">7 Eloquent-моделей с полными отношениями и кастами</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">5 PHP-перечислений (UserRole, OrganizationStatus, ContestStatus, ApplicationStatus, FileType)</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">3 кастомных middleware (CheckRole, CheckOrgPermission, EnsureOrgVerified)</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">4 политики авторизации (User, Organization, Contest, Application)</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">Авторизация через Breeze: регистрация с ФИО, вход, подтверждение email, сброс пароля</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">Редактирование профиля (имя, фамилия, отчество, телефон, email)</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">3 панели управления (админ, поддержка, участник)</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">Навигация с учётом ролей и цветными бейджами</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">Компонент flash-сообщений</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">ActionLogService — сервис логирования действий</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">Сидеры тестовых данных (AdminSeeder + TestDataSeeder)</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <span class="text-sm text-dark">Связь хранилища (storage:link)</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NAVIGATION ========== -->
+    <section class="py-12 px-4">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <a href="{{ route('development-plan') }}" class="inline-flex items-center text-sm text-warm-gray hover:text-primary transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> План развития
+            </a>
+            <a href="{{ route('development-plan.stage', 'stage-2') }}" class="inline-flex items-center px-6 py-3 gradient-gold text-dark font-semibold rounded-lg text-sm hover:opacity-90 transition">
+                Этап 2: Панели и организации <i class="fas fa-arrow-right ml-2"></i>
+            </a>
         </div>
     </section>
 
@@ -390,7 +371,6 @@
     <footer class="bg-dark text-cream py-12 px-4">
         <div class="max-w-6xl mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <!-- Logo & Description -->
                 <div class="md:col-span-1">
                     <div class="flex items-center space-x-3 mb-4">
                         <div class="w-10 h-10 gradient-gold rounded-full flex items-center justify-center">
@@ -405,17 +385,15 @@
                     </p>
                 </div>
 
-                <!-- Разделы -->
                 <div>
                     <h5 class="font-serif font-semibold text-gold mb-4">Разделы</h5>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="/" class="text-warm-gray hover:text-gold transition-colors">Главная</a></li>
+                        <li><a href="{{ route('home') }}" class="text-warm-gray hover:text-gold transition-colors">Главная</a></li>
                         <li><a href="#" class="text-warm-gray hover:text-gold transition-colors">Конкурсы</a></li>
                         <li><a href="{{ route('development-plan') }}" class="text-warm-gray hover:text-gold transition-colors">План развития</a></li>
                     </ul>
                 </div>
 
-                <!-- Организаторам -->
                 <div>
                     <h5 class="font-serif font-semibold text-gold mb-4">Организаторам</h5>
                     <ul class="space-y-2 text-sm">
@@ -425,7 +403,6 @@
                     </ul>
                 </div>
 
-                <!-- Контакты -->
                 <div>
                     <h5 class="font-serif font-semibold text-gold mb-4">Контакты</h5>
                     <ul class="space-y-2 text-sm">
@@ -436,7 +413,6 @@
                 </div>
             </div>
 
-            <!-- Separator -->
             <div class="border-t border-warm-gray/30 pt-6">
                 <p class="text-warm-gray text-sm text-center">
                     &copy; {{ date('Y') }} Талант-центр. Все права защищены.

@@ -5,6 +5,11 @@
                 <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark">Мои участники</h2>
                 <p class="text-warm-gray mt-1">Управление участниками конкурсов</p>
             </div>
+            <a href="#add-participant-form"
+               onclick="event.preventDefault(); document.getElementById('add-participant-form').scrollIntoView({ behavior: 'smooth' })"
+               class="self-start sm:self-auto px-4 py-2 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm shrink-0">
+                <i class="fas fa-plus mr-2"></i>Добавить участника
+            </a>
         </div>
     </x-slot>
 
@@ -89,7 +94,7 @@
                 </div>
 
                 {{-- Add Participant Form --}}
-                <div class="lg:col-span-2">
+                <div id="add-participant-form" class="lg:col-span-2">
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <h3 class="font-serif text-lg font-semibold text-dark mb-5">
                             <i class="fas fa-user-plus text-primary mr-2"></i>Добавить участника
