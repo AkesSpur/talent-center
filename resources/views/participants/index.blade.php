@@ -13,8 +13,21 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    {{-- Confirm Delete Participant Modal --}}
+    <x-confirm-modal
+        name="delete-participant"
+        title="Удалить участника"
+        message="Вы уверены, что хотите удалить этого участника?"
+        icon="fa-user-minus"
+        iconColor="text-red-600"
+        iconBg="bg-red-100"
+        confirmText="Удалить"
+        confirmClass="bg-red-600 text-white hover:bg-red-700"
+        method="DELETE"
+    />
+
+    <div x-data class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -40,17 +53,12 @@
                                                 title="Редактировать">
                                                 <i class="fas fa-pen text-xs"></i>
                                             </a>
-                                            <form method="POST" action="{{ route('participants.destroy', $child) }}"
-                                                x-data
-                                                @submit.prevent="if(confirm('Удалить участника {{ addslashes($child->first_name) }}?')) $el.submit()">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                    class="w-8 h-8 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
-                                                    title="Удалить">
-                                                    <i class="fas fa-trash text-xs"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button"
+                                                @click="$dispatch('confirm-delete-participant', { action: '{{ route('participants.destroy', $child) }}' })"
+                                                class="w-8 h-8 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
+                                                title="Удалить">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="space-y-1.5 text-sm text-warm-gray">
