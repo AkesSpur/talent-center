@@ -208,7 +208,6 @@
                                 <span class="px-2 py-1 bg-cream-dark rounded-md text-warm-gray">Дипломы PDF</span>
                                 <span class="px-2 py-1 bg-cream-dark rounded-md text-warm-gray hidden sm:inline-block">Уведомления</span>
                                 <span class="px-2 py-1 bg-cream-dark rounded-md text-warm-gray hidden sm:inline-block">Тестирование</span>
-                                <span class="px-2 py-1 bg-cream-dark rounded-md text-warm-gray">30 000 ₽</span>
                             </div>
                         </a>
                     </div>
