@@ -76,10 +76,6 @@
                 Финальный этап: интерфейс жюри для оценки работ, автоматическая генерация PDF-дипломов, система email-уведомлений и полное тестирование платформы.
             </p>
 
-            <div class="inline-flex items-center px-4 py-2 rounded-full bg-gold/10 border border-gold/30 text-sm text-primary font-medium">
-                <i class="fas fa-ruble-sign mr-2 text-gold"></i>
-                Бюджет этапа: 30 000 ₽
-            </div>
         </div>
     </section>
 

@@ -76,10 +76,6 @@
                 Третий этап — полный цикл конкурсов: создание, публикация, подача заявок с загрузкой файлов и автоматический переход статусов. После этого этапа основной конкурсный процесс работает от начала до конца.
             </p>
 
-            <div class="inline-flex items-center px-4 py-2 rounded-full bg-gold/10 border border-gold/30 text-sm text-primary font-medium">
-                <i class="fas fa-ruble-sign mr-2 text-gold"></i>
-                Бюджет этапа: 30 000 ₽
-            </div>
         </div>
     </section>
 

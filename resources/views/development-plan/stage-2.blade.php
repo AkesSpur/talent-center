@@ -76,10 +76,6 @@
                 Второй этап включает создание полноценных панелей управления для каждой роли, систему управления участниками, полный CRUD организаций и процесс верификации.
             </p>
 
-            <div class="inline-flex items-center px-4 py-2 rounded-full bg-gold/10 border border-gold/30 text-sm text-primary font-medium">
-                <i class="fas fa-ruble-sign mr-2 text-gold"></i>
-                Бюджет этапа: 30 000 ₽
-            </div>
         </div>
     </section>
 
