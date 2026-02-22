@@ -28,7 +28,7 @@
                         <div>
                             <input type="file" name="avatar" accept="image/*"
                                 class="text-sm text-warm-gray file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
-                            <p class="text-xs text-warm-gray mt-1">JPEG, PNG, GIF, WebP. Макс. 4 МБ. Конвертируется в WebP.</p>
+                            <p class="text-xs text-warm-gray mt-1">JPG, PNG, GIF, WebP — до 4 МБ </p>
                             @error('avatar')
                                 <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                             @enderror
