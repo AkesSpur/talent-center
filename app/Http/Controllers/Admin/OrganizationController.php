@@ -9,14 +9,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use App\Models\User;
 use App\Services\ActionLogService;
+use App\Traits\HandlesImages;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class OrganizationController extends Controller
 {
+    use HandlesImages;
     public function index(Request $request): View
     {
         $query = Organization::with('createdBy');
@@ -107,13 +108,11 @@ class OrganizationController extends Controller
         $data = collect($validated)->except(['avatar', 'delete_avatar'])->toArray();
 
         if ($request->boolean('delete_avatar') && $organization->avatar_path) {
-            Storage::disk('public')->delete($organization->avatar_path);
+            $this->deleteStoredImage($organization->avatar_path);
             $data['avatar_path'] = null;
         } elseif ($request->hasFile('avatar')) {
-            if ($organization->avatar_path) {
-                Storage::disk('public')->delete($organization->avatar_path);
-            }
-            $data['avatar_path'] = $request->file('avatar')->store('organizations/avatars', 'public');
+            $this->deleteStoredImage($organization->avatar_path);
+            $data['avatar_path'] = $this->storeImageAsWebp($request->file('avatar'), 'organizations/avatars');
         }
 
         $changes = [];

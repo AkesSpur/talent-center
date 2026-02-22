@@ -8,13 +8,14 @@ use App\Http\Requests\StoreOrganizationRequest;
 use App\Http\Requests\UpdateOrganizationRequest;
 use App\Models\Organization;
 use App\Services\ActionLogService;
+use App\Traits\HandlesImages;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class OrganizationController extends Controller
 {
+    use HandlesImages;
     public function index(Request $request): View
     {
         $organizations = $request->user()->organizations()->latest()->get();
@@ -37,7 +38,7 @@ class OrganizationController extends Controller
         ]);
 
         if ($request->hasFile('avatar')) {
-            $data['avatar_path'] = $request->file('avatar')->store('organizations/avatars', 'public');
+            $data['avatar_path'] = $this->storeImageAsWebp($request->file('avatar'), 'organizations/avatars');
         }
 
         $org = Organization::create($data);
@@ -75,13 +76,11 @@ class OrganizationController extends Controller
         $data = $request->safe()->except(['avatar', 'delete_avatar']);
 
         if ($request->boolean('delete_avatar') && $organization->avatar_path) {
-            Storage::disk('public')->delete($organization->avatar_path);
+            $this->deleteStoredImage($organization->avatar_path);
             $data['avatar_path'] = null;
         } elseif ($request->hasFile('avatar')) {
-            if ($organization->avatar_path) {
-                Storage::disk('public')->delete($organization->avatar_path);
-            }
-            $data['avatar_path'] = $request->file('avatar')->store('organizations/avatars', 'public');
+            $this->deleteStoredImage($organization->avatar_path);
+            $data['avatar_path'] = $this->storeImageAsWebp($request->file('avatar'), 'organizations/avatars');
         }
 
         $organization->update($data);
