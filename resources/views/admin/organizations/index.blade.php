@@ -232,7 +232,10 @@
                                                 class="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/20 text-primary hover:bg-primary/5 transition-colors">
                                                 <i class="fas fa-pen text-xs"></i>
                                             </a>
-                                             
+                                            <a href="{{ route('admin.organizations.show', $org) }}" title="Просмотр"
+                                                class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                                                <i class="fas fa-eye text-xs"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
