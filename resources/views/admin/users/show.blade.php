@@ -99,31 +99,33 @@
                             <h3 class="font-serif text-xl font-semibold text-dark mb-4">Организации</h3>
                             <div class="space-y-3">
                                 @foreach($user->organizations as $org)
-                                    <div class="flex items-center justify-between p-3 border border-primary/10 rounded-lg {{ $org->isBlocked() ? 'opacity-60' : '' }}">
-                                        <div>
-                                            <div class="flex items-center gap-2">
-                                                <a href="{{ route('admin.organizations.show', $org) }}" class="font-medium text-primary hover:underline">{{ $org->name }}</a>
-                                                @if($org->isBlocked())
-                                                    <span class="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
-                                                        <i class="fas fa-ban mr-0.5"></i>Заблокирована
-                                                    </span>
-                                                @endif
+                                    <div class="p-3 border border-primary/10 rounded-lg {{ $org->isBlocked() ? 'opacity-60' : '' }}">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="min-w-0">
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <a href="{{ route('admin.organizations.show', $org) }}" class="font-medium text-primary hover:underline break-words">{{ $org->name }}</a>
+                                                    @if($org->isBlocked())
+                                                        <span class="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                                                            <i class="fas fa-ban mr-0.5"></i>Заблокирована
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <p class="text-xs text-warm-gray">ИНН: {{ $org->inn }}</p>
                                             </div>
-                                            <p class="text-xs text-warm-gray">ИНН: {{ $org->inn }}</p>
                                         </div>
-                                        <div class="flex gap-1.5">
+                                        <div class="flex flex-wrap gap-1.5 mt-2">
                                             @if($org->pivot->can_create)
-                                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full" title="Создание конкурсов">
+                                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full whitespace-nowrap" title="Создание конкурсов">
                                                     <i class="fas fa-plus-circle mr-0.5"></i> Создание
                                                 </span>
                                             @endif
                                             @if($org->pivot->can_manage)
-                                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full" title="Управление организацией">
+                                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full whitespace-nowrap" title="Управление организацией">
                                                     <i class="fas fa-cog mr-0.5"></i> Управление
                                                 </span>
                                             @endif
                                             @if($org->pivot->can_evaluate)
-                                                <span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full" title="Оценка заявок">
+                                                <span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full whitespace-nowrap" title="Оценка заявок">
                                                     <i class="fas fa-star mr-0.5"></i> Оценка
                                                 </span>
                                             @endif

@@ -66,12 +66,16 @@
                             <p class="text-red-600 text-xs mb-2">{{ $message }}</p>
                         @enderror
                         <h2 class="font-serif text-xl font-semibold text-dark mb-1">{{ $user->full_name }}</h2>
-                        <p class="text-warm-gray text-sm mb-4">
-                            @if($user->isAdmin()) Администратор
-                            @elseif($user->isSupport()) Поддержка
-                            @else Конкурсант
+                        <div class="text-warm-gray text-sm mb-4">
+                            @if($user->isAdmin())
+                                Администратор
+                            @elseif($user->isSupport())
+                                Поддержка
+                            @else
+                                <span class="block">Представитель участников</span>
+                                <span class="block text-xs">(родитель/воспитатель/педагог)</span>
                             @endif
-                        </p>
+                        </div>
                         <div class="flex justify-center space-x-2">
                             @if($user->hasVerifiedEmail())
                                 <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">

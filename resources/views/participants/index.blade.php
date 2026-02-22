@@ -5,11 +5,18 @@
                 <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark">Мои участники</h2>
                 <p class="text-warm-gray mt-1">Управление участниками конкурсов</p>
             </div>
-            <a href="#add-participant-form"
-               onclick="event.preventDefault(); document.getElementById('add-participant-form').scrollIntoView({ behavior: 'smooth' })"
-               class="self-start sm:self-auto px-4 py-2 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm shrink-0">
-                <i class="fas fa-plus mr-2"></i>Добавить участника
-            </a>
+            @if($children->count() > 0)
+                <button type="button" onclick="document.getElementById('add-participant-modal').showModal()"
+                   class="self-start sm:self-auto px-4 py-2 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm shrink-0">
+                    <i class="fas fa-plus mr-2"></i>Добавить участника
+                </button>
+            @else
+                <a href="#add-participant-form"
+                   onclick="event.preventDefault(); document.getElementById('add-participant-form').scrollIntoView({ behavior: 'smooth' })"
+                   class="self-start sm:self-auto px-4 py-2 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm shrink-0">
+                    <i class="fas fa-plus mr-2"></i>Добавить участника
+                </a>
+            @endif
         </div>
     </x-slot>
 
@@ -101,7 +108,8 @@
                     @endif
                 </div>
 
-                {{-- Add Participant Form --}}
+                {{-- Inline Add Participant Form (only when no participants yet) --}}
+                @if($children->count() === 0)
                 <div id="add-participant-form" class="lg:col-span-2">
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <h3 class="font-serif text-lg font-semibold text-dark mb-5">
@@ -173,8 +181,102 @@
                         </form>
                     </div>
                 </div>
+                @endif
 
             </div>
         </div>
     </div>
+
+    {{-- Add Participant Modal (when participants already exist) --}}
+    @if($children->count() > 0)
+    <dialog id="add-participant-modal" class="bg-transparent p-0 m-0 max-w-none w-full h-full max-h-none backdrop:bg-dark/40 backdrop:backdrop-blur-sm">
+        <div class="fixed inset-0 flex items-center justify-center p-4" onclick="if(event.target===this) document.getElementById('add-participant-modal').close()">
+            <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                {{-- Modal Header --}}
+                <div class="sticky top-0 bg-white border-b border-primary/10 px-6 py-4 flex items-center justify-between rounded-t-xl z-10">
+                    <h3 class="font-serif text-xl font-semibold text-dark">
+                        <i class="fas fa-user-plus text-primary mr-2"></i>Новый участник
+                    </h3>
+                    <button type="button" onclick="document.getElementById('add-participant-modal').close()" class="text-warm-gray hover:text-dark transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                {{-- Modal Form --}}
+                <form method="POST" action="{{ route('participants.store') }}" class="p-6 space-y-4">
+                    @csrf
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-1.5">Фамилия <span class="text-red-500">*</span></label>
+                            <input name="last_name" type="text" value="{{ old('last_name') }}" required
+                                class="w-full px-3 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                placeholder="Иванов" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-1.5">Имя <span class="text-red-500">*</span></label>
+                            <input name="first_name" type="text" value="{{ old('first_name') }}" required
+                                class="w-full px-3 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                placeholder="Иван" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-1.5">Отчество</label>
+                            <input name="patronymic" type="text" value="{{ old('patronymic') }}"
+                                class="w-full px-3 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                placeholder="Иванович" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-1.5">Дата рождения</label>
+                            <input name="birth_date" type="date" value="{{ old('birth_date') }}"
+                                class="w-full px-3 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-1.5">Город</label>
+                            <input name="city" type="text" value="{{ old('city') }}"
+                                class="w-full px-3 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                placeholder="Москва" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-1.5">Учреждение</label>
+                            <input name="organization" type="text" value="{{ old('organization') }}"
+                                class="w-full px-3 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                placeholder="ДШИ №1" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-1.5">Класс / группа</label>
+                            <input name="group" type="text" value="{{ old('group') }}"
+                                class="w-full px-3 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                placeholder="3А" />
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="document.getElementById('add-participant-modal').close()"
+                            class="flex-1 py-2.5 border border-primary text-primary font-medium rounded-lg hover:bg-primary/5 transition-colors">
+                            Отмена
+                        </button>
+                        <button type="submit"
+                            class="flex-1 py-2.5 gradient-gold text-dark font-medium rounded-lg hover:opacity-90 transition-opacity">
+                            <i class="fas fa-plus mr-2"></i>Добавить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
+    @if($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('add-participant-modal').showModal();
+        });
+    </script>
+    @endif
+    @endif
 </x-app-layout>
