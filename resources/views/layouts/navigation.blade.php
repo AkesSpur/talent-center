@@ -18,32 +18,30 @@
                 <x-slot name="trigger">
                     <button class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
                         <x-user-avatar :user="Auth::user()" size="sm" />
-                        <span class="hidden sm:inline">{{ Auth::user()->email }}</span>
+                        <span class="hidden sm:inline">{{ Auth::user()->last_name }} {{ mb_substr(Auth::user()->first_name, 0, 1) }}.{{ Auth::user()->patronymic ? mb_substr(Auth::user()->patronymic, 0, 1) . '.' : '' }}</span>
                         <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
                     </button>
                 </x-slot>
 
                 <x-slot name="content">
-                    <!-- Personal section -->
+                    <!-- Participant section -->
+                    <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Участник конкурсов</div>
                     <x-dropdown-link :href="route('profile.edit')">
-                        <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Мой профиль
+                        <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Профиль представителя
                     </x-dropdown-link>
                     <x-dropdown-link href="#">
-                        <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Мои заявки
+                        <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
                     </x-dropdown-link>
                     <x-dropdown-link href="#">
-                        <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои награды
+                        <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Награды
                     </x-dropdown-link>
                     <x-dropdown-link :href="route('participants.index')">
-                        <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Мои участники
+                        <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Участники
                     </x-dropdown-link>
 
                     <!-- Organizer section -->
                     <div class="border-t border-gold/10 mt-1 pt-1">
-                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор</div>
-                        <x-dropdown-link :href="route('dashboard')">
-                            <i class="fas fa-th-large mr-2 text-warm-gray w-5 text-center"></i> Личный кабинет
-                        </x-dropdown-link>
+                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор конкурсов</div>
                         <x-dropdown-link href="#">
                             <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои конкурсы
                         </x-dropdown-link>
