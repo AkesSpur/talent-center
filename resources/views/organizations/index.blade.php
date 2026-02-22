@@ -16,7 +16,8 @@
 
             @if($organizations->count() > 0)
                 <div class="bg-white rounded-xl shadow-lg border border-gold/10 overflow-hidden">
-                    <table class="w-full text-sm">
+                    <div class="overflow-x-auto">
+                    <table class="w-full text-sm min-w-[480px]">
                         <thead>
                             <tr class="border-b border-gold/10 text-warm-gray text-xs uppercase tracking-wider">
                                 <th class="text-left px-6 py-3 font-semibold">Организация</th>
@@ -93,6 +94,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
             @else
                 <div class="bg-white rounded-xl shadow-lg p-12 text-center">
