@@ -8,3 +8,8 @@ Schedule::command('queue:work --sleep=3 --timeout=280 --max-time=280')
     ->withoutOverlapping(5) // Lock expires after 5 mins to prevent stuck locks
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/queue-work.log'));
+
+Schedule::command('contests:transition')
+    ->everyMinute()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/contests-transition.log'));

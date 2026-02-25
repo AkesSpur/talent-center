@@ -42,11 +42,11 @@ class ApplicationPolicy
     }
 
     /**
-     * Participants can submit applications.
+     * Participants, admin, and support can submit applications.
      */
     public function create(User $user): bool
     {
-        return $user->isParticipant();
+        return $user->isParticipant() || $user->isAdmin() || $user->isSupport();
     }
 
     /**

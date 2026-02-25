@@ -8,7 +8,8 @@
       "Bash(PGPASSWORD=password \"/c/Program Files/PostgreSQL/18/bin/psql.exe\":*)",
       "Bash(composer require:*)",
       "Bash(mysql:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(xargs:*)"
     ]
   }
 }

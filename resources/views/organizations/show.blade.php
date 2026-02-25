@@ -86,6 +86,56 @@
                         </div>
                     </div>
 
+                    {{-- Contests section --}}
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-serif text-xl font-semibold text-dark">Конкурсы</h3>
+                            <div class="flex items-center gap-2">
+                                @if($organization->isVerified() && (auth()->user()->canInOrg('create', $organization) || auth()->user()->isAdmin()))
+                                    <a href="{{ route('contests.create', ['organization_id' => $organization->id]) }}"
+                                        class="text-sm bg-primary text-white px-3 py-1.5 rounded-lg hover:bg-primary/90 transition">
+                                        <i class="fas fa-plus mr-1"></i>Создать
+                                    </a>
+                                @endif
+                                @if(auth()->user()->canInOrg('manage', $organization) || auth()->user()->canInOrg('evaluate', $organization) || auth()->user()->isAdmin())
+                                    <a href="{{ route('organizations.applications', $organization) }}"
+                                        class="text-sm border border-primary/20 text-primary px-3 py-1.5 rounded-lg hover:bg-primary/5 transition">
+                                        <i class="fas fa-inbox mr-1"></i>Заявки
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+
+                        @if($organization->contests->count())
+                            <div class="space-y-2">
+                                @foreach($organization->contests->sortByDesc('created_at')->take(5) as $contest)
+                                    <a href="{{ route('contests.show', $contest) }}"
+                                        class="block p-3 rounded-lg border border-primary/10 hover:bg-cream/50 transition">
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-medium text-dark truncate text-sm">{{ $contest->title }}</p>
+                                                <p class="text-xs text-warm-gray mt-0.5">
+                                                    {{ $contest->applications_start_at->format('d.m.Y') }} — {{ $contest->applications_end_at->format('d.m.Y') }}
+                                                </p>
+                                            </div>
+                                            <span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full {{ $contest->status->color() }} shrink-0">
+                                                {{ $contest->status->label() }}
+                                            </span>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-warm-gray text-sm">
+                                @if($organization->isVerified())
+                                    У организации пока нет конкурсов.
+                                @else
+                                    Создание конкурсов станет доступно после верификации организации.
+                                @endif
+                            </p>
+                        @endif
+                    </div>
+
                     {{-- Representatives --}}
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <div class="flex items-center justify-between mb-4">

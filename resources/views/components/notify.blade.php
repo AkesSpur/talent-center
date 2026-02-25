@@ -23,6 +23,12 @@
         // Profile
         'profile-updated'        => ['Профиль успешно обновлён', 'success'],
         'password-updated'       => ['Пароль успешно изменён', 'success'],
+        // Contests
+        'contest-created'        => ['Конкурс успешно создан', 'success'],
+        'contest-updated'        => ['Конкурс успешно обновлён', 'success'],
+        'contest-cancelled'      => ['Конкурс отменён', 'success'],
+        // Applications
+        'application-submitted'  => ['Заявка успешно подана', 'success'],
     ];
 
     if (session('status') && isset($statusMap[session('status')])) {

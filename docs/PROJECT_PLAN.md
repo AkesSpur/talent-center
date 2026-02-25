@@ -48,7 +48,7 @@ Set up the full development environment, database architecture, authentication s
 
 ## Stage 2: Dashboards, Profiles & Organizations — 30,000 RUB
 
-### Status: NOT STARTED
+### Status: COMPLETE
 
 ### Objective
 Build the real dashboards for every role, the parent-child participant management UI, organization CRUD with verification workflow, and admin/support management panels. After this stage, users can fully manage their accounts, create organizations, and admins can govern the platform.
@@ -131,78 +131,112 @@ Build the real dashboards for every role, the parent-child participant managemen
 
 ## Stage 3: Contests & Application Submission — 30,000 RUB
 
-### Status: NOT STARTED
+### Status: COMPLETE
 
 ### Objective
-Build the full contest lifecycle — creation, publishing, browsing, and application submission with file upload. Implement the automated status transitions (accepting -> evaluation). After this stage, the core competition flow works end-to-end (minus evaluation).
+Build the full contest lifecycle — creation, browsing, and application submission with file upload. Implement automated status transitions via a scheduled command. After this stage, the core competition flow works end-to-end (minus evaluation).
 
 ### Deliverables
 
 #### 3.1 Contest CRUD
-- **Create contest** — form: title, description, rules, dates (start, app deadline, eval deadline), categories (add/remove), diploma background upload
+- **Create contest** — form: title, description, rules, dates (start, app deadline, results date), categories (add/remove), diploma background upload
 - **Gate:** Only users with `can_create` on a **verified** org can create contests
-- **Edit contest** — editable while in `draft` or `accepting` status (not evaluation/archive)
-- **Delete contest** — admin only, soft or hard delete
-- **Contest detail page** — public info, categories, status badge, dates, org name
+- **Edit contest** — editable while in `pending` or `accepting` status only
+- **Cancel contest** — soft cancel; accessible to org reps with `can_create` or `can_manage`, or admin
+- **Contest detail page** — public info, categories, status badge, dates, org name, status-aware apply card
 
 #### 3.2 Contest Category Management
 - Add/remove categories during contest creation and editing
 - Each category: name + description
-- Dynamic form (add/remove rows with JS)
+- Dynamic form rows powered by Alpine.js; `Js::from()` used for safe PHP→JS state passing
 
 #### 3.3 Contest Listing & Browsing
-- **Public contest list** — all contests with status `accepting` (filterable, searchable)
-- **Org contest list** — all contests for an org (visible to org representatives)
-- **Contest card component** — reusable Blade component: title, org, dates, status, category count
-- **Status filter:** accepting / evaluation / archive
+- **Public contest list** — all non-draft/non-cancelled contests; searchable by title, filterable by status tabs
+- **Org contest section** — organization detail page shows up to 5 recent contests for the org
+- **Status filter tabs:** Все / Приём заявок / Ожидает / Оценка / Архив
 
 #### 3.4 Contest Status State Machine
-- `draft` -> `accepting`: manual button "Publish" (by org rep with `can_create`)
-- `accepting` -> `evaluation`: **automatic** via scheduled command when `applications_end_at` passes
-- Laravel scheduled command: `php artisan contests:transition` runs every minute via cron
-- Log status transitions via ActionLogService
+
+Status is **automatically computed on creation** from the contest's dates vs. current date — there is no manual "Publish" step. The machine has 6 states:
+
+| Status | Value | Description |
+|--------|-------|-------------|
+| Черновик | `draft` | Transient state only during `store()` before `determineCurrentStatus()` is called |
+| Ожидает начала приёма | `pending` | Created; `applications_start_at` is in the future |
+| Приём заявок | `accepting` | Today is between `applications_start_at` and `applications_end_at` |
+| Оценка заявок | `evaluation` | `applications_end_at` has passed; before `evaluation_end_at` |
+| Архив | `archive` | `evaluation_end_at` has passed; auto-archived |
+| Отменён | `cancelled` | Manual cancel by authorized user |
+
+**Transitions (scheduled):** `php artisan contests:transition` runs every minute via cron:
+- `pending` → `accepting` when `applications_start_at ≤ now`
+- `accepting` → `evaluation` when `applications_end_at < now`
+- `evaluation` → `archive` when `evaluation_end_at < now`
+
+Each transition is logged via `ActionLogService` (requires `action_logs.user_id` to be nullable since `Auth::id()` returns null during cron).
+
+**Note:** The `evaluation_end_at` column is labeled **"Дата публикации результатов"** in the UI.
 
 #### 3.5 Application Submission
 - **Submit application form:** select category (optional), attach file OR paste cloud link
-- **File upload:** max 1 file, max 4MB, types: image (jpg/png/gif), document (pdf/doc/docx)
+- **File upload:** max 1 file, max 4MB, types: jpg/jpeg/png/gif/pdf/doc/docx (stored as-is, not converted to WebP, to preserve document integrity)
 - **Cloud link:** alternative to file upload — paste link to Google Drive, Yandex Disk, etc.
-- **Validation:** cannot submit if contest is not in `accepting` status
-- **Duplicate guard:** one application per user per contest (or per category? — clarify)
+- **Validation:** cannot submit if contest is not in `accepting` status (re-checked server-side in `store()` to guard race conditions)
+- **Duplicate guard:** one application per `user_id` per contest. A parent submitting for themselves AND for a child creates two separate, valid applications (one per physical user). The "submit as" dropdown excludes users who have already applied.
+- **Ties:** multiple users can hold the same rank — this is handled in Stage 4 evaluation with no unique constraint needed here
 - **Application status:** starts as `new`
-- **My applications page:** participant sees their submitted applications with status
+- **My applications page:** participant + their children's applications with status badges, file/link column
 
 #### 3.6 Application for Child Participants
 - Parent can submit application on behalf of any of their children
-- "Submit as" dropdown shows parent + children
-- Application `user_id` set to the selected child (or parent if self)
+- "Submit as" dropdown shows parent + each child, excluding any who have already applied to that contest
+- Application `user_id` set to the selected child's ID (or parent's if self-submitting)
 
 #### 3.7 Org Application Viewer
-- Org reps with `can_manage` or `can_evaluate` see all applications for their org's contests
-- Table: applicant name, contest, category, status, date, file link
-- Filterable by contest, status
+- Org reps with `can_manage` OR `can_evaluate` see all applications for their org's contests
+- Table: applicant name, contest, category, status badge, date, file link
+- Filterable by contest (dropdown) and status (dropdown)
+- OR logic handled in controller (middleware only supports AND)
 
 #### 3.8 Form Requests
-- `StoreContestRequest`
-- `UpdateContestRequest`
-- `StoreApplicationRequest`
+- `StoreContestRequest` — title, description, rules, 3 date fields (after: constraints), diploma_background image, categories array
+- `UpdateContestRequest` — same as Store plus `delete_diploma_background` boolean
+- `StoreApplicationRequest` — contest_id, category_id, submitted_for_user_id, file, external_link; custom `withValidator()` enforces at least one of file/link
 
 ### Routes Added
 ```
-/contests                            — public contest listing
-/contests/{contest}                  — contest detail
+/contests                                        — public contest listing
+/contests/{contest}                              — contest detail
 
-/organizations/{org}/contests/create — create contest
-/organizations/{org}/contests/{contest}/edit — edit contest
+/organizations/{org}/contests/create             — create contest form
+/organizations/{org}/contests                    — store contest (POST)
+/organizations/{org}/contests/{contest}/edit     — edit contest form
+/organizations/{org}/contests/{contest}          — update contest (PUT)
+/organizations/{org}/contests/{contest}/cancel   — cancel contest (POST)
 
-/contests/{contest}/apply            — submit application
-/dashboard/applications              — my applications list
-
-/organizations/{org}/applications    — org's applications viewer
+/contests/{contest}/apply                        — submit application (GET + POST)
+/dashboard/applications                          — my applications list
+/organizations/{org}/applications                — org's applications viewer
 ```
 
 ### Scheduled Commands
 ```
-contests:transition — moves accepting -> evaluation when deadline passes
+contests:transition — runs every minute; transitions pending→accepting→evaluation→archive
+```
+
+### Key Files
+```
+app/Enums/ContestStatus.php                      — 6-status enum with label(), color(), canEdit(), canCancel()
+app/Enums/ApplicationStatus.php                  — label() + color() added
+app/Models/Contest.php                           — determineCurrentStatus() + status helper booleans
+app/Policies/ContestPolicy.php                   — updated view/update + new cancel()
+app/Http/Controllers/ContestController.php       — full CRUD + cancel
+app/Http/Controllers/ApplicationController.php   — create/store/myIndex/orgIndex
+app/Console/Commands/TransitionContestStatuses.php
+resources/views/contests/{index,show,create,edit}.blade.php
+resources/views/applications/{create,index}.blade.php
+resources/views/organizations/applications.blade.php
+database/migrations/2026_02_23_085255_make_action_logs_user_id_nullable.php
 ```
 
 ---
@@ -314,3 +348,4 @@ Each stage **requires** the previous stage to be complete. No parallel developme
 | PDF generation slow | Timeouts on finalization | Queue diploma generation as background jobs |
 | Email deliverability | Notifications go to spam | Configure SPF/DKIM/DMARC on domain, use reputable SMTP (Mailgun, etc.) |
 | Parent submitting for wrong child | Data integrity | Validate parent_id ownership before allowing "submit as" |
+                  

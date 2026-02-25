@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\ContestStatus;
 use App\Models\Contest;
 use App\Models\User;
 
@@ -18,11 +19,14 @@ class ContestPolicy
     }
 
     /**
-     * Anyone can view a published contest. Drafts only by org reps or admin.
+     * Non-draft, non-cancelled contests are publicly visible.
+     * Draft and cancelled: only org reps (can_create or can_manage) or admin.
      */
     public function view(?User $user, Contest $contest): bool
     {
-        if ($contest->status->value !== 'draft') {
+        $restricted = [ContestStatus::Draft, ContestStatus::Cancelled];
+
+        if (! in_array($contest->status, $restricted, true)) {
             return true;
         }
 
@@ -34,7 +38,8 @@ class ContestPolicy
             return true;
         }
 
-        return $user->canInOrg('create', $contest->organization);
+        return $user->canInOrg('create', $contest->organization)
+            || $user->canInOrg('manage', $contest->organization);
     }
 
     /**
@@ -47,15 +52,38 @@ class ContestPolicy
     }
 
     /**
-     * Org rep with 'create' or admin can update.
+     * Editing is only allowed while the contest is in pending or accepting status.
+     * Admin or org rep with 'create' permission.
      */
     public function update(User $user, Contest $contest): bool
     {
+        if (! $contest->status->canEdit()) {
+            return false;
+        }
+
         if ($user->isAdmin()) {
             return true;
         }
 
         return $user->canInOrg('create', $contest->organization);
+    }
+
+    /**
+     * Cancelling is allowed while the contest is active (pending/accepting/evaluation).
+     * Admin or org rep with 'create' OR 'manage' permission.
+     */
+    public function cancel(User $user, Contest $contest): bool
+    {
+        if (! $contest->status->canCancel()) {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        return $user->canInOrg('create', $contest->organization)
+            || $user->canInOrg('manage', $contest->organization);
     }
 
     /**

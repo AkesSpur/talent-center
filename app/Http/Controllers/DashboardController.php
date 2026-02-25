@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -13,9 +14,19 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        // Collect IDs: user + their children
+        $userIds = $user->children()->pluck('id')->prepend($user->id);
+
+        $recentApplications = Application::with(['contest.organization', 'user'])
+            ->whereIn('user_id', $userIds)
+            ->latest()
+            ->take(3)
+            ->get();
+
         return view('dashboard', [
-            'organizations' => $user->organizations()->latest()->get(),
-            'children' => $user->children()->orderBy('last_name')->get(),
+            'organizations'      => $user->organizations()->latest()->get(),
+            'children'           => $user->children()->orderBy('last_name')->get(),
+            'recentApplications' => $recentApplications,
         ]);
     }
 }

@@ -110,18 +110,54 @@
                 </div>
             </div>
 
-            <!-- Плейсхолдеры для будущих этапов -->
+            <!-- Мои заявки + Мои дипломы -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gold/10 opacity-60">
+                <!-- Мои заявки -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gold/10">
                     <div class="p-6">
-                        <h3 class="text-lg font-medium text-dark mb-2">
-                            <i class="fas fa-file-alt text-gold mr-2"></i> Мои заявки
-                        </h3>
-                        <p class="text-warm-gray text-sm">
-                            Подача заявок на конкурсы появится на следующем этапе разработки.
-                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-dark">
+                                <i class="fas fa-file-alt text-gold mr-2"></i> Мои заявки
+                            </h3>
+                            <a href="{{ route('dashboard.applications') }}" class="text-sm text-primary hover:text-primary/80">
+                                Все заявки <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+
+                        @if($recentApplications->count())
+                            <div class="space-y-2">
+                                @foreach($recentApplications as $app)
+                                    <div class="p-3 rounded-lg border border-primary/10">
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex-1 min-w-0">
+                                                <a href="{{ route('contests.show', $app->contest) }}"
+                                                    class="font-medium text-dark hover:text-primary text-sm truncate block transition-colors">
+                                                    {{ $app->contest->title }}
+                                                </a>
+                                                <p class="text-xs text-warm-gray mt-0.5">
+                                                    {{ $app->created_at->format('d.m.Y') }}
+                                                    @if($app->user_id !== auth()->id())
+                                                        · {{ $app->user->first_name }}
+                                                    @endif
+                                                </p>
+                                            </div>
+                                            <span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full {{ $app->status->color() }} shrink-0">
+                                                {{ $app->status->label() }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-warm-gray text-sm">
+                                Вы ещё не подавали заявок.
+                                <a href="{{ route('contests.index') }}" class="text-primary hover:underline">Найти конкурсы</a>
+                            </p>
+                        @endif
                     </div>
                 </div>
+
+                <!-- Мои дипломы (placeholder Stage 4) -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gold/10 opacity-60">
                     <div class="p-6">
                         <h3 class="text-lg font-medium text-dark mb-2">

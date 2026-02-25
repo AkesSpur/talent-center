@@ -1,6 +1,6 @@
 <nav x-data="{ open: false }" class="bg-cream shadow-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
+        <div class="flex items-center justify-between h-20 gap-4">
 
             <!-- Logo -->
             <a href="/" class="flex items-center space-x-3">
@@ -12,6 +12,16 @@
                     <p class="text-xs text-warm-gray leading-tight">Всероссийский центр талантов</p>
                 </div>
             </a>
+
+            <!-- Center Nav (large screens only) -->
+            <div class="hidden lg:flex items-center justify-center gap-8">
+                <a href="/" class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
+                    Главная
+                </a>
+                <a href="{{ route('contests.index') }}" class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
+                    Конкурсы
+                </a>
+            </div>
 
             <!-- Right Side: User Dropdown (all screens) -->
             <x-dropdown align="right" width="72">
@@ -29,7 +39,7 @@
                     <x-dropdown-link :href="route('profile.edit')">
                         <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Профиль представителя
                     </x-dropdown-link>
-                    <x-dropdown-link href="#">
+                    <x-dropdown-link :href="route('dashboard.applications')">
                         <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
                     </x-dropdown-link>
                     <x-dropdown-link href="#">
@@ -42,8 +52,8 @@
                     <!-- Organizer section -->
                     <div class="border-t border-gold/10 mt-1 pt-1">
                         <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор конкурсов</div>
-                        <x-dropdown-link href="#">
-                            <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои конкурсы
+                        <x-dropdown-link :href="route('dashboard.contests')">
+                            <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
                         </x-dropdown-link>
                         <x-dropdown-link :href="route('organizations.index')">
                             <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Управление организацией
@@ -63,6 +73,12 @@
                             <x-dropdown-link :href="route('admin.organizations.index')">
                                 <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Организации
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.contests.index')">
+                                <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.platform-categories.index')">
+                                <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Категории
+                            </x-dropdown-link>
                         </div>
                     @endif
 
@@ -78,6 +94,9 @@
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('support.organizations.index')">
                                 <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Организации
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('support.contests.index')">
+                                <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
                             </x-dropdown-link>
                         </div>
                     @endif

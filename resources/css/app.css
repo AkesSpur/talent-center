@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent Alpine.js flash of unrendered content */
+[x-cloak] { display: none !important; }
+
 @layer utilities {
     .gradient-gold {
         background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 50%, #D4AF37 100%);

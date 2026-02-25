@@ -23,7 +23,7 @@
     <!-- ========== HEADER ========== -->
     <header class="bg-cream shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
+            <div class="flex items-center justify-between h-20 gap-4">
                 <!-- Logo -->
                 <a href="/" class="flex items-center space-x-3">
                     <div class="w-12 h-12 gradient-gold rounded-full flex items-center justify-center shadow-sm">
@@ -35,14 +35,24 @@
                     </div>
                 </a>
 
+                <!-- Center Nav (large screens only) -->
+                <nav class="hidden lg:flex items-center justify-center gap-8">
+                    <a href="/" class="text-sm font-medium text-primary border-b-2 border-primary pb-0.5">
+                        Главная
+                    </a>
+                    <a href="{{ route('contests.index') }}" class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
+                        Конкурсы
+                    </a>
+                </nav>
+
                 <!-- Auth buttons -->
-                <div class="flex items-center space-x-4" x-data="{ open: false }">
+                <div class="flex items-center justify-end space-x-4" x-data="{ open: false }">
                     @auth
                         <!-- User Dropdown -->
                         <div class="relative">
                             <button @click="open = !open" class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
                                 <x-user-avatar :user="Auth::user()" size="sm" />
-                                <span class="hidden sm:inline">{{ Auth::user()->email }}</span>
+                                <span class="hidden sm:inline">{{ Auth::user()->last_name }} {{ mb_substr(Auth::user()->first_name, 0, 1) }}.{{ Auth::user()->patronymic ? mb_substr(Auth::user()->patronymic, 0, 1) . '.' : '' }}</span>
                                 <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
                             </button>
 
@@ -56,19 +66,23 @@
                                  class="absolute right-0 z-50 mt-2 w-72 rounded-md shadow-lg origin-top-right"
                                  style="display: none;">
                                 <div class="rounded-md ring-1 ring-gold/20 py-1 bg-white">
-                                    <a href="{{ route('profile.edit') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                        <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Мой профиль
-                                    </a>
-                                    <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                        <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Мои заявки
-                                    </a>
-                                    <a href="#" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                        <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Мои награды
-                                    </a>
-                                    <a href="{{ route('participants.index') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">
-                                        <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Мои участники
-                                    </a>
-
+                                <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Участник конкурсов</div>
+                                <a href="{{ route('profile.edit') }}"
+                                    class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                    <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Профиль представителя
+                                </a>
+                                <a href="{{ route('dashboard.applications') }}"
+                                    class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                    <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
+                                </a>
+                                <a href="#"
+                                    class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                    <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Награды
+                                </a>
+                                <a href="{{ route('participants.index') }}"
+                                    class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                    <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Участники
+                                </a>
                                     <div class="border-t border-gold/10 mt-1 pt-1">
                                         <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор</div>
                                         <a href="{{ route('dashboard') }}" class="block w-full px-4 py-2 text-start text-sm leading-5 text-dark hover:bg-cream-dark transition duration-150 whitespace-nowrap">

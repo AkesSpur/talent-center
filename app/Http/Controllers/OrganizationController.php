@@ -59,7 +59,7 @@ class OrganizationController extends Controller
     {
         $this->authorize('view', $organization);
 
-        $organization->load(['representatives', 'createdBy', 'verifiedBy']);
+        $organization->load(['representatives', 'createdBy', 'verifiedBy', 'contests']);
 
         return view('organizations.show', compact('organization'));
     }
