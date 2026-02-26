@@ -76,6 +76,9 @@
                             <x-dropdown-link :href="route('admin.contests.index')">
                                 <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.applications.index')">
+                                <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.platform-categories.index')">
                                 <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Категории
                             </x-dropdown-link>

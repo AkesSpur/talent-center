@@ -34,7 +34,7 @@
                 <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
                     <form method="POST" action="{{ route('applications.store', $contest) }}"
                           enctype="multipart/form-data"
-                          x-data="{ uploadMode: '{{ old('external_link') ? 'link' : 'file' }}' }"
+                          x-data="{ uploadMode: '{{ old('external_link') ? 'link' : 'file' }}', selectedFile: null, formatSize(bytes) { if (!bytes) return ''; const mb = bytes / 1024 / 1024; return mb >= 1 ? mb.toFixed(1) + ' МБ' : (bytes / 1024).toFixed(0) + ' КБ'; } }"
                           class="space-y-6">
                         @csrf
                         <input type="hidden" name="contest_id" value="{{ $contest->id }}">
@@ -104,14 +104,30 @@
 
                             {{-- File upload --}}
                             <div x-show="uploadMode === 'file'">
-                                <div class="border-2 border-dashed border-primary/20 rounded-lg p-6 text-center hover:border-primary/40 transition-colors">
+                                <div :class="selectedFile ? 'border-green-400 bg-green-50' : 'border-primary/20 hover:border-primary/40'"
+                                     class="border-2 border-dashed rounded-lg p-6 text-center transition-colors">
                                     <input type="file" name="file" id="application-file"
                                         accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx"
-                                        class="hidden">
-                                    <label for="application-file" class="cursor-pointer">
-                                        <i class="fas fa-cloud-upload-alt text-3xl text-primary/40 mb-3 block"></i>
-                                        <p class="text-sm font-medium text-dark mb-1">Нажмите для выбора файла</p>
-                                        <p class="text-xs text-warm-gray">JPG, PNG, GIF, PDF, DOC, DOCX — до 4 МБ</p>
+                                        class="hidden"
+                                        @change="selectedFile = $event.target.files[0]">
+                                    <label for="application-file" class="cursor-pointer block">
+                                        {{-- No file selected --}}
+                                        <template x-if="!selectedFile">
+                                            <div>
+                                                <i class="fas fa-cloud-upload-alt text-3xl text-primary/40 mb-3 block"></i>
+                                                <p class="text-sm font-medium text-dark mb-1">Нажмите для выбора файла</p>
+                                                <p class="text-xs text-warm-gray">JPG, PNG, GIF, PDF, DOC, DOCX — до 4 МБ</p>
+                                            </div>
+                                        </template>
+                                        {{-- File selected --}}
+                                        <template x-if="selectedFile">
+                                            <div>
+                                                <i class="fas fa-check-circle text-3xl text-green-500 mb-3 block"></i>
+                                                <p class="text-sm font-semibold text-green-700 mb-1 truncate" x-text="selectedFile.name"></p>
+                                                <p class="text-xs text-green-600" x-text="formatSize(selectedFile.size)"></p>
+                                                <p class="text-xs text-warm-gray mt-2">Нажмите, чтобы изменить файл</p>
+                                            </div>
+                                        </template>
                                     </label>
                                 </div>
                                 <x-input-error class="mt-2" :messages="$errors->get('file')" />

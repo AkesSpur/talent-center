@@ -32,37 +32,59 @@
             </div>
 
             <!-- Быстрые ссылки -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <a href="{{ route('admin.users.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gold/10 hover:bg-cream/50 transition group">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <a href="{{ route('admin.users.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 border border-gold/10 hover:bg-cream/50 transition group">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition">
+                        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition shrink-0">
                             <i class="fas fa-users"></i>
                         </div>
-                        <div>
-                            <div class="font-medium text-dark">Управление пользователями</div>
-                            <div class="text-sm text-warm-gray">Поиск, роли, блокировка</div>
+                        <div class="min-w-0">
+                            <div class="font-medium text-dark text-sm">Пользователи</div>
+                            <div class="text-xs text-warm-gray">Роли, блокировка</div>
                         </div>
                     </div>
                 </a>
-                <a href="{{ route('admin.organizations.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gold/10 hover:bg-cream/50 transition group">
+                <a href="{{ route('admin.organizations.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 border border-gold/10 hover:bg-cream/50 transition group">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition">
+                        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition shrink-0">
                             <i class="fas fa-building"></i>
                         </div>
-                        <div>
-                            <div class="font-medium text-dark">Управление организациями</div>
-                            <div class="text-sm text-warm-gray">Верификация, просмотр</div>
+                        <div class="min-w-0">
+                            <div class="font-medium text-dark text-sm">Организации</div>
+                            <div class="text-xs text-warm-gray">Верификация</div>
                         </div>
                     </div>
                 </a>
-                <a href="{{ route('admin.action-logs.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gold/10 hover:bg-cream/50 transition group">
+                <a href="{{ route('admin.contests.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 border border-gold/10 hover:bg-cream/50 transition group">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition">
+                        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition shrink-0">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-medium text-dark text-sm">Конкурсы</div>
+                            <div class="text-xs text-warm-gray">Все конкурсы</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="{{ route('admin.applications.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 border border-gold/10 hover:bg-cream/50 transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition shrink-0">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-medium text-dark text-sm">Заявки</div>
+                            <div class="text-xs text-warm-gray">Все заявки</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="{{ route('admin.action-logs.index') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5 border border-gold/10 hover:bg-cream/50 transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition shrink-0">
                             <i class="fas fa-list-alt"></i>
                         </div>
-                        <div>
-                            <div class="font-medium text-dark">Журнал действий</div>
-                            <div class="text-sm text-warm-gray">Аудит всех изменений</div>
+                        <div class="min-w-0">
+                            <div class="font-medium text-dark text-sm">Журнал</div>
+                            <div class="text-xs text-warm-gray">Аудит действий</div>
                         </div>
                     </div>
                 </a>

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\ActionLogController;
+use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
 use App\Http\Controllers\Admin\ContestController as AdminContestController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrganizationController as AdminOrganizationController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\ProfileController;
@@ -23,9 +25,7 @@ use Illuminate\Support\Facades\Route;
 
 // ── Public ──────────────────────────────────────────────
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', HomeController::class)->name('home');
 
 Route::get('/development-plan', function () {
     return view('development-plan.index');
@@ -45,7 +45,7 @@ Route::get('/contests', [ContestController::class, 'index'])->name('contests.ind
 Route::get('/contests/create', [ContestController::class, 'create'])
     ->middleware(['auth', 'verified'])
     ->name('contests.create');
-Route::get('/contests/{contest}', [ContestController::class, 'show'])->name('contests.show');
+Route::get('/contests/{contest}', [ContestController::class, 'show'])->middleware(['auth', 'verified'])->name('contests.show');
 
 // ── Authenticated (any role) ────────────────────────────
 
@@ -126,6 +126,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/contests', [AdminContestController::class, 'index'])->name('contests.index');
     Route::get('/contests/{contest}/applications', [AdminContestController::class, 'applications'])->name('contests.applications');
     Route::delete('/contests/{contest}', [AdminContestController::class, 'destroy'])->name('contests.destroy');
+
+    // Application management (global — all contests, all statuses)
+    Route::get('/applications', [AdminApplicationController::class, 'index'])->name('applications.index');
 
     // Action logs
     Route::get('/action-logs', [ActionLogController::class, 'index'])->name('action-logs.index');

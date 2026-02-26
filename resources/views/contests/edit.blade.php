@@ -37,7 +37,7 @@
                         <h3 class="font-serif text-lg font-semibold text-dark border-b border-gold/20 pb-2">Основная информация</h3>
 
                         <div>
-                            <label for="platform_category_id" class="block text-sm font-medium text-dark mb-2">Категория платформы</label>
+                            <label for="platform_category_id" class="block text-sm font-medium text-dark mb-2">Категория</label>
                             <select id="platform_category_id" name="platform_category_id"
                                 class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
                                 <option value="">— Без категории —</option>
