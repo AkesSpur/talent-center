@@ -53,16 +53,16 @@ class ContestPolicy
 
     /**
      * Editing is only allowed while the contest is in pending or accepting status.
-     * Admin or org rep with 'create' permission.
+     * Admin can always edit; org rep needs 'create' permission and an editable status.
      */
     public function update(User $user, Contest $contest): bool
     {
-        if (! $contest->status->canEdit()) {
-            return false;
-        }
-
         if ($user->isAdmin()) {
             return true;
+        }
+
+        if (! $contest->status->canEdit()) {
+            return false;
         }
 
         return $user->canInOrg('create', $contest->organization);

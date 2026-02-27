@@ -12,7 +12,19 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <x-confirm-modal
+        name="delete-contest"
+        title="Удалить конкурс"
+        message="Вы уверены, что хотите удалить этот конкурс? Все связанные заявки будут удалены. Это действие нельзя отменить."
+        icon="fa-trash"
+        iconColor="text-red-600"
+        iconBg="bg-red-100"
+        confirmText="Удалить"
+        confirmClass="bg-red-600 text-white hover:bg-red-700"
+        method="DELETE"
+    />
+
+    <div x-data class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <x-notify />
@@ -137,14 +149,11 @@
                                                     class="px-2.5 py-1.5 border border-gold/30 text-dark text-xs rounded-lg hover:bg-cream/50 transition-colors" title="Редактировать">
                                                     <i class="fas fa-pen"></i>
                                                 </a>
-                                                <form method="POST" action="{{ route('admin.contests.destroy', $contest) }}"
-                                                    onsubmit="return confirm('Удалить конкурс «{{ addslashes($contest->title) }}»? Это действие нельзя отменить.')">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit"
-                                                        class="px-2.5 py-1.5 border border-red-200 text-red-500 text-xs rounded-lg hover:bg-red-50 transition-colors" title="Удалить">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <button type="button"
+                                                    @click="$dispatch('confirm-delete-contest', { action: '{{ route('admin.contests.destroy', $contest) }}' })"
+                                                    class="px-2.5 py-1.5 border border-red-200 text-red-500 text-xs rounded-lg hover:bg-red-50 transition-colors" title="Удалить">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

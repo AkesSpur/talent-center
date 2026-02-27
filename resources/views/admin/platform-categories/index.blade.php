@@ -12,7 +12,19 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <x-confirm-modal
+        name="delete-category"
+        title="Удалить категорию"
+        message="Вы уверены, что хотите удалить эту категорию? Все привязанные конкурсы потеряют категорию."
+        icon="fa-trash"
+        iconColor="text-red-600"
+        iconBg="bg-red-100"
+        confirmText="Удалить"
+        confirmClass="bg-red-600 text-white hover:bg-red-700"
+        method="DELETE"
+    />
+
+    <div x-data class="py-8">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <x-notify />
@@ -58,13 +70,11 @@
                                                     class="px-3 py-1.5 border border-primary/20 text-primary text-xs rounded-lg hover:bg-primary/5 transition-colors">
                                                     <i class="fas fa-pen mr-1"></i>Изменить
                                                 </button>
-                                                <form method="POST" action="{{ route('admin.platform-categories.destroy', $category) }}"
-                                                    onsubmit="return confirm('Удалить категорию «{{ addslashes($category->name) }}»? Все привязанные конкурсы потеряют категорию.')">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="px-3 py-1.5 border border-red-200 text-red-500 text-xs rounded-lg hover:bg-red-50 transition-colors">
-                                                        <i class="fas fa-trash mr-1"></i>Удалить
-                                                    </button>
-                                                </form>
+                                                <button type="button"
+                                                    @click="$dispatch('confirm-delete-category', { action: '{{ route('admin.platform-categories.destroy', $category) }}' })"
+                                                    class="px-3 py-1.5 border border-red-200 text-red-500 text-xs rounded-lg hover:bg-red-50 transition-colors">
+                                                    <i class="fas fa-trash mr-1"></i>Удалить
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
