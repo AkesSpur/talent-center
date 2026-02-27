@@ -142,10 +142,10 @@
 {{-- ===== HERO ===== --}}
 <section class="relative overflow-hidden pattern-bg" style="background-color: #FAF8F5; min-height: 88vh;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div class="grid lg:grid-cols-5 gap-6 lg:gap-4 items-center">
+        <div class="grid lg:grid-cols-6 gap-6 lg:gap-4 items-center">
 
             {{-- Left: Text --}}
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-3">
                 <div class="inline-flex items-center gap-2 mb-6">
                     <div class="w-6 h-px bg-gold"></div>
                     <span class="text-xs font-semibold text-gold uppercase tracking-[0.2em]">Всероссийский центр талантов</span>
