@@ -214,9 +214,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
             {{-- Filter bar --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-gold/10 p-4 flex flex-col sm:flex-row gap-3">
+            <div class="bg-white rounded-2xl shadow-sm border border-gold/10 p-4 flex flex-wrap gap-3">
                 {{-- Search --}}
-                <div class="flex-1 relative">
+                <div class="flex-1 min-w-[200px] relative">
                     <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-gray text-sm pointer-events-none"></i>
                     <input
                         type="text"
@@ -228,17 +228,15 @@
 
                 {{-- Category --}}
                 @if($platformCategories->count())
-                    <div class="sm:w-64">
-                        <select
-                            x-model="category"
-                            class="w-full px-3 py-2.5 border border-primary/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm bg-cream/50 text-dark"
-                        >
-                            <option value="">Все категории</option>
-                            @foreach($platformCategories as $cat)
-                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <select
+                        x-model="category"
+                        class="px-3 py-2.5 border border-primary/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm bg-cream/50 text-dark"
+                    >
+                        <option value="">Все категории</option>
+                        @foreach($platformCategories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
                 @endif
             </div>
 
