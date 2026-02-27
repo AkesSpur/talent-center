@@ -31,64 +31,67 @@
 
             {{-- Filters --}}
             <form method="GET" action="{{ route('admin.contests.index') }}"
-                class="bg-white rounded-xl shadow-sm border border-gold/10 p-4 flex flex-wrap gap-3 items-end">
+                class="bg-white rounded-xl shadow-sm border border-gold/10 p-4 space-y-3">
 
-                <div>
-                    <label class="block text-xs font-medium text-dark mb-1">Поиск</label>
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Название конкурса..."
-                        class="px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm min-w-[200px]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-dark mb-1">Поиск</label>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Название конкурса..."
+                            class="w-full px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-dark mb-1">Статус</label>
+                        <select name="status"
+                            class="w-full px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
+                            <option value="">Все статусы</option>
+                            @foreach(\App\Enums\ContestStatus::cases() as $status)
+                                <option value="{{ $status->value }}" {{ request('status') === $status->value ? 'selected' : '' }}>
+                                    {{ $status->label() }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-dark mb-1">Категория</label>
+                        <select name="category"
+                            class="w-full px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
+                            <option value="">Все категории</option>
+                            @foreach($platformCategories as $cat)
+                                <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
+                                    {{ $cat->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-dark mb-1">Организация</label>
+                        <select name="organization"
+                            class="w-full px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm truncate">
+                            <option value="">Все организации</option>
+                            @foreach($organizations as $org)
+                                <option value="{{ $org->id }}" {{ request('organization') == $org->id ? 'selected' : '' }}>
+                                    {{ Str::limit($org->name, 50) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-medium text-dark mb-1">Статус</label>
-                    <select name="status"
-                        class="px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
-                        <option value="">Все статусы</option>
-                        @foreach(\App\Enums\ContestStatus::cases() as $status)
-                            <option value="{{ $status->value }}" {{ request('status') === $status->value ? 'selected' : '' }}>
-                                {{ $status->label() }}
-                            </option>
-                        @endforeach
-                    </select>
+                <div class="flex gap-3">
+                    <button type="submit" class="px-4 py-2 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 text-sm">
+                        Применить
+                    </button>
+                    @if(request('search') || request('status') || request('category') || request('organization'))
+                        <a href="{{ route('admin.contests.index') }}"
+                            class="px-4 py-2 border border-primary/20 text-warm-gray rounded-lg hover:border-primary/40 text-sm">
+                            Сбросить
+                        </a>
+                    @endif
                 </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-dark mb-1">Категория</label>
-                    <select name="category"
-                        class="px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
-                        <option value="">Все категории</option>
-                        @foreach($platformCategories as $cat)
-                            <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
-                                {{ $cat->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="min-w-0">
-                    <label class="block text-xs font-medium text-dark mb-1">Организация</label>
-                    <select name="organization"
-                        class="px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm min-w-[180px] max-w-[280px] truncate">
-                        <option value="">Все организации</option>
-                        @foreach($organizations as $org)
-                            <option value="{{ $org->id }}" {{ request('organization') == $org->id ? 'selected' : '' }}>
-                                {{ Str::limit($org->name, 50) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <button type="submit" class="px-4 py-2 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 text-sm">
-                    Применить
-                </button>
-
-                @if(request('search') || request('status') || request('category') || request('organization'))
-                    <a href="{{ route('admin.contests.index') }}"
-                        class="px-4 py-2 border border-primary/20 text-warm-gray rounded-lg hover:border-primary/40 text-sm">
-                        Сбросить
-                    </a>
-                @endif
             </form>
 
             @if($contests->count())
