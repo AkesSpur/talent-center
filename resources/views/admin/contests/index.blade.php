@@ -66,14 +66,14 @@
                     </select>
                 </div>
 
-                <div>
+                <div class="min-w-0">
                     <label class="block text-xs font-medium text-dark mb-1">Организация</label>
                     <select name="organization"
-                        class="px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm min-w-[180px]">
+                        class="px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm min-w-[180px] max-w-[240px] truncate">
                         <option value="">Все организации</option>
                         @foreach($organizations as $org)
                             <option value="{{ $org->id }}" {{ request('organization') == $org->id ? 'selected' : '' }}>
-                                {{ $org->name }}
+                                {{ Str::limit($org->name, 35) }}
                             </option>
                         @endforeach
                     </select>
