@@ -14,6 +14,7 @@ use App\Services\ActionLogService;
 use App\Traits\HandlesImages;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -83,7 +84,7 @@ class ContestController extends Controller
         ])->values();
 
         $platformCategories = PlatformCategory::active()->get();
-        $preselectedOrgId   = $request->integer('organization_id', 0);
+        $preselectedOrgId   = (int) old('organization_id', $request->integer('organization_id', 0));
 
         return view('contests.create', compact('orgsData', 'platformCategories', 'preselectedOrgId'));
     }
@@ -113,6 +114,10 @@ class ContestController extends Controller
                 'status'          => ContestStatus::Draft->value,
             ]
         );
+
+        $data['applications_start_at'] = Carbon::parse($data['applications_start_at'])->startOfDay();
+        $data['applications_end_at']   = Carbon::parse($data['applications_end_at'])->endOfDay();
+        $data['evaluation_end_at']     = Carbon::parse($data['evaluation_end_at'])->endOfDay();
 
         if ($request->hasFile('diploma_background')) {
             $data['diploma_background'] = $this->storeImageAsWebp(
@@ -208,6 +213,10 @@ class ContestController extends Controller
             'cover_image', 'delete_cover_image',
             'categories', 'juries',
         ]);
+
+        $data['applications_start_at'] = Carbon::parse($data['applications_start_at'])->startOfDay();
+        $data['applications_end_at']   = Carbon::parse($data['applications_end_at'])->endOfDay();
+        $data['evaluation_end_at']     = Carbon::parse($data['evaluation_end_at'])->endOfDay();
 
         // Diploma background
         if ($request->boolean('delete_diploma_background') && $contest->diploma_background) {

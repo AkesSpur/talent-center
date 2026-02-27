@@ -11,6 +11,7 @@ use App\Models\Application;
 use App\Models\Contest;
 use App\Models\Organization;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -23,12 +24,24 @@ class HomeController extends Controller
             ->take(6)
             ->get();
 
-        $stats = [
-            'contests'      => Contest::count(),
-            'organizations' => Organization::where('status', OrganizationStatus::Verified)->count(),
-            'participants'  => User::where('role', UserRole::Participant)->count(),
-            'applications'  => Application::count(),
-        ];
+        $stats = Cache::remember('homepage_stats', now()->endOfDay()->diffInSeconds(now()), function () {
+            $format = function (int $n): string {
+                if ($n < 100) {
+                    $rounded = (int) round($n / 10) * 10;
+                } else {
+                    $rounded = (int) round($n / 100) * 100;
+                }
+
+                return number_format($rounded, 0, ',', ' ');
+            };
+
+            return [
+                'contests'      => $format(Contest::count()),
+                'organizations' => $format(Organization::where('status', OrganizationStatus::Verified)->count()),
+                'participants'  => $format(User::where('role', UserRole::Participant)->count()),
+                'applications'  => $format(Application::count()),
+            ];
+        });
 
         return view('welcome', compact('activeContests', 'stats'));
     }

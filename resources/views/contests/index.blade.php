@@ -251,9 +251,9 @@
                                 'cover_image'        => $contest->cover_image ? asset('storage/' . $contest->cover_image) : null,
                                 'category'           => $contest->platformCategory?->name,
                                 'org_name'           => $contest->organization->name,
-                                'applications_start' => $contest->applications_start_at->format('d M'),
-                                'applications_end'   => $contest->applications_end_at->format('d M'),
-                                'evaluation_end'     => $contest->evaluation_end_at->format('d M'),
+                                'applications_start' => $contest->applications_start_at->isoFormat('D MMM'),
+                                'applications_end'   => $contest->applications_end_at->isoFormat('D MMM'),
+                                'evaluation_end'     => $contest->evaluation_end_at->isoFormat('D MMM'),
                                 'apply_url'          => route('applications.create', $contest),
                                 'show_url'           => route('contests.show', $contest),
                                 'categories'         => $contest->categories->map(fn ($c) => $c->name)->values()->toArray(),
@@ -300,11 +300,11 @@
                                 <div class="text-xs text-warm-gray space-y-1 mb-4">
                                     <div>
                                         <i class="fas fa-calendar-alt mr-1.5"></i>
-                                        {{ $contest->applications_start_at->format('d M') }} — {{ $contest->applications_end_at->format('d M') }}
+                                        {{ $contest->applications_start_at->isoFormat('D MMM') }} — {{ $contest->applications_end_at->isoFormat('D MMM') }}
                                     </div>
                                     <div>
                                         <i class="fas fa-flag-checkered mr-1.5"></i>
-                                        Результаты: {{ $contest->evaluation_end_at->format('d M') }}
+                                        Результаты: {{ $contest->evaluation_end_at->isoFormat('D MMM') }}
                                     </div>
                                 </div>
 

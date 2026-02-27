@@ -160,13 +160,13 @@
                     Талант-центр — удобная площадка для образовательных организаций. Создавайте бесплатные конкурсы или получайте внебюджетный доход от платных мероприятий. Всё в одном месте: от приёма заявок до выдачи дипломов.
                 </p>
 
-                <div class="flex flex-wrap gap-4 mb-10">
+                <div class="flex flex-col sm:flex-row gap-4 mb-10">
                     <a href="{{ route('contests.create') }}"
-                        class="inline-flex items-center px-7 py-3.5 gradient-gold text-dark font-bold rounded-xl text-sm hover:opacity-90 transition-opacity shadow-sm">
+                        class="inline-flex items-center justify-center px-7 py-3.5 gradient-gold text-dark font-bold rounded-xl text-sm hover:opacity-90 transition-opacity shadow-sm">
                         <i class="fas fa-plus mr-2"></i>Создать конкурс
                     </a>
                     <a href="{{ route('contests.index') }}"
-                        class="inline-flex items-center px-7 py-3.5 border-2 border-primary text-primary font-semibold rounded-xl text-sm hover:bg-primary hover:text-white transition-colors">
+                        class="inline-flex items-center justify-center px-7 py-3.5 border-2 border-primary text-primary font-semibold rounded-xl text-sm hover:bg-primary hover:text-white transition-colors">
                         <i class="fas fa-trophy mr-2"></i>Найти конкурс
                     </a>
                 </div>
@@ -175,17 +175,17 @@
                 <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-warm-gray">
                     <span class="flex items-center gap-1.5">
                         <i class="fas fa-trophy text-gold text-xs"></i>
-                        <strong class="text-dark">2 500+</strong> конкурсов
+                        <strong class="text-dark">{{ $stats['contests'] }}+</strong> конкурсов
                     </span>
                     <span class="text-gold/40">·</span>
                     <span class="flex items-center gap-1.5">
                         <i class="fas fa-building text-gold text-xs"></i>
-                        <strong class="text-dark">480+</strong> организаций
+                        <strong class="text-dark">{{ $stats['organizations'] }}+</strong> организаций
                     </span>
                     <span class="text-gold/40">·</span>
                     <span class="flex items-center gap-1.5">
                         <i class="fas fa-users text-gold text-xs"></i>
-                        <strong class="text-dark">35 000+</strong> участников
+                        <strong class="text-dark">{{ $stats['participants'] }}+</strong> участников
                     </span>
                 </div>
             </div>
@@ -271,19 +271,19 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4">
             <div class="text-center px-6 py-4 border-b border-r md:border-b-0 border-warm-gray/20">
-                <div class="font-serif text-4xl font-bold text-gold mb-1">2 500<span class="text-2xl align-super text-gold/70">+</span></div>
+                <div class="font-serif text-4xl font-bold text-gold mb-1">{{ $stats['contests'] }}<span class="text-2xl align-super text-gold/70">+</span></div>
                 <div class="text-xs text-warm-gray uppercase tracking-widest">Конкурсов</div>
             </div>
             <div class="text-center px-6 py-4 border-b md:border-b-0 md:border-r border-warm-gray/20">
-                <div class="font-serif text-4xl font-bold text-gold mb-1">480<span class="text-2xl align-super text-gold/70">+</span></div>
+                <div class="font-serif text-4xl font-bold text-gold mb-1">{{ $stats['organizations'] }}<span class="text-2xl align-super text-gold/70">+</span></div>
                 <div class="text-xs text-warm-gray uppercase tracking-widest">Организаций</div>
             </div>
             <div class="text-center px-6 py-4 border-r border-warm-gray/20">
-                <div class="font-serif text-4xl font-bold text-gold mb-1">35 000<span class="text-2xl align-super text-gold/70">+</span></div>
+                <div class="font-serif text-4xl font-bold text-gold mb-1">{{ $stats['participants'] }}<span class="text-2xl align-super text-gold/70">+</span></div>
                 <div class="text-xs text-warm-gray uppercase tracking-widest">Участников</div>
             </div>
             <div class="text-center px-6 py-4">
-                <div class="font-serif text-4xl font-bold text-gold mb-1">120 000<span class="text-2xl align-super text-gold/70">+</span></div>
+                <div class="font-serif text-4xl font-bold text-gold mb-1">{{ $stats['applications'] }}<span class="text-2xl align-super text-gold/70">+</span></div>
                 <div class="text-xs text-warm-gray uppercase tracking-widest">Заявок</div>
             </div>
         </div>
@@ -314,9 +314,9 @@
                             'cover_image'        => $contest->cover_image ? asset('storage/' . $contest->cover_image) : null,
                             'category'           => $contest->platformCategory?->name,
                             'org_name'           => $contest->organization->name,
-                            'applications_start' => $contest->applications_start_at->format('d.m.Y'),
-                            'applications_end'   => $contest->applications_end_at->format('d.m.Y'),
-                            'evaluation_end'     => $contest->evaluation_end_at->format('d.m.Y'),
+                            'applications_start' => $contest->applications_start_at->isoFormat('D MMM YYYY'),
+                            'applications_end'   => $contest->applications_end_at->isoFormat('D MMM YYYY'),
+                            'evaluation_end'     => $contest->evaluation_end_at->isoFormat('D MMM YYYY'),
                             'apply_url'          => route('applications.create', $contest),
                             'show_url'           => route('contests.show', $contest),
                             'categories'         => $contest->categories->map(fn ($c) => $c->name)->values()->toArray(),
@@ -369,7 +369,7 @@
                             <div class="flex items-center justify-between pt-3 border-t border-gold/10">
                                 <div class="flex items-center gap-1.5 text-xs text-warm-gray">
                                     <i class="fas fa-calendar-alt text-gold"></i>
-                                    до {{ $contest->applications_end_at->format('d.m.Y') }}
+                                    до {{ $contest->applications_end_at->isoFormat('D MMM') }}
                                 </div>
                                 <span class="text-xs font-semibold text-primary group-hover:underline flex items-center gap-1">
                                     Подробнее <i class="fas fa-arrow-right text-xs"></i>

@@ -108,7 +108,7 @@
                             @endif
                         @elseif($contest->isPending())
                             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-700">
-                                <i class="fas fa-clock mr-2"></i>Приём заявок начнётся {{ $contest->applications_start_at->format('d.m.Y') }}.
+                                <i class="fas fa-clock mr-2"></i>Приём заявок начнётся {{ $contest->applications_start_at->isoFormat('D MMMM YYYY [г.]') }}.
                             </div>
                         @elseif($contest->isEvaluation())
                             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-700">
@@ -127,27 +127,25 @@
 
                     {{-- Dates card --}}
                     <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
-                        <h3 class="font-semibold text-dark mb-4">Даты конкурса</h3>
-                        <div class="space-y-3 text-sm">
+                        <h3 class="font-semibold text-dark mb-4">Информация</h3>
+                        <div class="space-y-4 text-sm">
                             <div class="flex items-start gap-3">
-                                <i class="fas fa-calendar-plus text-primary mt-0.5 w-4 text-center"></i>
+                                <i class="fas fa-calendar-alt text-primary mt-0.5 w-4 text-center shrink-0"></i>
                                 <div>
-                                    <p class="text-warm-gray text-xs mb-0.5">Начало приёма заявок</p>
-                                    <p class="font-medium text-dark">{{ $contest->applications_start_at->format('d.m.Y') }}</p>
+                                    <p class="text-warm-gray text-xs mb-1">Приём заявок</p>
+                                    <p class="font-medium text-dark">
+                                        с 00:00:00 {{ $contest->applications_start_at->isoFormat('D MMMM YYYY [г.]') }}
+                                    </p>
+                                    <p class="font-medium text-dark">
+                                        до 23:59:59 {{ $contest->applications_end_at->isoFormat('D MMMM YYYY [г.]') }}
+                                    </p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
-                                <i class="fas fa-calendar-times text-primary mt-0.5 w-4 text-center"></i>
+                                <i class="fas fa-trophy text-primary mt-0.5 w-4 text-center shrink-0"></i>
                                 <div>
-                                    <p class="text-warm-gray text-xs mb-0.5">Окончание приёма заявок</p>
-                                    <p class="font-medium text-dark">{{ $contest->applications_end_at->format('d.m.Y') }}</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <i class="fas fa-flag-checkered text-primary mt-0.5 w-4 text-center"></i>
-                                <div>
-                                    <p class="text-warm-gray text-xs mb-0.5">Дата публикации результатов</p>
-                                    <p class="font-medium text-dark">{{ $contest->evaluation_end_at->format('d.m.Y') }}</p>
+                                    <p class="text-warm-gray text-xs mb-1">Результаты</p>
+                                    <p class="font-medium text-dark">{{ $contest->evaluation_end_at->isoFormat('D MMMM YYYY [г.]') }}</p>
                                 </div>
                             </div>
                         </div>
