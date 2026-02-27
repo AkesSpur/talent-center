@@ -69,11 +69,11 @@
                 <div class="min-w-0">
                     <label class="block text-xs font-medium text-dark mb-1">Организация</label>
                     <select name="organization"
-                        class="px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm min-w-[180px] max-w-[240px] truncate">
+                        class="px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm min-w-[180px] max-w-[280px] truncate">
                         <option value="">Все организации</option>
                         @foreach($organizations as $org)
                             <option value="{{ $org->id }}" {{ request('organization') == $org->id ? 'selected' : '' }}>
-                                {{ Str::limit($org->name, 35) }}
+                                {{ Str::limit($org->name, 50) }}
                             </option>
                         @endforeach
                     </select>
