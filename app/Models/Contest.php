@@ -29,6 +29,7 @@ class Contest extends Model
         'evaluation_end_at',
         'diploma_background',
         'cover_image',
+        'regulations_url',
     ];
 
     protected function casts(): array

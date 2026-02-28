@@ -129,6 +129,15 @@
                     <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
                         <h3 class="font-semibold text-dark mb-4">Информация</h3>
                         <div class="space-y-4 text-sm">
+                            @if($contest->regulations_url)
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-file-alt text-primary mt-0.5 w-4 text-center shrink-0"></i>
+                                    <div>
+                                        <a href="{{ $contest->regulations_url }}" target="_blank" rel="noopener noreferrer"
+                                            class="font-medium text-primary hover:underline">Положение о конкурсе</a>
+                                    </div>
+                                </div>
+                            @endif
                             <div class="flex items-start gap-3">
                                 <i class="fas fa-calendar-alt text-primary mt-0.5 w-4 text-center shrink-0"></i>
                                 <div>

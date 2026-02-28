@@ -70,6 +70,15 @@
                                 class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none">{{ old('rules', $contest->rules) }}</textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('rules')" />
                         </div>
+
+                        <div>
+                            <label for="regulations_url" class="block text-sm font-medium text-dark mb-2">Положение о конкурсе</label>
+                            <input id="regulations_url" name="regulations_url" type="url" value="{{ old('regulations_url', $contest->regulations_url) }}"
+                                class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                placeholder="https://example.com/regulations.pdf" />
+                            <p class="text-xs text-warm-gray mt-1">Ссылка на документ в облачном хранилище или на сайте. Необязательное поле.</p>
+                            <x-input-error class="mt-2" :messages="$errors->get('regulations_url')" />
+                        </div>
                     </div>
 
                     {{-- Section 2: Dates --}}

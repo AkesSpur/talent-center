@@ -257,6 +257,7 @@
                                 'apply_url'          => route('applications.create', $contest),
                                 'show_url'           => route('contests.show', $contest),
                                 'categories'         => $contest->categories->map(fn ($c) => $c->name)->values()->toArray(),
+                                'regulations_url'    => $contest->regulations_url,
                             ];
                         @endphp
                         <div
@@ -415,6 +416,13 @@
 
                     {{-- Dates --}}
                     <div class="bg-cream rounded-xl p-4 space-y-2 mb-4 text-sm">
+                        <template x-if="modal && modal.regulations_url">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-file-alt text-primary w-4 text-center shrink-0"></i>
+                                <a :href="modal.regulations_url" target="_blank" rel="noopener noreferrer"
+                                    class="font-medium text-primary hover:underline">Положение о конкурсе</a>
+                            </div>
+                        </template>
                         <div class="flex items-center gap-3">
                             <i class="fas fa-calendar-alt text-primary w-4 text-center shrink-0"></i>
                             <span class="text-warm-gray shrink-0">Приём заявок:</span>
