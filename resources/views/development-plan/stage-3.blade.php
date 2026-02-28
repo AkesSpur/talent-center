@@ -162,43 +162,43 @@
             <div class="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-gold/10">
                 <ul class="space-y-3">
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">CRUD конкурсов с валидацией и загрузкой фона диплома</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Управление категориями конкурсов (динамическая форма)</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Публичный каталог конкурсов с фильтрацией и поиском</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Детальная страница конкурса</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Автоматический переход статусов (cron-команда)</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Форма подачи заявки с загрузкой файлов</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Подача заявки от имени ребёнка-участника</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Просмотр заявок организацией</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Страница «Мои заявки» в личном кабинете</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Form Requests для валидации</span>
                     </li>
                 </ul>
