@@ -134,10 +134,10 @@
                                 <div>
                                     <p class="text-warm-gray text-xs mb-1">Приём заявок</p>
                                     <p class="font-medium text-dark">
-                                        с 00:00:00 {{ $contest->applications_start_at->isoFormat('D MMMM YYYY [г.]') }}
+                                        с {{ $contest->applications_start_at->isoFormat('D MMMM YYYY [г.]') }}
                                     </p>
                                     <p class="font-medium text-dark">
-                                        до 23:59:59 {{ $contest->applications_end_at->isoFormat('D MMMM YYYY [г.]') }}
+                                        до {{ $contest->applications_end_at->isoFormat('D MMMM YYYY [г.]') }}
                                     </p>
                                 </div>
                             </div>
