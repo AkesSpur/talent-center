@@ -120,8 +120,8 @@
                 <!-- Stage 2 — IN PROGRESS -->
                 <div class="relative flex items-start mb-8 sm:mb-12 group">
                     <!-- Dot -->
-                    <div class="relative z-10 flex-shrink-0 w-10 h-10 sm:w-16 sm:h-16 bg-white border-4 border-gold rounded-full flex items-center justify-center shadow-md">
-                        <i class="fas fa-spinner fa-spin text-gold text-sm sm:text-xl"></i>
+                    <div class="relative z-10 flex-shrink-0 w-10 h-10 sm:w-16 sm:h-16 gradient-gold rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-check text-white text-sm sm:text-xl"></i>
                     </div>
                     <!-- Content -->
                     <div class="ml-4 sm:ml-6 flex-1 min-w-0">
@@ -152,8 +152,8 @@
                 <!-- Stage 3 — PLANNED -->
                 <div class="relative flex items-start mb-8 sm:mb-12 group">
                     <!-- Dot -->
-                    <div class="relative z-10 flex-shrink-0 w-10 h-10 sm:w-16 sm:h-16 bg-white border-4 border-warm-gray/30 rounded-full flex items-center justify-center">
-                        <span class="font-serif font-bold text-warm-gray text-base sm:text-lg">3</span>
+                    <div class="relative z-10 flex-shrink-0 w-10 h-10 sm:w-16 sm:h-16 bg-white border-4 border-gold rounded-full flex items-center justify-center shadow-md">
+                        <i class="fas fa-spinner fa-spin text-gold text-sm sm:text-xl"></i>
                     </div>
                     <!-- Content -->
                     <div class="ml-4 sm:ml-6 flex-1 min-w-0">
