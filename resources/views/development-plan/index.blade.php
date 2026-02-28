@@ -238,11 +238,11 @@
                         <div>Этап 1</div>
                     </div>
                     <div class="text-center">
-                        <i class="fas fa-spinner fa-spin text-gold mb-1"></i>
+                        <i class="fas fa-check-circle text-green-500 mb-1"></i>
                         <div>Этап 2</div>
                     </div>
                     <div class="text-center">
-                        <i class="fas fa-circle text-gray-300 mb-1"></i>
+                        <i class="fas fa-spinner fa-spin text-gold mb-1"></i>
                         <div>Этап 3</div>
                     </div>
                     <div class="text-center">
