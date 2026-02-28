@@ -225,11 +225,11 @@
 
             <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gold/10">
                 <div class="flex justify-between text-xs sm:text-sm text-warm-gray mb-2">
-                    <span>Выполнено: 1 из 4</span>
-                    <span class="font-semibold text-primary">25%</span>
+                    <span>Выполнено: 2 из 4</span>
+                    <span class="font-semibold text-primary">70%</span>
                 </div>
                 <div class="w-full bg-cream-dark rounded-full h-3 sm:h-4 overflow-hidden">
-                    <div class="gradient-gold h-3 sm:h-4 rounded-full transition-all duration-1000" style="width: 25%"></div>
+                    <div class="gradient-gold h-3 sm:h-4 rounded-full transition-all duration-1000" style="width: 70%"></div>
                 </div>
 
                 <div class="grid grid-cols-4 gap-1 sm:gap-2 mt-3 sm:mt-4 text-xs text-warm-gray">
