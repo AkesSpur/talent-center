@@ -127,7 +127,7 @@
                     <div class="ml-4 sm:ml-6 flex-1 min-w-0">
                         <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                             <span class="text-xs font-semibold text-gold uppercase tracking-wider">Этап 2</span>
-                            <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 <i class="fas fa-check-circle mr-1"></i> Завершён
                             </span>
                         </div>
@@ -159,7 +159,7 @@
                     <div class="ml-4 sm:ml-6 flex-1 min-w-0">
                         <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                             <span class="text-xs font-semibold text-warm-gray uppercase tracking-wider">Этап 3</span>
-                            <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                            <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                 <i class="fas fa-clock mr-1"></i> В работе
                             </span>
                         </div>
