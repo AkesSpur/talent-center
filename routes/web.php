@@ -6,12 +6,16 @@ use App\Http\Controllers\Admin\ActionLogController;
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
 use App\Http\Controllers\Admin\ContestController as AdminContestController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\EvaluationController as AdminEvaluationController;
 use App\Http\Controllers\Admin\OrganizationController as AdminOrganizationController;
+use App\Http\Controllers\Admin\DiplomaBackgroundController as AdminDiplomaBackgroundController;
 use App\Http\Controllers\Admin\PlatformCategoryController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiplomaController;
+use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ParticipantController;
@@ -76,6 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/organizations/{organization}/representatives', [RepresentativeController::class, 'store'])->name('organizations.representatives.store');
     Route::put('/organizations/{organization}/representatives/{user}', [RepresentativeController::class, 'update'])->name('organizations.representatives.update');
     Route::delete('/organizations/{organization}/representatives/{user}', [RepresentativeController::class, 'destroy'])->name('organizations.representatives.destroy');
+    Route::post('/organizations/{organization}/add-jury-member', [OrganizationController::class, 'addJuryMember'])->name('organizations.add-jury-member');
 
     // ── Contests (auth-required management) ─────────────
     Route::get('/dashboard/contests', [ContestController::class, 'myIndex'])->name('dashboard.contests');
@@ -90,6 +95,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/applications', [ApplicationController::class, 'myIndex'])->name('dashboard.applications');
     Route::get('/organizations/{organization}/applications', [ApplicationController::class, 'orgIndex'])
         ->name('organizations.applications');
+
+    // ── Evaluation (jury interface) ───────────────────────
+    Route::get('/organizations/{organization}/evaluate', [EvaluationController::class, 'index'])->name('evaluation.index');
+    Route::get('/organizations/{organization}/contests/{contest}/evaluate', [EvaluationController::class, 'show'])->name('evaluation.show');
+    Route::post('/organizations/{organization}/applications/{application}/evaluate', [EvaluationController::class, 'evaluate'])->name('evaluation.evaluate');
+    Route::post('/organizations/{organization}/contests/{contest}/finalize', [EvaluationController::class, 'finalize'])->name('evaluation.finalize');
+
+    // ── Diplomas ──────────────────────────────────────────
+    Route::get('/dashboard/diplomas', [DiplomaController::class, 'index'])->name('dashboard.diplomas');
+    Route::get('/diplomas/{diploma}/download', [DiplomaController::class, 'download'])->name('diplomas.download');
 });
 
 // ── Admin ───────────────────────────────────────────────
@@ -122,6 +137,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::put('/platform-categories/{platformCategory}', [PlatformCategoryController::class, 'update'])->name('platform-categories.update');
     Route::delete('/platform-categories/{platformCategory}', [PlatformCategoryController::class, 'destroy'])->name('platform-categories.destroy');
 
+    // Diploma backgrounds
+    Route::get('/diploma-backgrounds', [AdminDiplomaBackgroundController::class, 'index'])->name('diploma-backgrounds.index');
+    Route::post('/diploma-backgrounds', [AdminDiplomaBackgroundController::class, 'store'])->name('diploma-backgrounds.store');
+    Route::put('/diploma-backgrounds/{diplomaBackground}', [AdminDiplomaBackgroundController::class, 'update'])->name('diploma-backgrounds.update');
+    Route::delete('/diploma-backgrounds/{diplomaBackground}', [AdminDiplomaBackgroundController::class, 'destroy'])->name('diploma-backgrounds.destroy');
+
     // Contest management
     Route::get('/contests', [AdminContestController::class, 'index'])->name('contests.index');
     Route::get('/contests/{contest}/applications', [AdminContestController::class, 'applications'])->name('contests.applications');
@@ -129,6 +150,11 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     // Application management (global — all contests, all statuses)
     Route::get('/applications', [AdminApplicationController::class, 'index'])->name('applications.index');
+
+    // Evaluation override + diploma regeneration
+    Route::get('/contests/{contest}/evaluate', [AdminEvaluationController::class, 'show'])->name('evaluation.show');
+    Route::post('/applications/{application}/evaluate', [AdminEvaluationController::class, 'evaluate'])->name('evaluation.evaluate');
+    Route::post('/contests/{contest}/regenerate-diplomas', [AdminEvaluationController::class, 'regenerateDiplomas'])->name('contests.regenerate-diplomas');
 
     // Action logs
     Route::get('/action-logs', [ActionLogController::class, 'index'])->name('action-logs.index');

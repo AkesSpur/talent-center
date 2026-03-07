@@ -8,6 +8,7 @@ use App\Enums\ContestStatus;
 use App\Http\Requests\StoreContestRequest;
 use App\Http\Requests\UpdateContestRequest;
 use App\Models\Contest;
+use App\Models\DiplomaBackground;
 use App\Models\Organization;
 use App\Models\PlatformCategory;
 use App\Services\ActionLogService;
@@ -75,9 +76,10 @@ class ContestController extends Controller
         }
 
         $orgsData = $userOrgs->map(fn (Organization $org) => [
-            'id'   => $org->id,
-            'name' => $org->name,
-            'reps' => $org->representatives->map(fn ($rep) => [
+            'id'        => $org->id,
+            'name'      => $org->name,
+            'canManage' => $user->isAdmin() || $user->canInOrg('manage', $org),
+            'reps'      => $org->representatives->map(fn ($rep) => [
                 'id'   => $rep->id,
                 'name' => $rep->full_name,
             ])->values()->toArray(),
@@ -86,7 +88,15 @@ class ContestController extends Controller
         $platformCategories = PlatformCategory::active()->get();
         $preselectedOrgId   = (int) old('organization_id', $request->integer('organization_id', 0));
 
-        return view('contests.create', compact('orgsData', 'platformCategories', 'preselectedOrgId'));
+        $diplomaBackgrounds = DiplomaBackground::with('platformCategories')->get()->map(fn ($bg) => [
+            'id'          => $bg->id,
+            'name'        => $bg->name,
+            'image_url'   => asset('storage/' . $bg->image_path),
+            'image_path'  => $bg->image_path,
+            'category_ids' => $bg->platformCategories->pluck('id')->toArray(),
+        ])->values();
+
+        return view('contests.create', compact('orgsData', 'platformCategories', 'preselectedOrgId', 'diplomaBackgrounds'));
     }
 
     /**
@@ -107,7 +117,7 @@ class ContestController extends Controller
         }
 
         $data = array_merge(
-            $request->safe()->except(['diploma_background', 'cover_image', 'categories', 'juries', 'organization_id']),
+            $request->safe()->except(['diploma_background', 'cover_image', 'categories', 'juries', 'organization_id', 'contest_age_groups', 'selected_diploma_background_path']),
             [
                 'organization_id' => $organization->id,
                 'created_by'      => $request->user()->id,
@@ -126,6 +136,8 @@ class ContestController extends Controller
                 1920,
                 90
             );
+        } elseif ($request->filled('selected_diploma_background_path')) {
+            $data['diploma_background'] = $request->input('selected_diploma_background_path');
         }
 
         if ($request->hasFile('cover_image')) {
@@ -139,7 +151,8 @@ class ContestController extends Controller
 
         $contest = Contest::create($data);
 
-        $this->syncCategories($contest, $request->input('categories', []));
+        $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
+        $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
         $this->syncJuries($contest, $request->input('juries', []));
 
         // Determine and apply correct status based on dates
@@ -183,13 +196,15 @@ class ContestController extends Controller
     {
         $this->authorize('update', $contest);
 
-        $contest->load(['categories', 'juries', 'organization.representatives']);
+        $contest->load(['categories.ageGroups', 'juries', 'organization.representatives', 'contestLevelAgeGroups']);
 
+        $user     = request()->user();
         $org      = $contest->organization;
         $orgsData = collect([[
-            'id'   => $org->id,
-            'name' => $org->name,
-            'reps' => $org->representatives->map(fn ($rep) => [
+            'id'        => $org->id,
+            'name'      => $org->name,
+            'canManage' => $user->isAdmin() || $user->canInOrg('manage', $org),
+            'reps'      => $org->representatives->map(fn ($rep) => [
                 'id'   => $rep->id,
                 'name' => $rep->full_name,
             ])->values()->toArray(),
@@ -198,7 +213,15 @@ class ContestController extends Controller
         $platformCategories = PlatformCategory::active()->get();
         $selectedJuryIds    = $contest->juries->pluck('id')->toArray();
 
-        return view('contests.edit', compact('contest', 'orgsData', 'platformCategories', 'selectedJuryIds'));
+        $diplomaBackgrounds = DiplomaBackground::with('platformCategories')->get()->map(fn ($bg) => [
+            'id'          => $bg->id,
+            'name'        => $bg->name,
+            'image_url'   => asset('storage/' . $bg->image_path),
+            'image_path'  => $bg->image_path,
+            'category_ids' => $bg->platformCategories->pluck('id')->toArray(),
+        ])->values();
+
+        return view('contests.edit', compact('contest', 'orgsData', 'platformCategories', 'selectedJuryIds', 'diplomaBackgrounds'));
     }
 
     /**
@@ -211,7 +234,8 @@ class ContestController extends Controller
         $data = $request->safe()->except([
             'diploma_background', 'delete_diploma_background',
             'cover_image', 'delete_cover_image',
-            'categories', 'juries',
+            'categories', 'juries', 'contest_age_groups',
+            'selected_diploma_background_path',
         ]);
 
         $data['applications_start_at'] = Carbon::parse($data['applications_start_at'])->startOfDay();
@@ -232,6 +256,11 @@ class ContestController extends Controller
                 1920,
                 90
             );
+        } elseif ($request->filled('selected_diploma_background_path')) {
+            if ($contest->diploma_background) {
+                $this->deleteStoredImage($contest->diploma_background);
+            }
+            $data['diploma_background'] = $request->input('selected_diploma_background_path');
         }
 
         // Cover image
@@ -252,7 +281,8 @@ class ContestController extends Controller
 
         $contest->update($data);
 
-        $this->syncCategories($contest, $request->input('categories', []));
+        $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
+        $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
         $this->syncJuries($contest, $request->input('juries', []));
 
         // Re-evaluate status after date changes (only if not cancelled)
@@ -292,18 +322,62 @@ class ContestController extends Controller
 
     /**
      * Sync contest categories: delete all existing, recreate from input array.
+     * Returns an index-mapped array of created ContestCategory models.
      *
      * @param  array<int, array{name: string, description?: string|null}>  $categories
+     * @return array<int, \App\Models\ContestCategory>
      */
-    private function syncCategories(Contest $contest, array $categories): void
+    private function syncCategories(Contest $contest, array $categories): array
     {
         $contest->categories()->delete();
 
-        foreach ($categories as $cat) {
+        $created = [];
+        foreach ($categories as $index => $cat) {
             if (! empty($cat['name'])) {
-                $contest->categories()->create([
+                $created[$index] = $contest->categories()->create([
                     'name'        => $cat['name'],
                     'description' => $cat['description'] ?? null,
+                ]);
+            }
+        }
+
+        return $created;
+    }
+
+    /**
+     * Sync age groups for a contest.
+     * Category-level age groups are cascaded via syncCategories delete.
+     * Contest-level age groups (no category) are handled separately.
+     */
+    private function syncAgeGroups(Contest $contest, array $categoriesInput, array $contestAgeGroupsInput, array $categoryModels): void
+    {
+        // Delete contest-level age groups (category-level ones cascade via category delete)
+        $contest->contestLevelAgeGroups()->delete();
+
+        // Create category-level age groups
+        foreach ($categoriesInput as $index => $cat) {
+            if (isset($categoryModels[$index]) && ! empty($cat['age_groups'])) {
+                foreach ($cat['age_groups'] as $ag) {
+                    if (! empty($ag['name'])) {
+                        $contest->ageGroups()->create([
+                            'contest_category_id' => $categoryModels[$index]->id,
+                            'name'                => $ag['name'],
+                            'min_age'             => $ag['min_age'] ?: null,
+                            'max_age'             => $ag['max_age'] ?: null,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // Create contest-level age groups (when no categories)
+        foreach ($contestAgeGroupsInput as $ag) {
+            if (! empty($ag['name'])) {
+                $contest->ageGroups()->create([
+                    'contest_category_id' => null,
+                    'name'                => $ag['name'],
+                    'min_age'             => $ag['min_age'] ?: null,
+                    'max_age'             => $ag['max_age'] ?: null,
                 ]);
             }
         }

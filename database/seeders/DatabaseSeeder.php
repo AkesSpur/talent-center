@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             TestDataSeeder::class,
             ContestSeeder::class,
+            Stage4TestSeeder::class,
         ]);
     }
 }

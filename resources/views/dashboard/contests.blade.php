@@ -18,11 +18,10 @@
             @if($contests->count())
                 <div class="bg-white rounded-xl shadow-sm border border-gold/10 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm min-w-[700px]">
+                        <table class="w-full text-sm min-w-[600px]">
                             <thead>
                                 <tr class="border-b border-gold/10 text-warm-gray text-xs uppercase tracking-wider">
                                     <th class="text-left px-6 py-3 font-semibold">Конкурс</th>
-                                    <th class="text-left px-6 py-3 font-semibold hidden md:table-cell">Организация</th>
                                     <th class="text-left px-6 py-3 font-semibold">Статус</th>
                                     <th class="text-left px-6 py-3 font-semibold hidden lg:table-cell">Приём заявок</th>
                                     <th class="text-center px-6 py-3 font-semibold hidden sm:table-cell">Заявки</th>
@@ -53,12 +52,6 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 hidden md:table-cell">
-                                            <div class="flex items-center gap-2">
-                                                <x-org-avatar :organization="$contest->organization" size="xs" />
-                                                <span class="text-dark text-sm truncate">{{ $contest->organization->name }}</span>
-                                            </div>
-                                        </td>
                                         <td class="px-6 py-4">
                                             <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full {{ $contest->status->color() }}">
                                                 {{ $contest->status->label() }}
@@ -76,6 +69,13 @@
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex items-center justify-end gap-1.5">
+                                                @if($contest->isEvaluation() && auth()->user()->canInOrg('evaluate', $contest->organization))
+                                                    <a href="{{ route('evaluation.show', [$contest->organization, $contest]) }}"
+                                                        title="Оценить заявки"
+                                                        class="w-8 h-8 flex items-center justify-center border border-gold/30 text-gold rounded-lg hover:bg-gold/10 transition-colors">
+                                                        <i class="fas fa-star text-xs"></i>
+                                                    </a>
+                                                @endif
                                                 <a href="{{ route('organizations.applications', $contest->organization) }}"
                                                     title="Заявки"
                                                     class="w-8 h-8 flex items-center justify-center border border-primary/20 text-primary rounded-lg hover:bg-primary/5 transition-colors">

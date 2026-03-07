@@ -109,20 +109,27 @@
                         @if($organization->contests->count())
                             <div class="space-y-2">
                                 @foreach($organization->contests->sortByDesc('created_at')->take(5) as $contest)
-                                    <a href="{{ route('contests.show', $contest) }}"
-                                        class="block p-3 rounded-lg border border-primary/10 hover:bg-cream/50 transition">
+                                    <div class="p-3 rounded-lg border border-primary/10 hover:bg-cream/50 transition">
                                         <div class="flex items-center justify-between gap-3">
-                                            <div class="flex-1 min-w-0">
+                                            <a href="{{ route('contests.show', $contest) }}" class="flex-1 min-w-0 block">
                                                 <p class="font-medium text-dark truncate text-sm">{{ $contest->title }}</p>
                                                 <p class="text-xs text-warm-gray mt-0.5">
                                                     {{ $contest->applications_start_at->format('d.m.Y') }} — {{ $contest->applications_end_at->format('d.m.Y') }}
                                                 </p>
+                                            </a>
+                                            <div class="flex items-center gap-2 shrink-0">
+                                                @if($contest->isEvaluation() && (auth()->user()->canInOrg('evaluate', $organization) || auth()->user()->isAdmin()))
+                                                    <a href="{{ route('evaluation.show', [$organization, $contest]) }}"
+                                                        class="text-xs bg-gold/20 text-dark border border-gold/40 px-2.5 py-1 rounded-lg hover:bg-gold/30 transition whitespace-nowrap">
+                                                        <i class="fas fa-star mr-1"></i>Оценить
+                                                    </a>
+                                                @endif
+                                                <span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full {{ $contest->status->color() }}">
+                                                    {{ $contest->status->label() }}
+                                                </span>
                                             </div>
-                                            <span class="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full {{ $contest->status->color() }} shrink-0">
-                                                {{ $contest->status->label() }}
-                                            </span>
                                         </div>
-                                    </a>
+                                    </div>
                                 @endforeach
                             </div>
                         @else

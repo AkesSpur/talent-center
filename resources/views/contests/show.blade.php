@@ -114,6 +114,12 @@
                             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-700">
                                 <i class="fas fa-star mr-2"></i>Приём заявок завершён. Проводится оценка работ.
                             </div>
+                            @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->canInOrg('evaluate', $contest->organization)))
+                                <a href="{{ route('evaluation.show', [$contest->organization, $contest]) }}"
+                                    class="block text-center mt-3 px-4 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm">
+                                    <i class="fas fa-star mr-2"></i>Оценить заявки
+                                </a>
+                            @endif
                         @elseif($contest->isArchive())
                             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-600">
                                 <i class="fas fa-archive mr-2"></i>Конкурс завершён.

@@ -7,8 +7,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreOrganizationRequest;
 use App\Http\Requests\UpdateOrganizationRequest;
 use App\Models\Organization;
+use App\Models\User;
 use App\Services\ActionLogService;
 use App\Traits\HandlesImages;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,7 +20,11 @@ class OrganizationController extends Controller
     use HandlesImages;
     public function index(Request $request): View
     {
-        $organizations = $request->user()->organizations()->latest()->get();
+        $organizations = $request->user()
+            ->organizations()
+            ->with(['contests' => fn ($q) => $q->where('status', 'evaluation')])
+            ->latest()
+            ->get();
 
         return view('organizations.index', compact('organizations'));
     }
@@ -89,5 +95,54 @@ class OrganizationController extends Controller
 
         return redirect()->route('organizations.show', $organization)
             ->with('status', 'organization-updated');
+    }
+
+    /**
+     * POST /organizations/{organization}/add-jury-member (AJAX)
+     * Add a user as an org representative with can_evaluate permission.
+     */
+    public function addJuryMember(Request $request, Organization $organization): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $user->canInOrg('manage', $organization) && ! $user->isAdmin()) {
+            return response()->json(['error' => 'Недостаточно прав.'], 403);
+        }
+
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $newRep = User::where('email', $request->input('email'))->first();
+
+        if (! $newRep) {
+            return response()->json(['error' => 'Пользователь с таким email не найден в системе.'], 422);
+        }
+
+        if ($organization->representatives()->where('user_id', $newRep->id)->exists()) {
+            return response()->json([
+                'id'             => $newRep->id,
+                'name'           => $newRep->full_name,
+                'already_member' => true,
+            ]);
+        }
+
+        $organization->representatives()->attach($newRep->id, [
+            'can_create'   => false,
+            'can_manage'   => false,
+            'can_evaluate' => true,
+        ]);
+
+        ActionLogService::log('representative.added', $organization, [
+            'user_id'   => $newRep->id,
+            'user_name' => $newRep->full_name,
+            'source'    => 'jury_invite',
+        ]);
+
+        return response()->json([
+            'id'             => $newRep->id,
+            'name'           => $newRep->full_name,
+            'already_member' => false,
+        ]);
     }
 }

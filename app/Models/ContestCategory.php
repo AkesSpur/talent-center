@@ -30,4 +30,9 @@ class ContestCategory extends Model
     {
         return $this->hasMany(Application::class, 'category_id');
     }
+
+    public function ageGroups(): HasMany
+    {
+        return $this->hasMany(AgeGroup::class);
+    }
 }

@@ -63,9 +63,9 @@
                 <i class="fas fa-arrow-left mr-2"></i> Вернуться к плану развития
             </a>
 
-            <div class="inline-flex items-center px-4 py-2 rounded-full bg-gray-100 border border-gray-200 text-sm text-gray-600 font-medium mb-6">
-                <i class="fas fa-hourglass-half mr-2"></i>
-                Этап 4 — Запланировано
+            <div class="inline-flex items-center px-4 py-2 rounded-full bg-yellow-50 border border-yellow-200 text-sm text-yellow-700 font-medium mb-6">
+                <i class="fas fa-spinner fa-spin mr-2"></i>
+                Этап 4 — В работе
             </div>
 
             <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-6">
@@ -83,7 +83,7 @@
     <section class="py-16 sm:py-20 px-4">
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-12">
-                <h3 class="font-serif text-2xl sm:text-3xl font-bold text-dark mb-4">Запланированные работы</h3>
+                <h3 class="font-serif text-2xl sm:text-3xl font-bold text-dark mb-4">Работы этапа</h3>
                 <p class="text-warm-gray max-w-xl mx-auto">Все компоненты финального этапа разработки.</p>
             </div>
 
@@ -162,39 +162,39 @@
             <div class="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-gold/10">
                 <ul class="space-y-3">
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Дашборд жюри: список конкурсов на оценке</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Страница оценки заявок с группировкой по категориям</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Присвоение мест с цветовой индикацией</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Кнопка «Завершить оценку» с проверкой полноты</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Генерация PDF-дипломов (barryvdh/laravel-dompdf)</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Страница «Мои дипломы» с возможностью скачивания</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Email-уведомления (Laravel Mailables + очереди)</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Возможность отписки от email-уведомлений</span>
                     </li>
                     <li class="flex items-start">
-                        <i class="fas fa-circle text-gray-300 mt-0.5 mr-3 flex-shrink-0"></i>
+                        <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
                         <span class="text-sm text-dark">Админ-инструменты для управления оценками и дипломами</span>
                     </li>
                     <li class="flex items-start">

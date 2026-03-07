@@ -78,6 +78,14 @@
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
+                                            @if($organization->contests->isNotEmpty() && auth()->user()->canInOrg('evaluate', $organization))
+                                                @php $evalContest = $organization->contests->first(); @endphp
+                                                <a href="{{ route('evaluation.show', [$organization, $evalContest]) }}"
+                                                   class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-gold/40 text-gold hover:bg-gold/10 transition-colors"
+                                                   title="Оценить заявки">
+                                                    <i class="fas fa-star text-xs"></i>
+                                                </a>
+                                            @endif
                                             <a href="{{ route('organizations.show', $organization) }}"
                                                class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-gold/30 text-warm-gray hover:text-primary hover:border-primary/40 transition-colors"
                                                title="Просмотр">

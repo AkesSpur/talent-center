@@ -42,7 +42,7 @@
                     <x-dropdown-link :href="route('dashboard.applications')">
                         <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
                     </x-dropdown-link>
-                    <x-dropdown-link href="#">
+                    <x-dropdown-link :href="route('dashboard.diplomas')">
                         <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Награды
                     </x-dropdown-link>
                     <x-dropdown-link :href="route('participants.index')">
@@ -80,7 +80,10 @@
                                 <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.platform-categories.index')">
-                                <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Категории
+                                <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Жанры
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.diploma-backgrounds.index')">
+                                <i class="fas fa-image mr-2 text-warm-gray w-5 text-center"></i> Фоны дипломов
                             </x-dropdown-link>
                         </div>
                     @endif

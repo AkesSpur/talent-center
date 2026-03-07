@@ -128,7 +128,7 @@
                                         </a>
                                         <a href="{{ route('admin.platform-categories.index') }}"
                                             class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
-                                            <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Категории
+                                            <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Жанры
                                         </a>
                                     </div>
                                 @endif
@@ -232,7 +232,7 @@
                         x-model="category"
                         class="px-3 py-2.5 border border-primary/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm bg-cream/50 text-dark"
                     >
-                        <option value="">Все категории</option>
+                        <option value="">Все жанры</option>
                         @foreach($platformCategories as $cat)
                             <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                         @endforeach

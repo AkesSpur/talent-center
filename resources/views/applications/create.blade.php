@@ -34,7 +34,20 @@
                 <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
                     <form method="POST" action="{{ route('applications.store', $contest) }}"
                           enctype="multipart/form-data"
-                          x-data="{ uploadMode: '{{ old('external_link') ? 'link' : 'file' }}', selectedFile: null, formatSize(bytes) { if (!bytes) return ''; const mb = bytes / 1024 / 1024; return mb >= 1 ? mb.toFixed(1) + ' МБ' : (bytes / 1024).toFixed(0) + ' КБ'; } }"
+                          x-data="{
+                            uploadMode: '{{ old('external_link') ? 'link' : 'file' }}',
+                            selectedFile: null,
+                            showTeacher: {{ old('teacher_name') ? 'true' : 'false' }},
+                            selectedCategoryId: '{{ old('category_id', '') }}',
+                            allAgeGroups: {{ \Illuminate\Support\Js::from($ageGroupsData) }},
+                            get filteredAgeGroups() {
+                                if (this.selectedCategoryId) {
+                                    return this.allAgeGroups.filter(ag => ag.contest_category_id == this.selectedCategoryId);
+                                }
+                                return this.allAgeGroups.filter(ag => !ag.contest_category_id);
+                            },
+                            formatSize(bytes) { if (!bytes) return ''; const mb = bytes / 1024 / 1024; return mb >= 1 ? mb.toFixed(1) + ' МБ' : (bytes / 1024).toFixed(0) + ' КБ'; }
+                          }"
                           class="space-y-6">
                         @csrf
                         <input type="hidden" name="contest_id" value="{{ $contest->id }}">
@@ -68,7 +81,7 @@
                         @if($contest->categories->count())
                             <div>
                                 <label for="category_id" class="block text-sm font-medium text-dark mb-2">Номинация</label>
-                                <select id="category_id" name="category_id"
+                                <select id="category_id" name="category_id" x-model="selectedCategoryId"
                                     class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm">
                                     <option value="">— Без номинации —</option>
                                     @foreach($contest->categories as $category)
@@ -80,6 +93,37 @@
                                 <x-input-error class="mt-2" :messages="$errors->get('category_id')" />
                             </div>
                         @endif
+
+                        {{-- Age group selection --}}
+                        <div x-show="filteredAgeGroups.length > 0" x-cloak>
+                            <label for="age_group_id" class="block text-sm font-medium text-dark mb-2">Возрастная группа</label>
+                            <select id="age_group_id" name="age_group_id"
+                                class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm">
+                                <option value="">— Без возрастной группы —</option>
+                                <template x-for="ag in filteredAgeGroups" :key="ag.id">
+                                    <option :value="ag.id" :selected="ag.id == '{{ old('age_group_id', '') }}'"
+                                        x-text="ag.name + (ag.min_age || ag.max_age ? ' (' + (ag.min_age || '') + '–' + (ag.max_age || '') + ' лет)' : '')"></option>
+                                </template>
+                            </select>
+                            <x-input-error class="mt-2" :messages="$errors->get('age_group_id')" />
+                        </div>
+
+                        {{-- Teacher in diploma --}}
+                        <div>
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" x-model="showTeacher"
+                                    class="rounded border-primary/30 text-primary focus:ring-primary/30">
+                                <span class="text-sm font-medium text-dark">Добавить преподавателя в диплом</span>
+                            </label>
+
+                            <div x-show="showTeacher" x-cloak class="mt-3">
+                                <input type="text" name="teacher_name"
+                                    value="{{ old('teacher_name') }}"
+                                    placeholder="ФИО преподавателя"
+                                    class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm" />
+                                <x-input-error class="mt-2" :messages="$errors->get('teacher_name')" />
+                            </div>
+                        </div>
 
                         {{-- Upload mode toggle --}}
                         <div>

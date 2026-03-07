@@ -55,10 +55,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-dark mb-1">Категория</label>
+                        <label class="block text-xs font-medium text-dark mb-1">Жанр</label>
                         <select name="category"
                             class="w-full px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
-                            <option value="">Все категории</option>
+                            <option value="">Все жанры</option>
                             @foreach($platformCategories as $cat)
                                 <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
                                     {{ $cat->name }}
@@ -102,7 +102,7 @@
                                 <tr class="border-b border-gold/10 text-warm-gray text-xs uppercase tracking-wider">
                                     <th class="text-left px-6 py-3 font-semibold">Конкурс</th>
                                     <th class="text-left px-6 py-3 font-semibold hidden md:table-cell">Организация</th>
-                                    <th class="text-left px-6 py-3 font-semibold hidden lg:table-cell">Категория</th>
+                                    <th class="text-left px-6 py-3 font-semibold hidden lg:table-cell">Жанр</th>
                                     <th class="text-left px-6 py-3 font-semibold">Статус</th>
                                     <th class="text-left px-6 py-3 font-semibold hidden lg:table-cell">Даты</th>
                                     <th class="text-right px-6 py-3 font-semibold">Действия</th>

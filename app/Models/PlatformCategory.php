@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PlatformCategory extends Model
@@ -28,5 +29,10 @@ class PlatformCategory extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true)->orderBy('sort_order');
+    }
+
+    public function diplomaBackgrounds(): BelongsToMany
+    {
+        return $this->belongsToMany(DiplomaBackground::class, 'diploma_bg_platform_category');
     }
 }

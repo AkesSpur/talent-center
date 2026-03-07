@@ -157,15 +157,40 @@
                     </div>
                 </div>
 
-                <!-- Мои дипломы (placeholder Stage 4) -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gold/10 opacity-60">
+                <!-- Мои дипломы -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gold/10">
                     <div class="p-6">
-                        <h3 class="text-lg font-medium text-dark mb-2">
-                            <i class="fas fa-award text-gold mr-2"></i> Мои дипломы
-                        </h3>
-                        <p class="text-warm-gray text-sm">
-                            Дипломы и награды появятся на четвёртом этапе разработки.
-                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-dark">
+                                <i class="fas fa-award text-gold mr-2"></i> Мои награды
+                            </h3>
+                            <a href="{{ route('dashboard.diplomas') }}" class="text-sm text-primary hover:text-primary/80">
+                                Все награды <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+
+                        @if($recentDiplomas->count())
+                            <div class="space-y-2">
+                                @foreach($recentDiplomas as $diploma)
+                                    <div class="p-3 rounded-lg border border-primary/10 flex items-center justify-between gap-3">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-medium text-dark text-sm truncate">{{ $diploma->contest->title }}</p>
+                                            <p class="text-xs text-warm-gray mt-0.5">{{ $diploma->application->status->label() }}</p>
+                                        </div>
+                                        @if($diploma->file_path)
+                                            <a href="{{ route('diplomas.download', $diploma) }}"
+                                                class="shrink-0 text-xs text-primary hover:underline">
+                                                <i class="fas fa-download mr-1"></i>Скачать
+                                            </a>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-warm-gray text-sm">
+                                Дипломы появятся здесь после завершения конкурсов.
+                            </p>
+                        @endif
                     </div>
                 </div>
             </div>

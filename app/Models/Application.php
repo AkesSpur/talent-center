@@ -18,12 +18,14 @@ class Application extends Model
     protected $fillable = [
         'contest_id',
         'category_id',
+        'age_group_id',
         'user_id',
         'status',
         'rejection_reason',
         'file_path',
         'file_type',
         'external_link',
+        'teacher_name',
         'evaluated_by',
         'evaluated_at',
     ];
@@ -57,6 +59,11 @@ class Application extends Model
     public function evaluatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'evaluated_by');
+    }
+
+    public function ageGroup(): BelongsTo
+    {
+        return $this->belongsTo(AgeGroup::class);
     }
 
     public function diploma(): HasOne

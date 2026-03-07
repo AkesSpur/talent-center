@@ -125,4 +125,14 @@ class Contest extends Model
     {
         return $this->belongsToMany(User::class, 'contest_juries');
     }
+
+    public function ageGroups(): HasMany
+    {
+        return $this->hasMany(AgeGroup::class);
+    }
+
+    public function contestLevelAgeGroups(): HasMany
+    {
+        return $this->hasMany(AgeGroup::class)->whereNull('contest_category_id');
+    }
 }

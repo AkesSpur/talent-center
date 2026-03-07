@@ -2,20 +2,20 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-                <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark">Категории конкурсов</h2>
-                <p class="text-warm-gray mt-1">Управление категориями платформы</p>
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark">Жанр конкурсов</h2>
+                <p class="text-warm-gray mt-1">Управление жанрами платформы</p>
             </div>
             <button type="button" onclick="document.getElementById('modal-create').classList.remove('hidden')"
                 class="inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm">
-                <i class="fas fa-plus mr-2"></i>Добавить категорию
+                <i class="fas fa-plus mr-2"></i>Добавить жанр
             </button>
         </div>
     </x-slot>
 
     <x-confirm-modal
         name="delete-category"
-        title="Удалить категорию"
-        message="Вы уверены, что хотите удалить эту категорию? Все привязанные конкурсы потеряют категорию."
+        title="Удалить жанр"
+        message="Вы уверены, что хотите удалить этот жанр? Все привязанные конкурсы потеряют жанр."
         icon="fa-trash"
         iconColor="text-red-600"
         iconBg="bg-red-100"
@@ -88,8 +88,8 @@
                     <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                         <i class="fas fa-tags text-3xl text-primary"></i>
                     </div>
-                    <h3 class="font-serif text-xl font-semibold text-dark mb-2">Категорий нет</h3>
-                    <p class="text-warm-gray mb-6">Создайте первую категорию для группировки конкурсов.</p>
+                    <h3 class="font-serif text-xl font-semibold text-dark mb-2">Жанров нет</h3>
+                    <p class="text-warm-gray mb-6">Создайте первый жанр для группировки конкурсов.</p>
                 </div>
             @endif
         </div>
@@ -99,7 +99,7 @@
     <div id="modal-create" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
             <div class="p-6 border-b border-gold/10 flex items-center justify-between">
-                <h3 class="font-serif text-lg font-semibold text-dark">Новая категория</h3>
+                <h3 class="font-serif text-lg font-semibold text-dark">Новый жанр</h3>
                 <button onclick="document.getElementById('modal-create').classList.add('hidden')" class="text-warm-gray hover:text-dark">
                     <i class="fas fa-times"></i>
                 </button>
@@ -116,7 +116,7 @@
                     <label class="block text-sm font-medium text-dark mb-2">Описание</label>
                     <textarea name="description" rows="3" maxlength="1000"
                         class="w-full px-4 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm resize-none"
-                        placeholder="Краткое описание категории..."></textarea>
+                        placeholder="Краткое описание жанра..."></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -149,7 +149,7 @@
     <div id="modal-edit" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
             <div class="p-6 border-b border-gold/10 flex items-center justify-between">
-                <h3 class="font-serif text-lg font-semibold text-dark">Редактировать категорию</h3>
+                <h3 class="font-serif text-lg font-semibold text-dark">Редактировать жанр</h3>
                 <button onclick="document.getElementById('modal-edit').classList.add('hidden')" class="text-warm-gray hover:text-dark">
                     <i class="fas fa-times"></i>
                 </button>

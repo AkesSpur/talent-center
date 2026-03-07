@@ -134,8 +134,21 @@
                                                     <x-user-avatar :user="$application->user" size="md" />
                                                     <div class="space-y-1 min-w-0">
                                                         <p class="font-semibold text-dark">{{ $application->user->full_name }}</p>
+                                                        <p class="text-sm text-warm-gray"><i class="fas fa-envelope mr-1.5 w-4 text-center"></i>{{ $application->user->email }}</p>
+                                                        @if($application->user->phone)
+                                                            <p class="text-sm text-warm-gray"><i class="fas fa-phone mr-1.5 w-4 text-center"></i>{{ $application->user->phone }}</p>
+                                                        @endif
+                                                        @if($application->user->birth_date)
+                                                            <p class="text-sm text-warm-gray"><i class="fas fa-birthday-cake mr-1.5 w-4 text-center"></i>{{ $application->user->birth_date->format('d.m.Y') }}</p>
+                                                        @endif
                                                         @if($application->user->city)
                                                             <p class="text-sm text-warm-gray"><i class="fas fa-map-marker-alt mr-1.5 w-4 text-center"></i>{{ $application->user->city }}</p>
+                                                        @endif
+                                                        @if($application->user->organization)
+                                                            <p class="text-sm text-warm-gray"><i class="fas fa-school mr-1.5 w-4 text-center"></i>{{ $application->user->organization }}</p>
+                                                        @endif
+                                                        @if($application->user->group)
+                                                            <p class="text-sm text-warm-gray"><i class="fas fa-users mr-1.5 w-4 text-center"></i>{{ $application->user->group }}</p>
                                                         @endif
                                                         @if($application->user->education)
                                                             <p class="text-sm text-warm-gray"><i class="fas fa-graduation-cap mr-1.5 w-4 text-center"></i>{{ $application->user->education }}</p>

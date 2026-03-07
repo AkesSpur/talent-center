@@ -24,6 +24,8 @@ class StoreApplicationRequest extends FormRequest
             'submitted_for_user_id' => ['nullable', 'integer', 'exists:users,id'],
             'file'                  => ['nullable', 'file', 'max:4096', 'mimes:jpg,jpeg,png,gif,pdf,doc,docx'],
             'external_link'         => ['nullable', 'url', 'max:500'],
+            'teacher_name'          => ['nullable', 'string', 'max:255'],
+            'age_group_id'          => ['nullable', 'integer', 'exists:age_groups,id'],
         ];
     }
 

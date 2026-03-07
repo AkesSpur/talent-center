@@ -19,7 +19,7 @@
                 @endphp
                 <form method="POST" action="{{ route('contests.store') }}"
                       enctype="multipart/form-data"
-                      x-data="contestForm({{ \Illuminate\Support\Js::from($initialCategories) }}, {{ \Illuminate\Support\Js::from($orgsData) }}, {{ $preselectedOrgId }})"
+                      x-data="contestForm({{ \Illuminate\Support\Js::from($initialCategories) }}, {{ \Illuminate\Support\Js::from($orgsData) }}, {{ $preselectedOrgId }}, {{ \Illuminate\Support\Js::from($diplomaBackgrounds) }})"
                       class="space-y-8">
                     @csrf
 
@@ -48,10 +48,10 @@
                         <h3 class="font-serif text-lg font-semibold text-dark border-b border-gold/20 pb-2">Основная информация</h3>
 
                         <div>
-                            <label for="platform_category_id" class="block text-sm font-medium text-dark mb-2">Категория</label>
-                            <select id="platform_category_id" name="platform_category_id"
+                            <label for="platform_category_id" class="block text-sm font-medium text-dark mb-2">Жанр</label>
+                            <select id="platform_category_id" name="platform_category_id" x-model="selectedGenreId"
                                 class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
-                                <option value="">— Без категории —</option>
+                                <option value="">— Без жанра —</option>
                                 @foreach($platformCategories as $cat)
                                     <option value="{{ $cat->id }}" {{ old('platform_category_id') == $cat->id ? 'selected' : '' }}>
                                         {{ $cat->name }}
@@ -115,7 +115,7 @@
                                 <x-input-error class="mt-2" :messages="$errors->get('applications_end_at')" />
                             </div>
                             <div>
-                                <label for="evaluation_end_at" class="block text-sm font-medium text-dark mb-2">Дата публикации результатов <span class="text-red-500">*</span></label>
+                                <label for="evaluation_end_at" class="block text-sm font-medium text-dark mb-2">Дата рассылки результатов <span class="text-red-500">*</span></label>
                                 <input id="evaluation_end_at" name="evaluation_end_at" type="date"
                                     value="{{ old('evaluation_end_at') }}" required
                                     class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
@@ -125,10 +125,10 @@
                     </div>
 
                     {{-- Section 3: Jury --}}
-                    <div class="space-y-4" x-show="selectedOrgId && currentReps.length > 0" x-cloak>
+                    <div class="space-y-4" x-show="selectedOrgId" x-cloak>
                         <h3 class="font-serif text-lg font-semibold text-dark border-b border-gold/20 pb-2">Члены жюри</h3>
                         <p class="text-xs text-warm-gray">Выберите представителей организации, которые будут оценивать работы.</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" x-show="currentReps.length > 0">
                             <template x-for="rep in currentReps" :key="rep.id">
                                 <label class="flex items-center gap-3 p-3 rounded-lg border border-primary/10 hover:border-primary/30 hover:bg-cream/50 cursor-pointer transition-colors"
                                     :class="selectedJuries.includes(rep.id) ? 'bg-primary/5 border-primary/30' : ''">
@@ -140,9 +140,33 @@
                                 </label>
                             </template>
                         </div>
+                        <div x-show="currentReps.length === 0" class="text-sm text-warm-gray italic">
+                            У организации пока нет представителей.
+                        </div>
                         <template x-for="juryId in selectedJuries" :key="juryId">
                             <input type="hidden" name="juries[]" :value="juryId">
                         </template>
+
+                        {{-- Invite jury member --}}
+                        <div x-show="currentOrgCanManage" class="mt-4 p-4 bg-cream rounded-lg border border-gold/10">
+                            <p class="text-sm font-medium text-dark mb-3">
+                                <i class="fas fa-user-plus mr-1 text-primary"></i>Пригласить члена жюри
+                            </p>
+                            <div class="flex gap-2">
+                                <input type="email" x-model="juryInviteEmail"
+                                    placeholder="Email пользователя"
+                                    class="flex-1 px-4 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm" />
+                                <button type="button" @click="inviteJuryMember()"
+                                    :disabled="juryInviteLoading"
+                                    class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50">
+                                    <i class="fas fa-plus mr-1" x-show="!juryInviteLoading"></i>
+                                    <i class="fas fa-spinner fa-spin mr-1" x-show="juryInviteLoading"></i>
+                                    Добавить
+                                </button>
+                            </div>
+                            <p x-show="juryInviteError" x-text="juryInviteError" class="text-sm text-red-600 mt-2"></p>
+                            <p x-show="juryInviteSuccess" x-text="juryInviteSuccess" class="text-sm text-green-600 mt-2"></p>
+                        </div>
                     </div>
 
                     {{-- Section 4: Contest Categories (Номинации) --}}
@@ -150,7 +174,7 @@
                         <div class="flex items-center justify-between border-b border-gold/20 pb-2">
                             <div>
                                 <h3 class="font-serif text-lg font-semibold text-dark">Номинации</h3>
-                                <p class="text-xs text-warm-gray mt-0.5">Необязательно. Добавьте номинации, если конкурс разбит на категории.</p>
+                                <p class="text-xs text-warm-gray mt-0.5">Необязательно. Добавьте номинации, если конкурс разбит на номинации.</p>
                             </div>
                             <button type="button" @click="addCategory()"
                                 class="text-sm text-primary hover:text-primary-dark font-medium flex items-center gap-1 shrink-0">
@@ -160,30 +184,96 @@
 
                         <div class="space-y-3">
                             <template x-for="(cat, index) in categories" :key="index">
-                                <div class="flex gap-3 items-start p-4 bg-cream rounded-lg border border-gold/10">
-                                    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        <div>
-                                            <label class="block text-xs font-medium text-dark mb-1">Название <span class="text-red-500">*</span></label>
-                                            <input type="text" :name="'categories[' + index + '][name]'" x-model="cat.name"
-                                                placeholder="Живопись"
-                                                class="w-full px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm" />
+                                <div class="p-4 bg-cream rounded-lg border border-gold/10">
+                                    <div class="flex gap-3 items-start">
+                                        <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-xs font-medium text-dark mb-1">Название <span class="text-red-500">*</span></label>
+                                                <input type="text" :name="'categories[' + index + '][name]'" x-model="cat.name"
+                                                    placeholder="Живопись"
+                                                    class="w-full px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm" />
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-dark mb-1">Описание</label>
+                                                <input type="text" :name="'categories[' + index + '][description]'" x-model="cat.description"
+                                                    placeholder="Краткое описание номинации"
+                                                    class="w-full px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm" />
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-dark mb-1">Описание</label>
-                                            <input type="text" :name="'categories[' + index + '][description]'" x-model="cat.description"
-                                                placeholder="Для участников от 10 до 14 лет"
-                                                class="w-full px-3 py-2 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm" />
-                                        </div>
+                                        <button type="button" @click="removeCategory(index)"
+                                            class="text-warm-gray hover:text-red-500 mt-6 transition-colors shrink-0">
+                                            <i class="fas fa-times text-sm"></i>
+                                        </button>
                                     </div>
-                                    <button type="button" @click="removeCategory(index)"
-                                        class="text-warm-gray hover:text-red-500 mt-6 transition-colors shrink-0">
-                                        <i class="fas fa-times text-sm"></i>
-                                    </button>
+                                    {{-- Age groups for this nomination --}}
+                                    <div class="mt-3 pt-3 border-t border-gold/10">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-xs font-medium text-warm-gray">Возрастные группы</span>
+                                            <button type="button" @click="addAgeGroup(cat)"
+                                                class="text-xs text-primary hover:text-primary-dark font-medium">
+                                                <i class="fas fa-plus mr-0.5"></i>Добавить
+                                            </button>
+                                        </div>
+                                        <template x-for="(ag, agIdx) in cat.age_groups" :key="agIdx">
+                                            <div class="flex gap-2 items-center mb-2">
+                                                <input type="text" :name="'categories[' + index + '][age_groups][' + agIdx + '][name]'" x-model="ag.name"
+                                                    placeholder="Название группы"
+                                                    class="flex-1 px-2 py-1.5 border border-primary/20 rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" />
+                                                <input type="number" :name="'categories[' + index + '][age_groups][' + agIdx + '][min_age]'" x-model="ag.min_age"
+                                                    placeholder="От"
+                                                    class="w-16 px-2 py-1.5 border border-primary/20 rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" min="0" />
+                                                <input type="number" :name="'categories[' + index + '][age_groups][' + agIdx + '][max_age]'" x-model="ag.max_age"
+                                                    placeholder="До"
+                                                    class="w-16 px-2 py-1.5 border border-primary/20 rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" min="0" />
+                                                <button type="button" @click="cat.age_groups.splice(agIdx, 1)"
+                                                    class="text-warm-gray hover:text-red-500 transition-colors">
+                                                    <i class="fas fa-times text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </template>
+                                        <div x-show="cat.age_groups.length === 0" class="text-xs text-warm-gray italic">Не указаны</div>
+                                    </div>
                                 </div>
                             </template>
 
                             <div x-show="categories.length === 0" class="text-center py-4 text-warm-gray text-sm italic">
                                 Номинации не добавлены
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Section 4b: Contest-level Age Groups (when no nominations) --}}
+                    <div class="space-y-4" x-show="categories.length === 0">
+                        <div class="flex items-center justify-between border-b border-gold/20 pb-2">
+                            <div>
+                                <h3 class="font-serif text-lg font-semibold text-dark">Возрастные группы</h3>
+                                <p class="text-xs text-warm-gray mt-0.5">Необязательно. Укажите возрастные группы для конкурса.</p>
+                            </div>
+                            <button type="button" @click="addContestAgeGroup()"
+                                class="text-sm text-primary hover:text-primary-dark font-medium flex items-center gap-1 shrink-0">
+                                <i class="fas fa-plus"></i> Добавить
+                            </button>
+                        </div>
+                        <div class="space-y-2">
+                            <template x-for="(ag, agIdx) in contestAgeGroups" :key="agIdx">
+                                <div class="flex gap-2 items-center p-3 bg-cream rounded-lg border border-gold/10">
+                                    <input type="text" :name="'contest_age_groups[' + agIdx + '][name]'" x-model="ag.name"
+                                        placeholder="Название группы"
+                                        class="flex-1 px-3 py-2 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                                    <input type="number" :name="'contest_age_groups[' + agIdx + '][min_age]'" x-model="ag.min_age"
+                                        placeholder="От"
+                                        class="w-20 px-3 py-2 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" min="0" />
+                                    <input type="number" :name="'contest_age_groups[' + agIdx + '][max_age]'" x-model="ag.max_age"
+                                        placeholder="До"
+                                        class="w-20 px-3 py-2 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" min="0" />
+                                    <button type="button" @click="contestAgeGroups.splice(agIdx, 1)"
+                                        class="text-warm-gray hover:text-red-500 transition-colors shrink-0">
+                                        <i class="fas fa-times text-sm"></i>
+                                    </button>
+                                </div>
+                            </template>
+                            <div x-show="contestAgeGroups.length === 0" class="text-center py-4 text-warm-gray text-sm italic">
+                                Возрастные группы не добавлены
                             </div>
                         </div>
                     </div>
@@ -216,9 +306,35 @@
                     </div>
 
                     {{-- Section 6: Diploma Background --}}
-                    <div class="space-y-3" x-data="{ diplomaPreview: null }">
+                    <div class="space-y-3">
                         <h3 class="font-serif text-lg font-semibold text-dark border-b border-gold/20 pb-2">Фон диплома</h3>
-                        <div class="flex items-start gap-5">
+
+                        {{-- Default backgrounds gallery --}}
+                        <div x-show="filteredBackgrounds.length > 0" class="space-y-2">
+                            <p class="text-xs text-warm-gray">Выберите из готовых фонов или загрузите свой:</p>
+                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                <template x-for="bg in filteredBackgrounds" :key="bg.id">
+                                    <div class="relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all aspect-[297/210]"
+                                         :class="selectedDefaultBg === bg.image_path ? 'border-primary ring-2 ring-primary/30' : 'border-primary/10 hover:border-primary/30'"
+                                         @click="selectDefaultBg(bg)">
+                                        <img :src="bg.image_url" class="w-full h-full object-cover" />
+                                        <div x-show="selectedDefaultBg === bg.image_path"
+                                             class="absolute top-1 right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </div>
+                                        {{-- Fullscreen button --}}
+                                        <button type="button" @click.stop="fullscreenUrl = bg.image_url"
+                                            class="absolute bottom-1 right-1 w-6 h-6 bg-black/50 rounded flex items-center justify-center text-white hover:bg-black/70 transition-colors">
+                                            <i class="fas fa-expand text-xs"></i>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                            <input type="hidden" name="selected_diploma_background_path" :value="selectedDefaultBg || ''">
+                        </div>
+
+                        {{-- Custom upload (disabled for now — using default backgrounds only)
+                        <div class="flex items-start gap-5" :class="filteredBackgrounds.length > 0 ? 'pt-3 border-t border-gold/10' : ''">
                             <div class="w-32 h-24 rounded-lg border-2 border-dashed border-primary/20 flex items-center justify-center bg-cream overflow-hidden shrink-0">
                                 <template x-if="diplomaPreview">
                                     <img :src="diplomaPreview" class="w-full h-full object-cover" />
@@ -232,14 +348,26 @@
                             </div>
                             <div>
                                 <label for="diploma-bg-input" class="inline-flex items-center gap-2 px-4 py-2 border border-primary/30 text-primary text-sm font-medium rounded-lg hover:bg-primary/5 cursor-pointer transition-colors">
-                                    <i class="fas fa-upload"></i> Загрузить фон
+                                    <i class="fas fa-upload"></i> Загрузить свой фон
                                 </label>
                                 <input id="diploma-bg-input" name="diploma_background" type="file" accept="image/*" class="hidden"
-                                    @change="diplomaPreview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null">
+                                    @change="onCustomDiplomaUpload($event)">
                                 <p class="text-xs text-warm-gray mt-2">JPG, PNG, WebP — до 2 МБ. Рекомендуется формат A4 (горизонтальный).</p>
                                 <x-input-error class="mt-2" :messages="$errors->get('diploma_background')" />
                             </div>
                         </div>
+                        --}}
+                    </div>
+
+                    {{-- Fullscreen preview overlay --}}
+                    <div x-show="fullscreenUrl" x-cloak
+                         @click="fullscreenUrl = null"
+                         @keydown.escape.window="fullscreenUrl = null"
+                         class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-pointer">
+                        <button type="button" @click="fullscreenUrl = null" class="absolute top-4 right-4 text-white text-2xl hover:text-gold z-10">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <img :src="fullscreenUrl" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl" @click.stop />
                     </div>
 
                     {{-- Info note --}}
@@ -265,29 +393,116 @@
 </x-app-layout>
 
 <script>
-function contestForm(initialCategories, orgsData, preselectedOrgId) {
+function contestForm(initialCategories, orgsData, preselectedOrgId, diplomaBgData) {
     return {
-        categories: initialCategories && initialCategories.length > 0
+        categories: (initialCategories && initialCategories.length > 0
             ? initialCategories
-            : [],
+            : []).map(c => ({ ...c, age_groups: c.age_groups || [] })),
+        contestAgeGroups: [],
         orgs: orgsData || [],
         selectedOrgId: preselectedOrgId || null,
         selectedJuries: [],
+        juryInviteEmail: '',
+        juryInviteLoading: false,
+        juryInviteError: '',
+        juryInviteSuccess: '',
+        selectedGenreId: '',
+        diplomaBackgrounds: diplomaBgData || [],
+        selectedDefaultBg: null,
+        fullscreenUrl: null,
+        diplomaPreview: null,
+        get filteredBackgrounds() {
+            if (!this.selectedGenreId) return [];
+            return this.diplomaBackgrounds.filter(bg =>
+                bg.category_ids.length === 0 || bg.category_ids.includes(parseInt(this.selectedGenreId))
+            );
+        },
+        selectDefaultBg(bg) {
+            if (this.selectedDefaultBg === bg.image_path) {
+                this.selectedDefaultBg = null;
+            } else {
+                this.selectedDefaultBg = bg.image_path;
+                // Clear custom upload when selecting default
+                this.diplomaPreview = null;
+                const input = document.getElementById('diploma-bg-input');
+                if (input) input.value = '';
+            }
+        },
+        onCustomDiplomaUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.diplomaPreview = URL.createObjectURL(file);
+                // Clear default selection when uploading custom
+                this.selectedDefaultBg = null;
+            } else {
+                this.diplomaPreview = null;
+            }
+        },
         get currentReps() {
             if (!this.selectedOrgId) return [];
             const org = this.orgs.find(o => o.id == this.selectedOrgId);
             return org ? org.reps : [];
         },
+        get currentOrgCanManage() {
+            if (!this.selectedOrgId) return false;
+            const org = this.orgs.find(o => o.id == this.selectedOrgId);
+            return org ? !!org.canManage : false;
+        },
         addCategory() {
-            this.categories.push({ name: '', description: '' });
+            this.categories.push({ name: '', description: '', age_groups: [] });
         },
         removeCategory(index) {
             this.categories.splice(index, 1);
+        },
+        addAgeGroup(cat) {
+            cat.age_groups.push({ name: '', min_age: '', max_age: '' });
+        },
+        addContestAgeGroup() {
+            this.contestAgeGroups.push({ name: '', min_age: '', max_age: '' });
         },
         toggleJury(id) {
             const idx = this.selectedJuries.indexOf(id);
             if (idx === -1) this.selectedJuries.push(id);
             else this.selectedJuries.splice(idx, 1);
+        },
+        async inviteJuryMember() {
+            if (!this.juryInviteEmail || !this.selectedOrgId) return;
+            this.juryInviteLoading = true;
+            this.juryInviteError = '';
+            this.juryInviteSuccess = '';
+            try {
+                const res = await fetch(`/organizations/${this.selectedOrgId}/add-jury-member`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ email: this.juryInviteEmail }),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    this.juryInviteError = data.error || data.message || 'Произошла ошибка.';
+                    return;
+                }
+                // Add to reps list if not already there
+                const org = this.orgs.find(o => o.id == this.selectedOrgId);
+                if (org && !org.reps.find(r => r.id === data.id)) {
+                    org.reps.push({ id: data.id, name: data.name });
+                }
+                // Auto-select as jury
+                if (!this.selectedJuries.includes(data.id)) {
+                    this.selectedJuries.push(data.id);
+                }
+                this.juryInviteSuccess = data.already_member
+                    ? `${data.name} уже представитель организации и добавлен в жюри.`
+                    : `${data.name} добавлен как представитель и член жюри.`;
+                this.juryInviteEmail = '';
+            } catch (e) {
+                this.juryInviteError = 'Ошибка сети. Попробуйте ещё раз.';
+            } finally {
+                this.juryInviteLoading = false;
+            }
         },
     };
 }

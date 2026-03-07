@@ -45,17 +45,8 @@ class TransitionContestStatuses extends Command
                 $transitioned++;
             });
 
-        // evaluation → archive: evaluation_end_at < now
-        Contest::where('status', ContestStatus::Evaluation->value)
-            ->where('evaluation_end_at', '<', $now)
-            ->each(function (Contest $contest) use (&$transitioned): void {
-                $contest->update(['status' => ContestStatus::Archive->value]);
-                ActionLogService::log('contest.status_transition', $contest, [
-                    'from' => ContestStatus::Evaluation->value,
-                    'to'   => ContestStatus::Archive->value,
-                ]);
-                $transitioned++;
-            });
+        // Note: evaluation → archive is manual only (via EvaluationController::finalize)
+        // to ensure diplomas are always generated during finalization.
 
         $this->info("Transitioned {$transitioned} contest(s).");
 

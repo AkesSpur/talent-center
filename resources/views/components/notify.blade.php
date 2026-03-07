@@ -27,8 +27,13 @@
         'contest-created'        => ['Конкурс успешно создан', 'success'],
         'contest-updated'        => ['Конкурс успешно обновлён', 'success'],
         'contest-cancelled'      => ['Конкурс отменён', 'success'],
+        'contest-deleted'        => ['Конкурс удалён', 'success'],
         // Applications
         'application-submitted'  => ['Заявка успешно подана', 'success'],
+        // Evaluation
+        'application-evaluated'  => ['Оценка заявки сохранена', 'success'],
+        'contest-finalized'      => ['Оценка завершена. Дипломы сформированы.', 'success'],
+        'diplomas-regenerated'   => ['Дипломы успешно пересчитаны', 'success'],
     ];
 
     if (session('status') && isset($statusMap[session('status')])) {

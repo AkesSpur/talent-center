@@ -9,6 +9,8 @@ use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
 use App\Models\Contest;
 use App\Models\Organization;
+use App\Models\User;
+use App\Notifications\ApplicationSubmitted;
 use App\Services\ActionLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,9 +50,18 @@ class ApplicationController extends Controller
                 ->with('warning', 'Все участники уже подали заявки на этот конкурс.');
         }
 
-        $contest->load('categories');
+        $contest->load(['categories', 'ageGroups']);
 
-        return view('applications.create', compact('contest', 'children', 'alreadyAppliedIds'));
+        // Build age groups data for Alpine.js filtering
+        $ageGroupsData = $contest->ageGroups->map(fn ($ag) => [
+            'id'                  => $ag->id,
+            'contest_category_id' => $ag->contest_category_id,
+            'name'                => $ag->name,
+            'min_age'             => $ag->min_age,
+            'max_age'             => $ag->max_age,
+        ])->values();
+
+        return view('applications.create', compact('contest', 'children', 'alreadyAppliedIds', 'ageGroupsData'));
     }
 
     /**
@@ -81,10 +92,12 @@ class ApplicationController extends Controller
         }
 
         $data = [
-            'contest_id'  => $contest->id,
-            'category_id' => $request->input('category_id') ?: null,
-            'user_id'     => $submittedForUserId,
-            'status'      => 'new',
+            'contest_id'   => $contest->id,
+            'category_id'  => $request->input('category_id') ?: null,
+            'age_group_id' => $request->input('age_group_id') ?: null,
+            'user_id'      => $submittedForUserId,
+            'status'       => 'new',
+            'teacher_name' => $request->input('teacher_name'),
         ];
 
         if ($request->hasFile('file')) {
@@ -108,6 +121,13 @@ class ApplicationController extends Controller
             'contest_id' => $contest->id,
             'user_id'    => $submittedForUserId,
         ]);
+
+        // Notify the applicant of successful submission
+        $application->load('contest');
+        $submittedForUser = User::find($submittedForUserId);
+        if ($submittedForUser && $submittedForUser->email_notifications) {
+            $submittedForUser->notify(new ApplicationSubmitted($application));
+        }
 
         return redirect()->route('dashboard.applications')
             ->with('status', 'application-submitted');
