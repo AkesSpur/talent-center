@@ -23,35 +23,30 @@
             <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-5 sm:p-6" x-data>
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="flex-1">
+                        @php $progress = $totalCount > 0 ? round(($evaluatedCount / $totalCount) * 100) : 0; @endphp
                         <div class="flex justify-between text-sm mb-2">
-                            <span class="text-dark font-medium">Оценено: {{ $evaluatedCount }} из {{ $totalCount }}</span>
-                            @php $progress = $totalCount > 0 ? round(($evaluatedCount / $totalCount) * 100) : 0; @endphp
-                            <span class="font-semibold {{ $evaluatedCount === $totalCount && $totalCount > 0 ? 'text-green-600' : 'text-primary' }}">{{ $progress }}%</span>
+                            <span class="text-dark font-medium">Оценено: <span id="eval-count">{{ $evaluatedCount }}</span> из <span id="eval-total">{{ $totalCount }}</span></span>
+                            <span id="eval-pct" class="font-semibold {{ $evaluatedCount === $totalCount && $totalCount > 0 ? 'text-green-600' : 'text-primary' }}">{{ $progress }}%</span>
                         </div>
                         <div class="w-full bg-cream-dark rounded-full h-3 overflow-hidden">
-                            <div class="h-3 rounded-full transition-all duration-700 {{ $evaluatedCount === $totalCount && $totalCount > 0 ? 'bg-green-500' : 'gradient-gold' }}"
+                            <div id="eval-bar" class="h-3 rounded-full transition-all duration-700 {{ $evaluatedCount === $totalCount && $totalCount > 0 ? 'bg-green-500' : 'gradient-gold' }}"
                                 style="width: {{ $progress }}%"></div>
                         </div>
                     </div>
 
                     @if($contest->isEvaluation())
                         <div class="shrink-0">
-                            @if($canFinalize)
-                                <button type="button"
-                                    @click="$dispatch('confirm-finalize', { action: '{{ route('evaluation.finalize', [$organization, $contest]) }}' })"
-                                    class="inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition text-sm">
-                                    <i class="fas fa-flag-checkered mr-2"></i>Завершить оценку
-                                </button>
-                            @else
-                                <button type="button" disabled
-                                    title="Оцените все заявки перед завершением"
-                                    class="inline-flex items-center px-5 py-2.5 bg-gray-100 text-gray-400 font-semibold rounded-lg text-sm cursor-not-allowed">
-                                    <i class="fas fa-flag-checkered mr-2"></i>Завершить оценку
-                                    @if($totalCount > $evaluatedCount)
-                                        <span class="ml-2 text-xs">(осталось {{ $totalCount - $evaluatedCount }})</span>
-                                    @endif
-                                </button>
-                            @endif
+                            <button type="button" id="finalize-btn"
+                                @if(!$canFinalize) disabled @endif
+                                title="{{ $canFinalize ? '' : 'Оцените все заявки перед завершением' }}"
+                                data-url="{{ route('evaluation.finalize', [$organization, $contest]) }}"
+                                onclick="if(!this.disabled){ window.dispatchEvent(new CustomEvent('confirm-finalize', { detail: { action: this.dataset.url } })) }"
+                                class="inline-flex items-center px-5 py-2.5 font-semibold rounded-lg transition text-sm {{ $canFinalize ? 'gradient-gold text-dark hover:opacity-90 cursor-pointer' : 'bg-gray-100 text-gray-400 cursor-not-allowed' }}">
+                                <i class="fas fa-flag-checkered mr-2"></i>Завершить оценку
+                                <span id="finalize-remaining" class="ml-2 text-xs"@if($canFinalize) style="display:none"@endif>
+                                    (осталось <span id="finalize-remaining-count">{{ max(0, $totalCount - $evaluatedCount) }}</span>)
+                                </span>
+                            </button>
                         </div>
                     @endif
                 </div>
@@ -87,6 +82,7 @@
                                     success: false,
                                     error: '',
                                     status: '{{ $application->status->value }}',
+                                    originalStatus: '{{ $application->status->value }}',
                                     statusLabel: {{ Illuminate\Support\Js::from($application->status->label()) }},
                                     statusColor: {{ Illuminate\Support\Js::from($application->status->color()) }},
                                     rejectionReason: {{ Illuminate\Support\Js::from($application->rejection_reason ?? '') }},
@@ -94,6 +90,8 @@
                                     async save(form) {
                                         this.saving = true;
                                         this.error = '';
+                                        const wasNew = this.originalStatus === 'new';
+                                        console.log('[eval] save() called, wasNew =', wasNew, ', originalStatus =', this.originalStatus, ', selected status =', this.status);
                                         try {
                                             const resp = await fetch(form.action, {
                                                 method: 'POST',
@@ -117,6 +115,10 @@
                                             this.showForm = false;
                                             this.success = true;
                                             setTimeout(() => this.success = false, 3000);
+                                            console.log('[eval] save() success, wasNew =', wasNew, ', new status =', json.status);
+                                            if (wasNew) {
+                                                window.incrementEvalCounter();
+                                            }
                                         } catch {
                                             this.error = 'Ошибка сети. Попробуйте ещё раз.';
                                         } finally {
@@ -233,6 +235,62 @@
 
         </div>
     </div>
+
+    <script>
+        window.incrementEvalCounter = function () {
+            console.log('[eval] incrementEvalCounter() called');
+
+            var countEl  = document.getElementById('eval-count');
+            var totalEl  = document.getElementById('eval-total');
+            var pctEl    = document.getElementById('eval-pct');
+            var barEl    = document.getElementById('eval-bar');
+            var btn      = document.getElementById('finalize-btn');
+            var remSpan  = document.getElementById('finalize-remaining');
+            var remCount = document.getElementById('finalize-remaining-count');
+
+            console.log('[eval] elements found:', { countEl, totalEl, pctEl, barEl, btn });
+
+            if (!countEl || !totalEl) {
+                console.error('[eval] eval-count or eval-total element not found!');
+                return;
+            }
+
+            var current = parseInt(countEl.textContent, 10);
+            var total   = parseInt(totalEl.textContent, 10);
+            var newCount = Math.min(total, current + 1);
+            var pct      = total > 0 ? Math.round((newCount / total) * 100) : 0;
+            var allDone  = newCount >= total;
+
+            console.log('[eval] updating:', { current, total, newCount, pct, allDone });
+
+            countEl.textContent = newCount;
+
+            if (pctEl) {
+                pctEl.textContent = pct + '%';
+                pctEl.className = 'font-semibold ' + (allDone ? 'text-green-600' : 'text-primary');
+            }
+
+            if (barEl) {
+                barEl.style.width = pct + '%';
+                if (allDone) {
+                    barEl.classList.remove('gradient-gold');
+                    barEl.classList.add('bg-green-500');
+                }
+            }
+
+            if (btn) {
+                if (allDone) {
+                    btn.disabled = false;
+                    btn.title = '';
+                    btn.className = 'inline-flex items-center px-5 py-2.5 font-semibold rounded-lg transition text-sm gradient-gold text-dark hover:opacity-90 cursor-pointer';
+                    if (remSpan) remSpan.style.display = 'none';
+                    console.log('[eval] finalize button enabled');
+                } else {
+                    if (remCount) remCount.textContent = total - newCount;
+                }
+            }
+        };
+    </script>
 
     {{-- Finalize confirmation modal --}}
     @if($contest->isEvaluation())
