@@ -39,9 +39,18 @@ class DiplomaController extends Controller
     {
         $user = $request->user();
 
+        $diploma->loadMissing(['user', 'contest.organization', 'application.category']);
+
+        $isJury = $diploma->contest?->organization
+            ?->representatives()
+            ->where('users.id', $user->id)
+            ->wherePivot('can_evaluate', true)
+            ->exists() ?? false;
+
         $allowed = $user->isAdmin()
             || $diploma->user_id === $user->id
-            || ($diploma->user && $diploma->user->parent_id === $user->id);
+            || ($diploma->user && $diploma->user->parent_id === $user->id)
+            || $isJury;
 
         if (! $allowed) {
             abort(403);
@@ -50,8 +59,6 @@ class DiplomaController extends Controller
         if (! $diploma->file_path || ! Storage::disk('public')->exists($diploma->file_path)) {
             return redirect()->back()->with('error', 'Файл диплома не найден.');
         }
-
-        $diploma->loadMissing(['user', 'contest', 'application.category']);
 
         $parts = array_filter([
             'Диплом',
