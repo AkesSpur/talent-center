@@ -741,6 +741,7 @@
                     <li><a href="/" class="text-warm-gray hover:text-gold transition-colors">Главная</a></li>
                     <li><a href="{{ route('contests.index') }}" class="text-warm-gray hover:text-gold transition-colors">Конкурсы</a></li>
                     <li><a href="{{ route('development-plan') }}" class="text-warm-gray hover:text-gold transition-colors">План развития</a></li>
+                    <li><a href="{{ route('diplomvtrifi.search') }}" class="text-warm-gray hover:text-gold transition-colors">Проверить диплом</a></li>
                 </ul>
             </div>
 

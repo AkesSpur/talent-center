@@ -76,6 +76,13 @@
                                                         <i class="fas fa-star text-xs"></i>
                                                     </a>
                                                 @endif
+                                                @if(auth()->user()->isAdmin())
+                                                    <a href="{{ route('admin.evaluation.show', $contest) }}"
+                                                        title="Управление оценкой (Админ)"
+                                                        class="w-8 h-8 flex items-center justify-center border border-primary/30 text-primary rounded-lg hover:bg-primary/10 transition-colors">
+                                                        <i class="fas fa-sliders-h text-xs"></i>
+                                                    </a>
+                                                @endif
                                                 <a href="{{ route('organizations.applications', $contest->organization) }}"
                                                     title="Заявки"
                                                     class="w-8 h-8 flex items-center justify-center border border-primary/20 text-primary rounded-lg hover:bg-primary/5 transition-colors">

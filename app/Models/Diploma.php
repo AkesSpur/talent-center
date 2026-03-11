@@ -18,6 +18,7 @@ class Diploma extends Model
         'contest_id',
         'file_path',
         'is_preview',
+        'diploma_number',
     ];
 
     protected function casts(): array

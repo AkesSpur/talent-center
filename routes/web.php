@@ -15,6 +15,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiplomaController;
+use App\Http\Controllers\DiplomaVerifyController;
 use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrganizationController;
@@ -30,6 +31,11 @@ use Illuminate\Support\Facades\Route;
 // ── Public ──────────────────────────────────────────────
 
 Route::get('/', HomeController::class)->name('home');
+
+// ── Diploma verification (public) ────────────────────
+Route::get('/diplomvtrifi', [DiplomaVerifyController::class, 'index'])->name('diplomvtrifi.search');
+Route::post('/diplomvtrifi', [DiplomaVerifyController::class, 'find'])->name('diplomvtrifi.find');
+Route::get('/diplomvtrifi/{number}', [DiplomaVerifyController::class, 'show'])->name('diplomvtrifi.show');
 
 Route::get('/development-plan', function () {
     return view('development-plan.index');

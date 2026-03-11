@@ -12,14 +12,13 @@
             </div>
             <div class="flex items-center gap-2 shrink-0">
                 {{-- Regenerate diplomas --}}
-                <form method="POST" action="{{ route('admin.contests.regenerate-diplomas', $contest) }}">
-                    @csrf
-                    <button type="submit"
-                        onclick="return confirm('Пересчитать дипломы для всех оценённых заявок?')"
+                <span x-data>
+                    <button type="button"
+                        @click="$dispatch('confirm-regenerate-diplomas', { action: '{{ route('admin.contests.regenerate-diplomas', $contest) }}' })"
                         class="inline-flex items-center px-4 py-2 border border-primary/20 text-primary font-medium rounded-lg hover:bg-primary/5 transition-colors text-sm">
                         <i class="fas fa-redo mr-2"></i>Пересчитать дипломы
                     </button>
-                </form>
+                </span>
                 <a href="{{ route('admin.contests.applications', $contest) }}"
                     class="px-4 py-2 text-warm-gray hover:text-primary transition-colors text-sm">
                     <i class="fas fa-arrow-left mr-2"></i>Назад
@@ -27,6 +26,17 @@
             </div>
         </div>
     </x-slot>
+
+    <x-confirm-modal
+        name="regenerate-diplomas"
+        title="Пересчитать дипломы"
+        message="Все дипломы для оценённых заявок этого конкурса будут сгенерированы заново. Продолжить?"
+        icon="fa-redo"
+        iconColor="text-primary"
+        iconBg="bg-primary/10"
+        confirmText="Пересчитать"
+        confirmClass="gradient-gold text-dark"
+    />
 
     <div class="py-8">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">

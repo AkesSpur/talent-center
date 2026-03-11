@@ -37,6 +37,17 @@ enum ApplicationStatus: string
         };
     }
 
+    public function diplomaLabel(): string
+    {
+        return match ($this) {
+            self::Place1      => 'лауреата I степени',
+            self::Place2      => 'лауреата II степени',
+            self::Place3      => 'лауреата III степени',
+            self::Participant => 'участника',
+            default           => $this->label(),
+        };
+    }
+
     public function isEvaluated(): bool
     {
         return $this !== self::New;

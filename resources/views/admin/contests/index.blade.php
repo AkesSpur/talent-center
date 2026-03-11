@@ -144,6 +144,10 @@
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex items-center justify-end gap-1.5">
+                                                <a href="{{ route('admin.evaluation.show', $contest) }}"
+                                                    class="px-2.5 py-1.5 border border-gold/30 text-gold text-xs rounded-lg hover:bg-gold/10 transition-colors" title="Оценка и дипломы">
+                                                    <i class="fas fa-star mr-1"></i>Оценка
+                                                </a>
                                                 <a href="{{ route('admin.contests.applications', $contest) }}"
                                                     class="px-2.5 py-1.5 border border-primary/20 text-primary text-xs rounded-lg hover:bg-primary/5 transition-colors" title="Заявки">
                                                     <i class="fas fa-inbox mr-1"></i>Заявки
