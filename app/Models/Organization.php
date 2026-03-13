@@ -22,6 +22,7 @@ class Organization extends Model
         'inn',
         'ogrn',
         'legal_address',
+        'city',
         'website',
         'contact_email',
         'contact_phone',

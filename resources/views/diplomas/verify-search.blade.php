@@ -1,14 +1,191 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Проверить диплом — Талант-центр</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-cream min-h-screen flex flex-col">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    @include('layouts.navigation')
+    <title>Проверить диплом — Талант-центр</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        [x-cloak] { display: none !important; }
+        @keyframes shrink {
+            from { width: 100%; }
+            to   { width: 0%; }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-cream text-dark min-h-screen flex flex-col">
+
+    <!-- ========== HEADER ========== -->
+    <header class="bg-cream shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20 gap-4">
+
+                <!-- Logo (left) -->
+                <a href="/" class="flex items-center space-x-3">
+                    <div class="w-11 h-11 gradient-gold rounded-full flex items-center justify-center shadow-sm shrink-0">
+                        <i class="fas fa-award text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-serif text-lg font-bold text-primary leading-tight">Талант-центр</h1>
+                        <p class="text-xs text-warm-gray leading-tight">Всероссийский центр талантов</p>
+                    </div>
+                </a>
+
+                <!-- Center Nav (large screens only) -->
+                <nav class="hidden lg:flex items-center justify-center gap-8">
+                    <a href="/" class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
+                        Главная
+                    </a>
+                    <a href="{{ route('contests.index') }}" class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
+                        Конкурсы
+                    </a>
+                    <a href="{{ route('diplomvtrifi.search') }}" class="text-sm font-medium text-primary border-b-2 border-primary pb-0.5">
+                        Проверить диплом
+                    </a>
+                </nav>
+
+                <!-- Right Side: User / Auth -->
+                <div class="flex items-center justify-end space-x-4 ml-auto lg:ml-0" x-data="{ open: false }">
+                    @auth
+                        <div class="relative">
+                            <button @click="open = !open"
+                                class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
+                                <x-user-avatar :user="Auth::user()" size="sm" />
+                                <span class="hidden sm:inline">{{ Auth::user()->last_name }} {{ mb_substr(Auth::user()->first_name, 0, 1) }}.{{ Auth::user()->patronymic ? mb_substr(Auth::user()->patronymic, 0, 1) . '.' : '' }}</span>
+                                <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
+                            </button>
+
+                            <div x-show="open" @click.outside="open = false"
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 class="absolute right-0 z-50 mt-2 w-72 rounded-xl shadow-lg origin-top-right ring-1 ring-gold/20 bg-white py-1"
+                                 style="display: none;">
+
+                                <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Участник конкурсов</div>
+                                <a href="{{ route('profile.edit') }}"
+                                    class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                    <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Профиль представителя
+                                </a>
+                                <a href="{{ route('dashboard.applications') }}"
+                                    class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                    <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
+                                </a>
+                                <a href="#"
+                                    class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                    <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Награды
+                                </a>
+                                <a href="{{ route('participants.index') }}"
+                                    class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                    <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Участники
+                                </a>
+
+                                <div class="border-t border-gold/10 mt-1 pt-1">
+                                    <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор конкурсов</div>
+                                    <a href="{{ route('dashboard.contests') }}"
+                                        class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                        <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
+                                    </a>
+                                    <a href="{{ route('organizations.index') }}"
+                                        class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                        <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Управление организацией
+                                    </a>
+                                </div>
+
+                                @if(auth()->user()->isAdmin())
+                                    <div class="border-t border-gold/10 mt-1 pt-1">
+                                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Администрирование</div>
+                                        <a href="{{ route('admin.dashboard') }}"
+                                            class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                            <i class="fas fa-cog mr-2 text-warm-gray w-5 text-center"></i> Админ-панель
+                                        </a>
+                                        <a href="{{ route('admin.users.index') }}"
+                                            class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                            <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Пользователи
+                                        </a>
+                                        <a href="{{ route('admin.organizations.index') }}"
+                                            class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                            <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Организации
+                                        </a>
+                                        <a href="{{ route('admin.contests.index') }}"
+                                            class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                            <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
+                                        </a>
+                                        <a href="{{ route('admin.platform-categories.index') }}"
+                                            class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                            <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Жанры
+                                        </a>
+                                    </div>
+                                @endif
+
+                                @if(auth()->user()->isSupport())
+                                    <div class="border-t border-gold/10 mt-1 pt-1">
+                                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Поддержка</div>
+                                        <a href="{{ route('support.dashboard') }}"
+                                            class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                            <i class="fas fa-headset mr-2 text-warm-gray w-5 text-center"></i> Панель поддержки
+                                        </a>
+                                        <a href="{{ route('support.users.index') }}"
+                                            class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                            <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Пользователи
+                                        </a>
+                                        <a href="{{ route('support.organizations.index') }}"
+                                            class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                            <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Организации
+                                        </a>
+                                        <a href="{{ route('support.contests.index') }}"
+                                            class="block w-full px-4 py-2 text-start text-sm text-dark hover:bg-cream transition duration-150">
+                                            <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
+                                        </a>
+                                    </div>
+                                @endif
+
+                                <div class="border-t border-gold/10 mt-1 pt-1">
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit"
+                                            class="block w-full px-4 py-2 text-start text-sm text-red-600 hover:bg-red-50 transition duration-150">
+                                            <i class="fas fa-sign-out-alt mr-2 w-5 text-center"></i> Выйти
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        @if (Route::has('login'))
+                            <a href="{{ route('login') }}"
+                                class="px-4 py-2 text-primary font-medium text-sm transition hover:text-primary/80">
+                                Войти
+                            </a>
+                        @endif
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}"
+                                class="hidden sm:inline-block px-6 py-2 gradient-gold text-dark font-semibold rounded-lg text-sm hover:opacity-90 transition">
+                                Регистрация
+                            </a>
+                        @endif
+                    @endauth
+                </div>
+
+            </div>
+        </div>
+    </header>
 
     {{-- Toast notification --}}
     @if(session('error'))
@@ -38,7 +215,6 @@
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
-            {{-- Progress bar --}}
             <div class="h-1 bg-red-100">
                 <div class="h-1 bg-red-400 animate-[shrink_5s_linear_forwards]" style="width:100%"></div>
             </div>
@@ -46,33 +222,32 @@
     </div>
     @endif
 
-    <main class="flex-1 flex items-center justify-center py-16 px-4">
-        <div class="w-full max-w-lg">
-
-            <!-- Icon -->
-            <div class="flex justify-center mb-6">
-                <div class="w-20 h-20 gradient-gold rounded-full flex items-center justify-center shadow-lg">
-                    <i class="fas fa-award text-white text-3xl"></i>
-                </div>
+    <!-- ========== HERO ========== -->
+    <section class="pattern-bg py-8 sm:py-10 px-4 text-center">
+        <div class="flex justify-center mb-4">
+            <div class="w-16 h-16 gradient-gold rounded-full flex items-center justify-center shadow-md">
+                <i class="fas fa-certificate text-white text-2xl"></i>
             </div>
+        </div>
+        <h2 class="font-serif text-3xl md:text-4xl font-bold text-dark mb-3">
+            Проверить диплом
+        </h2>
+        <p class="text-warm-gray text-md max-w-xl mx-auto">
+            Введите номер диплома для проверки подлинности и получения информации о награде
+        </p>
+    </section>
 
-            <!-- Heading -->
-            <h1 class="font-serif text-3xl font-bold text-dark text-center mb-3">
-                Проверить диплом
-            </h1>
-            <p class="text-warm-gray text-center mb-10 text-base leading-relaxed">
-                Введите номер диплома для проверки подлинности и<br>
-                получения информации о награде
-            </p>
+    <!-- ========== MAIN ========== -->
+    <main class="flex-1 py-12 px-4">
+        <div class="max-w-lg mx-auto">
 
-            <!-- Form -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-gold/10 p-8">
                 <form method="POST" action="{{ route('diplomvtrifi.find') }}">
                     @csrf
 
                     <div class="mb-6">
                         <label for="diploma_number" class="block text-sm font-semibold text-dark mb-2">
-                            Номер диплома
+                            <i class="fas fa-hashtag text-gold mr-1.5"></i>Номер диплома
                         </label>
                         <div class="relative">
                             <input
@@ -80,19 +255,19 @@
                                 id="diploma_number"
                                 name="diploma_number"
                                 value="{{ old('diploma_number') }}"
-                                placeholder="Введите номер диплома"
+                                placeholder="Например: 1-0000042"
                                 class="w-full border rounded-xl px-4 py-3 pr-10 text-dark placeholder-warm-gray focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold transition-colors {{ session('error') || $errors->has('diploma_number') ? 'border-red-300 bg-red-50/30' : 'border-gray-200' }}"
                                 autofocus
                             >
                             <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                                <i class="fas fa-hashtag {{ session('error') || $errors->has('diploma_number') ? 'text-red-400' : 'text-warm-gray' }}"></i>
+                                <i class="fas fa-search {{ session('error') || $errors->has('diploma_number') ? 'text-red-400' : 'text-warm-gray' }}"></i>
                             </div>
                         </div>
                         @error('diploma_number')
                             <p class="mt-2 text-sm text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
                         @enderror
                         <p class="mt-2 text-xs text-warm-gray">
-                            Номер диплома указан в нижней части документа
+                            <i class="fas fa-info-circle mr-1"></i>Номер диплома указан в нижней части документа
                         </p>
                     </div>
 
@@ -101,28 +276,88 @@
                         class="w-full gradient-gold text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                     >
                         <i class="fas fa-search"></i>
-                        Найти
+                        Найти диплом
                     </button>
                 </form>
             </div>
 
-            <p class="text-center mt-6 text-sm text-warm-gray">
-                <a href="{{ route('home') }}" class="hover:text-gold transition-colors">
-                    <i class="fas fa-arrow-left mr-1"></i> На главную
-                </a>
-            </p>
+            <!-- Info card -->
+            <div class="mt-6 bg-white rounded-2xl border border-gold/10 shadow-sm p-6">
+                <h3 class="font-serif font-semibold text-dark mb-3 flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-gold"></i>
+                    Зачем проверять диплом?
+                </h3>
+                <ul class="space-y-2 text-sm text-warm-gray">
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-gold mt-0.5 shrink-0"></i>
+                        Убедитесь в подлинности документа
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-gold mt-0.5 shrink-0"></i>
+                        Получите полную информацию о награде и конкурсе
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-gold mt-0.5 shrink-0"></i>
+                        Подтвердите данные участника и организатора
+                    </li>
+                </ul>
+            </div>
 
         </div>
     </main>
 
-    @include('layouts.footer')
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-dark text-cream py-12 px-4 mt-12">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 gradient-gold rounded-full flex items-center justify-center">
+                            <i class="fas fa-award text-white"></i>
+                        </div>
+                        <h4 class="font-serif font-bold text-cream">Талант-центр</h4>
+                    </div>
+                    <p class="text-warm-gray text-sm">
+                        Всероссийская платформа для проведения онлайн-конкурсов, оценки работ и выдачи дипломов.
+                    </p>
+                </div>
 
-    <style>
-        @keyframes shrink {
-            from { width: 100%; }
-            to   { width: 0%; }
-        }
-    </style>
+                <div>
+                    <h5 class="font-serif font-semibold text-gold mb-4">Разделы</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/" class="text-warm-gray hover:text-gold transition-colors">Главная</a></li>
+                        <li><a href="{{ route('contests.index') }}" class="text-warm-gray hover:text-gold transition-colors">Конкурсы</a></li>
+                        <li><a href="{{ route('development-plan') }}" class="text-warm-gray hover:text-gold transition-colors">План развития</a></li>
+                        <li><a href="{{ route('diplomvtrifi.search') }}" class="text-gold font-medium">Проверить диплом</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="font-serif font-semibold text-gold mb-4">Организаторам</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{{ route('organizations.create') }}" class="text-warm-gray hover:text-gold transition-colors">Создать организацию</a></li>
+                        <li><a href="{{ route('contests.create') }}" class="text-warm-gray hover:text-gold transition-colors">Провести конкурс</a></li>
+                        <li><a href="#" class="text-warm-gray hover:text-gold transition-colors">Документация</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="font-serif font-semibold text-gold mb-4">Контакты</h5>
+                    <ul class="space-y-2 text-sm">
+                        <li class="text-warm-gray"><i class="fas fa-envelope text-gold mr-2"></i>info@talentcenter.ru</li>
+                        <li class="text-warm-gray"><i class="fas fa-phone text-gold mr-2"></i>+7 (800) 000-00-00</li>
+                        <li class="text-warm-gray"><i class="fas fa-map-marker-alt text-gold mr-2"></i>Россия</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-warm-gray/30 pt-6">
+                <p class="text-warm-gray text-sm text-center">
+                    &copy; {{ date('Y') }} Талант-центр. Все права защищены.
+                </p>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>

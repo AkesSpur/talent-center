@@ -100,6 +100,12 @@
                                 class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                         </div>
                         <div>
+                            <label for="city" class="block text-sm font-medium text-dark mb-2">Город</label>
+                            <input id="city" name="city" type="text" value="{{ old('city', $organization->city) }}"
+                                class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                placeholder="Москва" />
+                        </div>
+                        <div>
                             <label for="website" class="block text-sm font-medium text-dark mb-2">Веб-сайт</label>
                             <input id="website" name="website" type="url" value="{{ old('website', $organization->website) }}"
                                 class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"

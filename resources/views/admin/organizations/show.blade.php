@@ -111,6 +111,12 @@
                                         <a href="{{ $organization->website }}" target="_blank" rel="noopener" class="text-primary hover:underline ml-2 break-all">{{ $organization->website }}</a>
                                     </div>
                                 @endif
+                                @if($organization->city)
+                                    <div>
+                                        <span class="text-warm-gray">Город:</span>
+                                        <span class="text-dark ml-2">{{ $organization->city }}</span>
+                                    </div>
+                                @endif
                                 @if($organization->legal_address)
                                     <div class="md:col-span-2">
                                         <span class="text-warm-gray">Юридический адрес:</span>

@@ -113,8 +113,16 @@
                         <label for="legal_address" class="block text-sm font-medium text-dark mb-2">Юридический адрес</label>
                         <input id="legal_address" name="legal_address" type="text" value="{{ old('legal_address', $organization->legal_address) }}"
                             class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-                            placeholder="г. Москва, ул. Примерная, д. 1" />
+                            placeholder=" ул. Примерная, д. 1" />
                         <x-input-error class="mt-2" :messages="$errors->get('legal_address')" />
+                    </div>
+
+                    <div>
+                        <label for="city" class="block text-sm font-medium text-dark mb-2">Город</label>
+                        <input id="city" name="city" type="text" value="{{ old('city', $organization->city) }}"
+                            class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                            placeholder="Москва" />
+                        <x-input-error class="mt-2" :messages="$errors->get('city')" />
                     </div>
 
                     <div class="flex gap-4">

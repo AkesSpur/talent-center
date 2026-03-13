@@ -23,6 +23,7 @@ class UpdateOrganizationRequest extends FormRequest
             'inn'           => ['required', 'string', 'max:12'],
             'ogrn'          => ['nullable', 'string', 'max:15'],
             'legal_address' => ['nullable', 'string', 'max:500'],
+            'city'          => ['nullable', 'string', 'max:255'],
             'website'       => ['nullable', 'url', 'max:255'],
             'contact_email' => ['required', 'email', 'max:255'],
             'contact_phone' => ['nullable', 'string', 'max:20'],

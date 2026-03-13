@@ -89,7 +89,14 @@
                     <div>
                         <label class="block text-sm font-medium text-dark mb-1.5">Юридический адрес</label>
                         <input name="legal_address" type="text" value="{{ old('legal_address') }}"
-                            placeholder="г. Москва, ул. Примерная, д. 1"
+                            placeholder=" ул. Примерная, д. 1"
+                            class="w-full px-4 py-2.5 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-dark mb-1.5">Город</label>
+                        <input name="city" type="text" value="{{ old('city') }}"
+                            placeholder="Москва"
                             class="w-full px-4 py-2.5 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                     </div>
 

@@ -1,8 +1,25 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <style>
+        /* 1. Load Arial Black */
+        @font-face {
+            font-family: 'Arial Black Custom';
+            src: url('{{ $fontAriblk }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* 2. Load Calibri */
+        @font-face {
+            font-family: 'Calibri Custom';
+            src: url('{{ $fontCalibri }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         @page {
             margin: 0;
             size: A4 portrait;
@@ -19,7 +36,7 @@
             padding: 0;
             width: 210mm;
             height: 297mm;
-            font-family: 'DejaVu Serif', serif;
+            font-family: 'DejaVu Sans', sans-serif;
             background-color: #FAF8F5;
         }
 
@@ -33,14 +50,15 @@
         }
 
         @if($backgroundPath)
-        .diploma-bg {
-            position: absolute;
-            inset: 0;
-            background-image: url('{{ $backgroundPath }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
+            .diploma-bg {
+                position: absolute;
+                inset: 0;
+                background-image: url('{{ $backgroundPath }}');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+
         @endif
 
         /* ── Content area ── */
@@ -59,85 +77,101 @@
         }
 
         .org-name {
+            /* font-family: 'Arial Black Custom', sans-serif; */
             font-size: 10pt;
             font-weight: bold;
             color: #000000;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            line-height: 1.4;
+            /* letter-spacing: 0.04em;
+            line-height: 1; */
         }
 
         .contest-title {
-            font-size: 12pt;
+            /* font-family: 'Calibri Custom', sans-serif; */
+            /* Added Calibri */
+            font-size: 16pt;
             font-weight: bold;
             color: #763609;
-            line-height: 1.4;
-            margin-top: 2mm;
+            /* line-height: 1;
+            margin-top: 2mm; */
         }
 
         .org-name-repeat {
+            /* font-family: 'Arial Black Custom', sans-serif; */
+            /* Added Arial Black */
             font-size: 10pt;
             font-weight: bold;
             color: #000000;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
-            line-height: 1.4;
-            margin-top: 2mm;
+            /* letter-spacing: 0.04em;
+            line-height: 1;
+            margin-top: 2mm; */
+        }
+
+        .org-city {
+            /* font-family: 'Calibri Custom', sans-serif; */
+            /* Added Calibri */
+            font-size: 10pt;
+            font-weight: bold;
+            color: #000000;
+            line-height: 1;
+            margin-top: 1mm;
         }
 
         /* ── Diploma word ── */
         .diploma-word {
             text-align: right;
-            font-size: 58pt;
-            color: #a68540;
+            font-size: 56pt;
+            margin-top: 60px; 
+            color: #ca9848;
+            font-weight: bold;
             font-style: italic;
-            font-weight: normal;
-            line-height: 1.0;
+            /* line-height: 1.0; */
             letter-spacing: 0.01em;
-            margin-bottom: 2mm;
+            margin-bottom: -2mm;
         }
 
         /* ── Degree ── */
         .diploma-degree {
             text-align: right;
-            font-size: 16pt;
+            font-size: 22pt;
             font-weight: bold;
-            color: #a68540;
+            color: #aa8345;
             margin-bottom: 2mm;
-            line-height: 1.2;
+            /* line-height: 1.2; */
         }
 
         /* ── Gold divider ── */
         .gold-divider {
             width: 60mm;
             height: 2px;
-            background: linear-gradient(90deg, transparent, #a68540, transparent);
+            background: linear-gradient(90deg, transparent, #A67C00, transparent);
             margin: 2mm 0 2mm auto;
         }
 
         /* ── Awarded label ── */
         .awarded-label {
             text-align: right;
-            font-size: 13pt;
+            font-size: 12pt;
             font-weight: bold;
-            color: #a68540;
-            letter-spacing: 0.06em;
-            margin-bottom: 2mm;
+            color: #aa8345;
+            letter-spacing: 0em;
+            margin-bottom: 1mm;
         }
 
         /* ── Participant name ── */
         .participant-last-name {
             text-align: right;
-            font-size: 28pt;
+            font-size: 21pt;
             font-weight: bold;
             font-style: italic;
             color: #000000;
-            line-height: 1.1;
+            line-height: 1.2;
         }
 
         .participant-first-patronymic {
             text-align: right;
-            font-size: 24pt;
+            font-size: 21pt;
             font-weight: bold;
             font-style: italic;
             color: #000000;
@@ -151,28 +185,43 @@
             margin-bottom: 4mm;
         }
 
-        .detail-line {
-            font-size: 10pt;
-            font-weight: bold;
-            color: #763609;
+        .nomination-line {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #000000;
             line-height: 1.7;
         }
 
-        .detail-label {
+        .nomination-label {
+            font-size: 12pt;
             font-weight: normal;
-            color: #763609;
+            color: #aa8345;
+        }
+
+        .age-line {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #000000;
+            line-height: 1.7;
+        }
+
+        .age-label {
+            font-size: 12pt;
+            font-weight: normal;
+            color: #aa8345;
         }
 
         .teacher-line {
-            font-size: 10pt;
-            font-weight: bold;
+            font-size: 12pt;
+            font-weight: 600;
             color: #000000;
             line-height: 1.7;
         }
 
         .teacher-label {
+            font-size: 12pt;
             font-weight: normal;
-            color: #000000;
+            color: #aa8345;
         }
 
         /* ── Bottom row: jury + qr ── */
@@ -200,30 +249,26 @@
             font-size: 11pt;
             font-weight: bold;
             color: #000000;
-            margin-bottom: 1mm;
         }
 
         .jury-member {
-            font-size: 10.5pt;
+            font-size: 11pt;
             font-weight: bold;
             color: #000000;
-            line-height: 1.5;
         }
 
         .diploma-meta {
             font-size: 10pt;
             font-weight: normal;
             color: #000000;
-            line-height: 1.7;
-            margin-top: 3mm;
+            margin-top: 4mm;
         }
 
         .diploma-contacts {
-            font-size: 8.5pt;
+            font-size: 9pt;
             font-weight: normal;
             color: #000000;
-            line-height: 1.7;
-            margin-top: 2mm;
+            margin-top: 4mm;
         }
 
         .qr-code {
@@ -238,84 +283,89 @@
         }
     </style>
 </head>
+
 <body>
-<div class="diploma-page">
-    @if($backgroundPath)
-    <div class="diploma-bg"></div>
-    @endif
+    <div class="diploma-page">
+        @if($backgroundPath)
+            <div class="diploma-bg"></div>
+        @endif
 
-    <!-- Main content -->
-    <div class="diploma-content">
+        <!-- Main content -->
+        <div class="diploma-content">
 
-        <!-- Organisation + contest (right-aligned) -->
-        <div class="org-block">
-            <div class="org-name">{{ $orgName }}</div>
-            <div class="contest-title">{{ $contestTitle }}</div>
-            <div class="org-name-repeat">{{ $orgName }}</div>
-        </div>
-
-        <!-- Diploma word -->
-        <div class="diploma-word">Диплом</div>
-
-        <!-- Degree (same gold color as Диплом) -->
-        <div class="diploma-degree">{{ $statusLabel }}</div>
-
-        <div class="gold-divider"></div>
-
-        <!-- вручается — bigger, bolder, gold -->
-        <div class="awarded-label">вручается</div>
-
-        <!-- Participant name (right, italic) -->
-        <div class="participant-last-name">{{ $participantLastName }}</div>
-        <div class="participant-first-patronymic">{{ $participantFirstPatronymic }}</div>
-
-        <!-- Details (right-aligned) -->
-        <div class="details-block">
-            @if($categoryName)
-            <div class="detail-line">
-                <span class="detail-label">номинация: </span>«{{ $categoryName }}»
-            </div>
-            @endif
-            @if($ageGroupName)
-            <div class="detail-line">
-                <span class="detail-label">возрастная категория: </span>{{ $ageGroupName }}
-            </div>
-            @endif
-            @if($teacherName)
-            <div class="teacher-line">
-                <span class="teacher-label">Преподаватель: </span>{{ $teacherName }}
-            </div>
-            @endif
-        </div>
-
-        <!-- Bottom row: jury (left) + QR code (right) -->
-        <div class="bottom-row">
-            <div class="bottom-left">
-                @if(!empty($juryMembers))
-                <div class="jury-label">Жюри:</div>
-                @foreach($juryMembers as $juryMember)
-                <div class="jury-member">{{ $juryMember }}</div>
-                @endforeach
+            <!-- Organisation + contest (right-aligned) -->
+            <div class="org-block">
+                <div class="org-name">{{ $orgName }}</div>
+                @if($orgCity)
+                    <div class="org-city">г.{{ $orgCity }}</div>
                 @endif
+                <div class="contest-title">{{ $contestTitle }}</div>
+                <div class="org-name-repeat">{{ $orgName }}</div>
+            </div>
 
-                <div class="diploma-meta">
-                    Диплом № {{ $diplomaNumber }}<br>
-                    {{ $awardedDate }}
+            <!-- Diploma word -->
+            <div class="diploma-word">Диплом</div>
+
+            <!-- Degree -->
+            <div class="diploma-degree">{{ $statusLabel }}</div>
+
+            <div class="gold-divider"></div>
+
+            <!-- вручается -->
+            <div class="awarded-label">вручается</div>
+
+            <!-- Participant name -->
+            <div class="participant-last-name">{{ $participantLastName }}</div>
+            <div class="participant-first-patronymic">{{ $participantFirstPatronymic }}</div>
+
+            <!-- Details (right-aligned) -->
+            <div class="details-block">
+                @if($categoryName)
+                    <div class="nomination-line">
+                        <span class="nomination-label">номинация: </span>«{{ $categoryName }}»
+                    </div>
+                @endif
+                @if($ageGroupName)
+                    <div class="age-line">
+                        <span class="age-label">возрастная категория: </span>{{ $ageGroupName }}
+                    </div>
+                @endif
+                @if($teacherName)
+                    <div class="teacher-line">
+                        <span class="teacher-label">Преподаватель: </span>{{ $teacherName }}
+                    </div>
+                @endif
+            </div>
+
+            <!-- Bottom row: jury (left) + QR code (right) -->
+            <div class="bottom-row">
+                <div class="bottom-left">
+                    @if(!empty($juryMembers))
+                        <div class="jury-label">Жюри:</div>
+                        @foreach($juryMembers as $juryMember)
+                            <div class="jury-member">{{ $juryMember }}</div>
+                        @endforeach
+                    @endif
+
+                    <div class="diploma-meta">
+                        Диплом № {{ $diplomaNumber }}<br>
+                        {{ $awardedDate }}
+                    </div>
+                    <div class="diploma-contacts">
+                        talant-centr.ru<br>
+                        info@talant-centr.ru
+                    </div>
                 </div>
-                <div class="diploma-contacts">
-                    talant-centr.ru<br>
-                    info@talant-centr.ru
+
+                <div class="bottom-right">
+                    <div class="qr-code">
+                        <img src="{{ $qrCodeDataUri }}" alt="QR">
+                    </div>
                 </div>
             </div>
 
-            <div class="bottom-right">
-                <div class="qr-code">
-                    <img src="{{ $qrCodeDataUri }}" alt="QR">
-                </div>
-            </div>
         </div>
-
     </div>
-</div>
 </body>
+
 </html>

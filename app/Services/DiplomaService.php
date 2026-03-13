@@ -8,11 +8,8 @@ use App\Enums\ApplicationStatus;
 use App\Models\Application;
 use App\Models\Contest;
 use App\Models\Diploma;
+use BaconQrCode\Common\ErrorCorrectionLevel;
 use BaconQrCode\Encoder\Encoder;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
@@ -25,14 +22,16 @@ class DiplomaService
      */
     public function generateForApplication(Application $application): Diploma
     {
+        set_time_limit(120);
+
         $application->load(['user', 'contest.organization', 'category', 'ageGroup']);
 
         // ── Diploma number ──────────────────────────────────
         $diplomaNumber = $application->contest_id . '-' . str_pad((string) $application->id, 7, '0', STR_PAD_LEFT);
 
-        // ── QR code as SVG data URI ─────────────────────────
-        $verifyUrl    = route('diplomvtrifi.show', $diplomaNumber);
-        $qrCodeDataUri = $this->generateQrCodeSvg($verifyUrl);
+        // ── QR code as PNG data URI ─────────────────────────
+        $verifyUrl     = route('diplomvtrifi.show', $diplomaNumber);
+        $qrCodeDataUri = $this->generateQrCodePng($verifyUrl);
 
         // ── Jury list ───────────────────────────────────────
         $juryMembers = $application->contest->organization
@@ -51,12 +50,17 @@ class DiplomaService
             }
         }
 
+        // ── Font paths (forward slashes required for dompdf CSS url()) ───
+        $fontAriblk  = str_replace('\\', '/', public_path('fonts/ariblk.ttf'));
+        $fontCalibri = str_replace('\\', '/', public_path('fonts/calibri.ttf'));
+
         $html = view('diplomas.template', [
             'participantName' => $application->user->full_name,
             'participantLastName' => $application->user->last_name,
             'participantFirstPatronymic' => trim(($application->user->first_name ?? '') . ' ' . ($application->user->patronymic ?? '')),
             'contestTitle'    => $application->contest->title,
             'orgName'         => $application->contest->organization->name,
+            'orgCity'         => $application->contest->organization->city,
             'categoryName'    => $application->category?->name,
             'ageGroupName'    => $application->ageGroup?->name,
             'statusLabel'     => $application->status->diplomaLabel(),
@@ -68,6 +72,8 @@ class DiplomaService
             'qrCodeDataUri'   => $qrCodeDataUri,
             'juryMembers'     => $juryMembers,
             'backgroundPath'  => $backgroundPath,
+            'fontAriblk'      => $fontAriblk,
+            'fontCalibri'     => $fontCalibri,
         ])->render();
 
         $pdf = Pdf::loadHTML($html, 'UTF-8')->setPaper('a4', 'portrait');
@@ -137,18 +143,40 @@ class DiplomaService
     }
 
     /**
-     * Generate a QR code as an inline SVG data URI.
+     * Generate a QR code as an inline PNG data URI using GD.
+     * PNG is rendered natively by dompdf, far faster than SVG.
      */
-    private function generateQrCodeSvg(string $content): string
+    private function generateQrCodePng(string $content): string
     {
-        $renderer = new ImageRenderer(
-            new RendererStyle(200),
-            new SvgImageBackEnd()
-        );
+        $qrCode = Encoder::encode($content, ErrorCorrectionLevel::L());
+        $matrix = $qrCode->getMatrix();
 
-        $writer = new Writer($renderer);
-        $svg    = $writer->writeString($content, Encoder::DEFAULT_BYTE_MODE_ECODING);
+        $moduleCount = $matrix->getWidth();
+        $moduleSize  = 6;  // pixels per module
+        $margin      = 4;  // quiet zone in modules
+        $imgSize     = ($moduleCount + $margin * 2) * $moduleSize;
 
-        return 'data:image/svg+xml;base64,' . base64_encode($svg);
+        $image = imagecreatetruecolor($imgSize, $imgSize);
+        $white = imagecolorallocate($image, 255, 255, 255);
+        $black = imagecolorallocate($image, 0, 0, 0);
+
+        imagefilledrectangle($image, 0, 0, $imgSize - 1, $imgSize - 1, $white);
+
+        for ($y = 0; $y < $moduleCount; $y++) {
+            for ($x = 0; $x < $moduleCount; $x++) {
+                if ($matrix->get($x, $y) === 1) {
+                    $px = ($x + $margin) * $moduleSize;
+                    $py = ($y + $margin) * $moduleSize;
+                    imagefilledrectangle($image, $px, $py, $px + $moduleSize - 1, $py + $moduleSize - 1, $black);
+                }
+            }
+        }
+
+        ob_start();
+        imagepng($image);
+        $png = ob_get_clean();
+        imagedestroy($image);
+
+        return 'data:image/png;base64,' . base64_encode($png);
     }
 }
