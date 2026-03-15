@@ -22,3 +22,17 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: ${{ secrets.FTP_REMOTE_DIR }}
         exclude: |
+          **/.claude/**
+          **/.git/**
+          **/.github/**
+          **/node_modules/**
+          **/.gitattributes
+          **/.gitignore
+          **/.gitkeep
+          **/vendor/hamcrest/**
+          **/vendor/mockery/**
+          **/vendor/phpunit/**
+          **/vendor/nunomaduro/**
+          **/vendor/pestphp/**
+          **/vendor/fakerphp/**
+          **/vendor/brianium/**
