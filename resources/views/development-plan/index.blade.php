@@ -181,18 +181,18 @@
                     </div>
                 </div>
 
-                <!-- Stage 4 — IN PROGRESS -->
+                <!-- Stage 4 — LARGELY COMPLETE -->
                 <div class="relative flex items-start group">
                     <!-- Dot -->
-                    <div class="relative z-10 flex-shrink-0 w-10 h-10 sm:w-16 sm:h-16 bg-white border-4 border-gold rounded-full flex items-center justify-center shadow-md">
-                        <i class="fas fa-spinner fa-spin text-gold text-sm sm:text-xl"></i>
+                    <div class="relative z-10 flex-shrink-0 w-10 h-10 sm:w-16 sm:h-16 gradient-gold rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-check text-white text-sm sm:text-xl"></i>
                     </div>
                     <!-- Content -->
                     <div class="ml-4 sm:ml-6 flex-1 min-w-0">
                         <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                            <span class="text-xs font-semibold text-warm-gray uppercase tracking-wider">Этап 4</span>
-                            <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                <i class="fas fa-spinner fa-spin mr-1"></i> В работе
+                            <span class="text-xs font-semibold text-gold uppercase tracking-wider">Этап 4</span>
+                            <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <i class="fas fa-spinner fa-spin mr-1"></i> Почти завершён
                             </span>
                         </div>
                         <a href="{{ route('development-plan.stage', 'stage-4') }}" class="block bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200 hover-lift group-hover:border-gold/30 transition-colors">
@@ -225,11 +225,11 @@
 
             <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gold/10">
                 <div class="flex justify-between text-xs sm:text-sm text-warm-gray mb-2">
-                    <span>Выполнено: 3 из 4</span>
-                    <span class="font-semibold text-primary">75%</span>
+                    <span>Финальное тестирование: этап 4 в завершающей стадии</span>
+                    <span class="font-semibold text-primary">90%</span>
                 </div>
                 <div class="w-full bg-cream-dark rounded-full h-3 sm:h-4 overflow-hidden">
-                    <div class="gradient-gold h-3 sm:h-4 rounded-full transition-all duration-1000" style="width: 75%"></div>
+                    <div class="gradient-gold h-3 sm:h-4 rounded-full transition-all duration-1000" style="width: 90%"></div>
                 </div>
 
                 <div class="grid grid-cols-4 gap-1 sm:gap-2 mt-3 sm:mt-4 text-xs text-warm-gray">
