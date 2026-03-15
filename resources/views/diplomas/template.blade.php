@@ -77,7 +77,7 @@
         }
 
         .org-name {
-            /* font-family: 'Arial Black Custom', sans-serif; */
+            font-family: 'Arial Black Custom', sans-serif;
             font-size: 10pt;
             font-weight: bold;
             color: #000000;
@@ -87,7 +87,7 @@
         }
 
         .contest-title {
-            /* font-family: 'Calibri Custom', sans-serif; */
+            font-family: 'Calibri Custom', sans-serif;
             /* Added Calibri */
             font-size: 16pt;
             font-weight: bold;
@@ -97,7 +97,7 @@
         }
 
         .org-name-repeat {
-            /* font-family: 'Arial Black Custom', sans-serif; */
+            font-family: 'Arial Black Custom', sans-serif;
             /* Added Arial Black */
             font-size: 10pt;
             font-weight: bold;
@@ -109,7 +109,7 @@
         }
 
         .org-city {
-            /* font-family: 'Calibri Custom', sans-serif; */
+            font-family: 'Calibri Custom', sans-serif;
             /* Added Calibri */
             font-size: 10pt;
             font-weight: bold;

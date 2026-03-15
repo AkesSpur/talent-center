@@ -117,10 +117,10 @@ A participant can create other participant accounts (e.g., parent creates childr
 ## Stage Roadmap
 | Stage | Focus | Status | Budget |
 |-------|-------|--------|--------|
-| 1 | Infrastructure & Database Foundation | LARGELY COMPLETE | 30,000 RUB |
-| 2 | Dashboards, Profiles & Organizations | NOT STARTED | 30,000 RUB |
-| 3 | Contests & Application Submission | NOT STARTED | 30,000 RUB |
-| 4 | Evaluation, Diplomas & Notifications | NOT STARTED | 30,000 RUB |
+| 1 | Infrastructure & Database Foundation | COMPLETE | 30,000 RUB |
+| 2 | Dashboards, Profiles & Organizations | COMPLETE | 30,000 RUB |
+| 3 | Contests & Application Submission | COMPLETE | 30,000 RUB |
+| 4 | Evaluation, Diplomas & Notifications | LARGELY COMPLETE | 30,000 RUB |
 
 **Full plan details:** See `docs/PROJECT_PLAN.md`
 

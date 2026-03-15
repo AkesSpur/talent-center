@@ -243,7 +243,7 @@ database/migrations/2026_02_23_085255_make_action_logs_user_id_nullable.php
 
 ## Stage 4: Evaluation, Diplomas & Notifications — 30,000 RUB
 
-### Status: NOT STARTED
+### Status: LARGELY COMPLETE
 
 ### Objective
 Build the jury evaluation interface, automatic PDF diploma generation, email notification system, and do final testing/polishing. After this stage, the full platform flow works: create contest -> submit -> evaluate -> diplomas -> notifications.
@@ -251,52 +251,50 @@ Build the jury evaluation interface, automatic PDF diploma generation, email not
 ### Deliverables
 
 #### 4.1 Evaluation Interface
-- **Jury dashboard:** list of contests in `evaluation` status for the evaluator's org
-- **Evaluation page:** for each contest, show all applications grouped by category
-- **Evaluate an application:** assign one of: Participant (just participated), 1st Place, 2nd Place, 3rd Place, Rejected (must provide reason)
-- **Editable until finalized:** evaluator can change assessment until "Finish Evaluation" is clicked
-- **Ties allowed:** multiple applications can get the same place
-- **Status indicators:** color-coded badges per application (new=gray, placed=gold/silver/bronze, rejected=red)
+- [x] **Jury dashboard:** list of contests in `evaluation` status for the evaluator's org
+- [x] **Evaluation page:** for each contest, show all applications grouped by category
+- [x] **Evaluate an application:** assign one of: Participant (just participated), 1st Place, 2nd Place, 3rd Place, Rejected (must provide reason)
+- [x] **Editable until finalized:** evaluator can change assessment until "Finish Evaluation" is clicked
+- [x] **Ties allowed:** multiple applications can get the same place
+- [x] **Status indicators:** color-coded badges per application (new=gray, placed=gold/silver/bronze, rejected=red)
 
 #### 4.2 Finalization Gate
-- "Finish Evaluation" button per contest
-- **Enabled only when:** all applications evaluated (none with `new` status)
-- **On click:** contest -> `archive`, diplomas generated, notifications sent
-- **Irreversible:** archived contests cannot be reopened in MVP
+- [x] "Finish Evaluation" button per contest
+- [x] **Enabled only when:** all applications evaluated (none with `new` status)
+- [x] **On click:** contest -> `archive`, diplomas generated, notifications sent
+- [x] **Irreversible:** archived contests cannot be reopened in MVP
 
 #### 4.3 PDF Diploma Generation
-- **Library:** barryvdh/laravel-dompdf (or snappy)
-- **Diploma contents:** organization name, participant full name, contest title, category, place, date, signature (from template)
-- **Background:** uses `diploma_background` image uploaded during contest creation
-- **Preview diploma:** generated at application submission time (with placeholder place)
-- **Final diploma:** generated automatically when place is assigned
-- **Storage:** saved to `storage/app/public/diplomas/`, record in `diplomas` table
-- **Download:** participant can download from their dashboard
+- [x] **Library:** barryvdh/laravel-dompdf installed and configured
+- [x] **Diploma contents:** organization name, participant full name, contest title, category, place, date, QR code
+- [x] **Background:** uses `diploma_background` image uploaded during contest creation
+- [x] **Final diploma:** generated automatically when place is assigned / contest finalized
+- [x] **Storage:** saved to `storage/app/public/diplomas/`, record in `diplomas` table with `diploma_number`
+- [x] **Download:** participant can download from their dashboard
+- [x] **Verification:** public QR code + `/diplomvtrifi` search page to verify diploma authenticity
 
 #### 4.4 Email Notifications
-- **Triggers:**
-  1. Application submitted (to applicant)
-  2. Contest status changed — published, moved to evaluation, archived (to all applicants)
-  3. Place awarded (to applicant — include diploma link)
-  4. Application rejected (to applicant — include reason)
-  5. New contest published (to all users who haven't opted out? — or only org followers? Clarify.)
-- **Implementation:** Laravel Mailables + Queued jobs
-- **Opt-out:** users.email_notifications flag — if false, skip all emails
-- **Templates:** clean, branded Blade email templates
+- [x] Application submitted (to applicant)
+- [x] Contest finalized (to all applicants)
+- [x] Place awarded / diploma ready (to applicant — include diploma link)
+- [x] Application rejected (to applicant — include reason)
+- [x] **Implementation:** Laravel Mailables
+- [x] **Opt-out:** users.email_notifications flag — if false, skip all emails
+- [x] **Templates:** branded Blade email templates
 
 #### 4.5 Admin Tools (Final)
-- Admin can manually correct evaluation results (override place assignment)
-- Admin can manage diploma templates (upload background images)
-- Admin can re-trigger diploma generation for a contest
+- [x] Admin can re-trigger diploma generation for a contest
+- [x] Admin can override/correct evaluation results
+- [ ] Admin diploma template management UI (upload background images per contest — handled via contest edit form)
 
 #### 4.6 Final Testing & Polish
-- Test complete flow: register -> create org -> verify -> create contest -> publish -> submit application -> evaluate -> finalize -> diplomas -> notifications
-- Test parent-child flow end to end
-- Test role access controls (participant can't access admin, etc.)
-- Test edge cases: expired contests, blocked users, unverified orgs
-- Responsive testing on mobile widths
-- Fix any Blade rendering issues, flash messages, validation errors
-- Performance check on seeded data
+- [ ] Test complete flow: register -> create org -> verify -> create contest -> publish -> submit application -> evaluate -> finalize -> diplomas -> notifications
+- [ ] Test parent-child flow end to end
+- [ ] Test role access controls (participant can't access admin, etc.)
+- [ ] Test edge cases: expired contests, blocked users, unverified orgs
+- [ ] Responsive testing on mobile widths
+- [ ] Fix any Blade rendering issues, flash messages, validation errors
+- [ ] Performance check on seeded data
 
 ### Routes Added
 ```
