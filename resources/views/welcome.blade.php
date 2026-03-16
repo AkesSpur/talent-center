@@ -6,6 +6,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Талант-центр — Всероссийская платформа конкурсов</title>
 
+    <!-- Favicon -->
+    @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_FAVICON]))
+        <link rel="icon" href="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_FAVICON]) }}">
+    @endif
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -63,12 +68,17 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-20 gap-4">
             <a href="/" class="flex items-center space-x-3 shrink-0">
-                <div class="w-11 h-11 gradient-gold rounded-full flex items-center justify-center shadow-sm">
-                    <i class="fas fa-award text-white text-lg"></i>
-                </div>
+                @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_LOGO]))
+                    <img src="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_LOGO]) }}"
+                         alt="Талант-центр" class="h-11 w-auto max-w-[44px] object-contain">
+                @else
+                    <div class="w-11 h-11 gradient-gold rounded-full flex items-center justify-center shadow-sm">
+                        <i class="fas fa-award text-white text-lg"></i>
+                    </div>
+                @endif
                 <div>
-                    <h1 class="font-serif text-lg font-bold text-primary leading-tight">Талант-центр</h1>
-                    <p class="text-xs text-warm-gray leading-tight">Всероссийский центр талантов</p>
+                    <h1 class="font-serif text-lg font-bold leading-tight" style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME_COLOR] ?? '#8B4513' }}">{{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}</h1>
+                    <p class="text-xs leading-tight" style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE_COLOR] ?? '#9A8B7A' }}">{{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE] ?? 'Всероссийский центр талантов' }}</p>
                 </div>
             </a>
 
@@ -718,59 +728,7 @@
 </section>
 
 {{-- ===== FOOTER ===== --}}
-<footer class="bg-dark text-cream py-12 px-4">
-    <div class="max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div class="md:col-span-1">
-                <div class="flex items-center space-x-3 mb-4">
-                    <div class="w-10 h-10 gradient-gold rounded-full flex items-center justify-center">
-                        <i class="fas fa-award text-white"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-serif font-bold text-cream">Талант-центр</h4>
-                    </div>
-                </div>
-                <p class="text-warm-gray text-sm leading-relaxed">
-                    Всероссийская платформа для проведения онлайн-конкурсов, оценки работ и выдачи дипломов.
-                </p>
-            </div>
-
-            <div>
-                <h5 class="font-serif font-semibold text-gold mb-4">Разделы</h5>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="/" class="text-warm-gray hover:text-gold transition-colors">Главная</a></li>
-                    <li><a href="{{ route('contests.index') }}" class="text-warm-gray hover:text-gold transition-colors">Конкурсы</a></li>
-                    <li><a href="{{ route('development-plan') }}" class="text-warm-gray hover:text-gold transition-colors">План развития</a></li>
-                    <li><a href="{{ route('diplomvtrifi.search') }}" class="text-warm-gray hover:text-gold transition-colors">Проверить диплом</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h5 class="font-serif font-semibold text-gold mb-4">Организаторам</h5>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('organizations.create') }}" class="text-warm-gray hover:text-gold transition-colors">Создать организацию</a></li>
-                    <li><a href="{{ route('contests.create') }}" class="text-warm-gray hover:text-gold transition-colors">Создать конкурс</a></li>
-                    <li><a href="{{ route('development-plan') }}" class="text-warm-gray hover:text-gold transition-colors">Документация</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h5 class="font-serif font-semibold text-gold mb-4">Контакты</h5>
-                <ul class="space-y-2 text-sm">
-                    <li class="text-warm-gray"><i class="fas fa-envelope text-gold mr-2"></i>info@talant-centr.ru</li>
-                    <li class="text-warm-gray"><i class="fas fa-phone text-gold mr-2"></i>+7 (800) 000-00-00</li>
-                    <li class="text-warm-gray"><i class="fas fa-map-marker-alt text-gold mr-2"></i>Россия</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="border-t border-warm-gray/20 pt-6">
-            <p class="text-warm-gray text-sm text-center">
-                &copy; {{ date('Y') }} Талант-центр. Все права защищены.
-            </p>
-        </div>
-    </div>
-</footer>
+@include('layouts.footer')
 
 </body>
 </html>

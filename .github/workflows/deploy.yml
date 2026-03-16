@@ -29,10 +29,3 @@ jobs:
           **/.gitattributes
           **/.gitignore
           **/.gitkeep
-          **/vendor/hamcrest/**
-          **/vendor/mockery/**
-          **/vendor/phpunit/**
-          **/vendor/nunomaduro/**
-          **/vendor/pestphp/**
-          **/vendor/fakerphp/**
-          **/vendor/brianium/**

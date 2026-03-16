@@ -7,6 +7,11 @@
 
         <title>{{ config('app.name', 'Талант-центр') }}</title>
 
+        <!-- Favicon -->
+        @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_FAVICON]))
+            <link rel="icon" href="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_FAVICON]) }}">
+        @endif
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

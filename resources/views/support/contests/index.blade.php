@@ -93,7 +93,7 @@
                                         <td class="px-6 py-4 text-right">
                                             <a href="{{ route('support.contests.show', $contest) }}"
                                                 class="px-3 py-1.5 border border-primary/20 text-primary text-xs rounded-lg hover:bg-primary/5 transition-colors">
-                                                <i class="fas fa-eye mr-1"></i>Просмотр
+                                                <i class="fas fa-eye mr-1"></i>
                                             </a>
                                         </td>
                                     </tr>

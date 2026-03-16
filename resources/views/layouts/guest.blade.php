@@ -7,6 +7,11 @@
 
         <title>{{ config('app.name', 'Талант-центр') }}</title>
 
+        <!-- Favicon -->
+        @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_FAVICON]))
+            <link rel="icon" href="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_FAVICON]) }}">
+        @endif
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,12 +28,17 @@
             <!-- Logo -->
             <div class="mb-6">
                 <a href="/" class="flex items-center space-x-3">
-                    <div class="w-14 h-14 gradient-gold rounded-full flex items-center justify-center shadow-md">
-                        <i class="fas fa-award text-white text-2xl"></i>
-                    </div>
+                    @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_LOGO]))
+                        <img src="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_LOGO]) }}"
+                             alt="Талант-центр" class="h-14 w-auto max-w-[56px] object-contain">
+                    @else
+                        <div class="w-14 h-14 gradient-gold rounded-full flex items-center justify-center shadow-md">
+                            <i class="fas fa-award text-white text-2xl"></i>
+                        </div>
+                    @endif
                     <div>
-                        <h1 class="font-serif text-xl font-bold text-primary">Талант-центр</h1>
-                        <p class="text-xs text-warm-gray">Всероссийский центр талантов</p>
+                        <h1 class="font-serif text-xl font-bold" style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME_COLOR] ?? '#8B4513' }}">{{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}</h1>
+                        <p class="text-xs" style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE_COLOR] ?? '#9A8B7A' }}">{{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE] ?? 'Всероссийский центр талантов' }}</p>
                     </div>
                 </a>
             </div>

@@ -4,12 +4,17 @@
 
             <!-- Logo -->
             <a href="/" class="flex items-center space-x-3">
-                <div class="w-11 h-11 gradient-gold rounded-full flex items-center justify-center shadow-sm">
-                    <i class="fas fa-award text-white text-lg"></i>
-                </div>
+                @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_LOGO]))
+                    <img src="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_LOGO]) }}"
+                         alt="Талант-центр" class="h-11 w-auto max-w-[44px] object-contain">
+                @else
+                    <div class="w-11 h-11 gradient-gold rounded-full flex items-center justify-center shadow-sm">
+                        <i class="fas fa-award text-white text-lg"></i>
+                    </div>
+                @endif
                 <div>
-                    <h1 class="font-serif text-lg font-bold text-primary leading-tight">Талант-центр</h1>
-                    <p class="text-xs text-warm-gray leading-tight">Всероссийский центр талантов</p>
+                    <h1 class="font-serif text-lg font-bold leading-tight" style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME_COLOR] ?? '#8B4513' }}">{{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}</h1>
+                    <p class="text-xs leading-tight" style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE_COLOR] ?? '#9A8B7A' }}">{{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE] ?? 'Всероссийский центр талантов' }}</p>
                 </div>
             </a>
 
@@ -84,6 +89,9 @@
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.diploma-backgrounds.index')">
                                 <i class="fas fa-image mr-2 text-warm-gray w-5 text-center"></i> Фоны дипломов
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.settings.index')">
+                                <i class="fas fa-sliders mr-2 text-warm-gray w-5 text-center"></i> Общие настройки
                             </x-dropdown-link>
                         </div>
                     @endif

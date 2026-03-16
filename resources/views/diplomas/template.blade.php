@@ -36,7 +36,7 @@
             padding: 0;
             width: 210mm;
             height: 297mm;
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: 'DejaVu Serif', serif;
             background-color: #FAF8F5;
         }
 

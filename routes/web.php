@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\EvaluationController as AdminEvaluationController
 use App\Http\Controllers\Admin\OrganizationController as AdminOrganizationController;
 use App\Http\Controllers\Admin\DiplomaBackgroundController as AdminDiplomaBackgroundController;
 use App\Http\Controllers\Admin\PlatformCategoryController;
+use App\Http\Controllers\Admin\SiteSettingsController as AdminSiteSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ContestController;
@@ -31,6 +32,9 @@ use Illuminate\Support\Facades\Route;
 // ── Public ──────────────────────────────────────────────
 
 Route::get('/', HomeController::class)->name('home');
+
+// ── Privacy policy (public) ──────────────────────────
+Route::get('/privacy-policy', [AdminSiteSettingsController::class, 'privacyPolicy'])->name('privacy-policy');
 
 // ── Diploma verification (public) ────────────────────
 Route::get('/diplomvtrifi', [DiplomaVerifyController::class, 'index'])->name('diplomvtrifi.search');
@@ -164,6 +168,17 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     // Action logs
     Route::get('/action-logs', [ActionLogController::class, 'index'])->name('action-logs.index');
+
+    // Site settings
+    Route::get('/settings', [AdminSiteSettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/contacts', [AdminSiteSettingsController::class, 'updateContacts'])->name('settings.contacts');
+    Route::post('/settings/privacy-policy', [AdminSiteSettingsController::class, 'updatePrivacyPolicy'])->name('settings.privacy-policy');
+    Route::delete('/settings/privacy-policy', [AdminSiteSettingsController::class, 'deletePrivacyPolicy'])->name('settings.privacy-policy.delete');
+    Route::post('/settings/logo', [AdminSiteSettingsController::class, 'updateLogo'])->name('settings.logo');
+    Route::delete('/settings/logo', [AdminSiteSettingsController::class, 'deleteLogo'])->name('settings.logo.delete');
+    Route::post('/settings/favicon', [AdminSiteSettingsController::class, 'updateFavicon'])->name('settings.favicon');
+    Route::delete('/settings/favicon', [AdminSiteSettingsController::class, 'deleteFavicon'])->name('settings.favicon.delete');
+    Route::post('/settings/brand-text', [AdminSiteSettingsController::class, 'updateBrandText'])->name('settings.brand-text');
 });
 
 // ── Support ─────────────────────────────────────────────
