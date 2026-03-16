@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrganizationRequest;
 use App\Http\Requests\UpdateOrganizationRequest;
+use App\Mail\JuryInvitation;
 use App\Models\Organization;
 use App\Models\User;
 use App\Services\ActionLogService;
@@ -13,6 +14,7 @@ use App\Traits\HandlesImages;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class OrganizationController extends Controller
@@ -116,7 +118,7 @@ class OrganizationController extends Controller
         $newRep = User::where('email', $request->input('email'))->first();
 
         if (! $newRep) {
-            return response()->json(['error' => 'Пользователь с таким email не найден в системе.'], 422);
+            return response()->json(['not_found' => true, 'email' => $request->input('email')], 422);
         }
 
         if ($organization->representatives()->where('user_id', $newRep->id)->exists()) {
@@ -144,5 +146,35 @@ class OrganizationController extends Controller
             'name'           => $newRep->full_name,
             'already_member' => false,
         ]);
+    }
+
+    /**
+     * POST /organizations/{organization}/send-jury-invitation (AJAX)
+     * Send a registration invitation email to an unregistered email address.
+     */
+    public function sendJuryInvitation(Request $request, Organization $organization): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $user->canInOrg('manage', $organization) && ! $user->isAdmin()) {
+            return response()->json(['error' => 'Недостаточно прав.'], 403);
+        }
+
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        if (User::where('email', $request->input('email'))->exists()) {
+            return response()->json(['error' => 'Пользователь уже зарегистрирован. Попробуйте добавить снова.'], 422);
+        }
+
+        Mail::to($request->input('email'))->send(new JuryInvitation($organization, $user));
+
+        ActionLogService::log('jury.invitation_sent', $organization, [
+            'invited_email' => $request->input('email'),
+            'invited_by'    => $user->id,
+        ]);
+
+        return response()->json(['sent' => true]);
     }
 }

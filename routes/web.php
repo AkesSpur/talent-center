@@ -91,6 +91,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/organizations/{organization}/representatives/{user}', [RepresentativeController::class, 'update'])->name('organizations.representatives.update');
     Route::delete('/organizations/{organization}/representatives/{user}', [RepresentativeController::class, 'destroy'])->name('organizations.representatives.destroy');
     Route::post('/organizations/{organization}/add-jury-member', [OrganizationController::class, 'addJuryMember'])->name('organizations.add-jury-member');
+    Route::post('/organizations/{organization}/send-jury-invitation', [OrganizationController::class, 'sendJuryInvitation'])->name('organizations.send-jury-invitation');
 
     // ── Contests (auth-required management) ─────────────
     Route::get('/dashboard/contests', [ContestController::class, 'myIndex'])->name('dashboard.contests');

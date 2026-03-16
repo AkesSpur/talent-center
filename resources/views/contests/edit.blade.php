@@ -165,6 +165,35 @@
                             </div>
                             <p x-show="juryInviteError" x-text="juryInviteError" class="text-sm text-red-600 mt-2"></p>
                             <p x-show="juryInviteSuccess" x-text="juryInviteSuccess" class="text-sm text-green-600 mt-2"></p>
+
+                            {{-- User not found: invite to register --}}
+                            <div x-show="juryInviteNotFound" x-cloak
+                                 class="mt-3 p-3 rounded-lg border border-amber-200 bg-amber-50">
+                                <p class="text-sm text-amber-800 mb-1">
+                                    <i class="fas fa-user-slash mr-1.5 text-amber-500"></i>
+                                    Пользователь <strong x-text="juryInviteNotFoundEmail"></strong> не зарегистрирован.
+                                </p>
+                                <p class="text-xs text-amber-700 mb-3">Отправить приглашение на регистрацию?</p>
+                                <div class="flex gap-2 flex-wrap">
+                                    <button type="button" @click="sendJuryInvitation()"
+                                        :disabled="jurySendingInvitation"
+                                        class="px-3 py-1.5 bg-amber-600 text-white text-xs font-medium rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50">
+                                        <i class="fas fa-envelope mr-1" x-show="!jurySendingInvitation"></i>
+                                        <i class="fas fa-spinner fa-spin mr-1" x-show="jurySendingInvitation"></i>
+                                        Отправить приглашение
+                                    </button>
+                                    <button type="button"
+                                        @click="juryInviteNotFound = false; juryInviteEmail = ''"
+                                        class="px-3 py-1.5 border border-amber-300 text-amber-700 text-xs rounded-lg hover:bg-amber-100 transition-colors">
+                                        Отмена
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p x-show="juryInviteSent" x-cloak class="text-sm text-green-600 mt-2">
+                                <i class="fas fa-check-circle mr-1"></i>
+                                Приглашение отправлено на <span x-text="juryInviteNotFoundEmail"></span>
+                            </p>
                         </div>
                     </div>
 
@@ -442,6 +471,10 @@ function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds,
         juryInviteLoading: false,
         juryInviteError: '',
         juryInviteSuccess: '',
+        juryInviteNotFound: false,
+        juryInviteNotFoundEmail: '',
+        jurySendingInvitation: false,
+        juryInviteSent: false,
         selectedGenreId: initialGenreId || '',
         diplomaBackgrounds: diplomaBgData || [],
         selectedDefaultBg: null,
@@ -502,6 +535,8 @@ function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds,
             this.juryInviteLoading = true;
             this.juryInviteError = '';
             this.juryInviteSuccess = '';
+            this.juryInviteNotFound = false;
+            this.juryInviteSent = false;
             try {
                 const res = await fetch(`/organizations/${this.selectedOrgId}/add-jury-member`, {
                     method: 'POST',
@@ -514,6 +549,11 @@ function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds,
                 });
                 const data = await res.json();
                 if (!res.ok) {
+                    if (data.not_found) {
+                        this.juryInviteNotFound = true;
+                        this.juryInviteNotFoundEmail = data.email;
+                        return;
+                    }
                     this.juryInviteError = data.error || data.message || 'Произошла ошибка.';
                     return;
                 }
@@ -532,6 +572,34 @@ function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds,
                 this.juryInviteError = 'Ошибка сети. Попробуйте ещё раз.';
             } finally {
                 this.juryInviteLoading = false;
+            }
+        },
+        async sendJuryInvitation() {
+            if (!this.juryInviteNotFoundEmail || !this.selectedOrgId) return;
+            this.jurySendingInvitation = true;
+            this.juryInviteError = '';
+            try {
+                const res = await fetch(`/organizations/${this.selectedOrgId}/send-jury-invitation`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ email: this.juryInviteNotFoundEmail }),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    this.juryInviteError = data.error || 'Произошла ошибка при отправке.';
+                    return;
+                }
+                this.juryInviteSent = true;
+                this.juryInviteNotFound = false;
+                this.juryInviteEmail = '';
+            } catch (e) {
+                this.juryInviteError = 'Ошибка сети. Попробуйте ещё раз.';
+            } finally {
+                this.jurySendingInvitation = false;
             }
         },
     };

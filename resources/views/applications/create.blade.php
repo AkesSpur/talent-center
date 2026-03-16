@@ -326,23 +326,24 @@
                                     </div>
                                 </div>
 
-                                {{-- Confirmation checkbox --}}
-                                <label
-                                    class="flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-200"
-                                    :class="confirmChecked
-                                        ? 'border-gold/40 bg-gold/5'
-                                        : 'border-primary/10 bg-cream/40 hover:border-gold/25 hover:bg-gold/[0.03]'"
-                                >
-                                    <input type="checkbox" x-model="confirmChecked"
-                                        class="w-4 h-4 mt-0.5 shrink-0 rounded border-primary/30 text-primary focus:ring-primary/20 cursor-pointer">
-                                    <div>
-                                        <p class="text-sm font-semibold text-dark leading-snug">Заполнено верно, мною проверено</p>
-                                        <p class="text-xs text-warm-gray mt-0.5 leading-relaxed">Я подтверждаю, что все данные заполнены верно и соответствуют действительности</p>
-                                    </div>
-                                </label>
 
                             </div>
                         </div>
+
+                        {{-- Confirmation checkbox (always visible) --}}
+                        <label
+                            class="flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-200"
+                            :class="confirmChecked
+                                ? 'border-gold/40 bg-gold/5'
+                                : 'border-primary/10 bg-cream/40 hover:border-gold/25 hover:bg-gold/[0.03]'"
+                        >
+                            <input type="checkbox" x-model="confirmChecked"
+                                class="w-4 h-4 mt-0.5 shrink-0 rounded border-primary/30 text-primary focus:ring-primary/20 cursor-pointer">
+                            <div>
+                                <p class="text-sm font-semibold text-dark leading-snug">Заполнено верно, мною проверено</p>
+                                <p class="text-xs text-warm-gray mt-0.5 leading-relaxed">Я подтверждаю, что все данные заполнены верно и соответствуют действительности</p>
+                            </div>
+                        </label>
 
                         {{-- Submit --}}
                         <div class="flex gap-3 pt-2">
