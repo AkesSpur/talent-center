@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between h-20 gap-4">
 
             <!-- Logo -->
-            <a href="/" class="flex items-center space-x-3">
+            <a href="/" class="flex items-center space-x-3 min-w-0">
                 @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_LOGO]))
                     <img src="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_LOGO]) }}"
                         alt="Талант-центр" class="h-11 w-auto max-w-[44px] object-contain shrink-0">
@@ -12,7 +12,7 @@
                         <i class="fas fa-award text-white text-lg"></i>
                     </div>
                 @endif
-                <div class="flex flex-col leading-tight">
+                <div class="min-w-0">
                     <h1 class="font-serif text-lg font-bold leading-tight"
                         style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME_COLOR] ?? '#8B4513' }}">
                         {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}</h1>
