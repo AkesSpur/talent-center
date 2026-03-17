@@ -13,7 +13,10 @@
                             </div>
                         @endif
                         <div>
-                            <h4 class="font-serif font-bold text-cream">Талант-центр</h4>
+                            <h4 class="font-serif font-bold text-cream">{{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}</h4>
+                            @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE]))
+                                <p class="text-xs text-warm-gray leading-tight">{{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE] }}</p>
+                            @endif
                         </div>
                     </div>
                     <p class="text-warm-gray text-sm">

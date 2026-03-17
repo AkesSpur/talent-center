@@ -6,9 +6,9 @@
             <a href="/" class="flex items-center space-x-3">
                 @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_LOGO]))
                     <img src="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_LOGO]) }}"
-                         alt="Талант-центр" class="h-11 w-auto max-w-[44px] object-contain">
+                         alt="Талант-центр" class="h-11 w-auto max-w-[44px] object-contain shrink-0">
                 @else
-                    <div class="w-11 h-11 gradient-gold rounded-full flex items-center justify-center shadow-sm">
+                    <div class="w-11 h-11 gradient-gold rounded-full flex items-center justify-center shadow-sm shrink-0">
                         <i class="fas fa-award text-white text-lg"></i>
                     </div>
                 @endif
