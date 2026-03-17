@@ -55,8 +55,18 @@
                             </li>
                         @endif
                         @if(!empty($siteSettings[\App\Models\SiteSettings::CONTACT_PHONE]))
+                            @php
+                                $rawPhone = $siteSettings[\App\Models\SiteSettings::CONTACT_PHONE];
+                                $digits = preg_replace('/\D/', '', $rawPhone);
+                                if (strlen($digits) === 11 && $digits[0] === '8') {
+                                    $digits = '7' . substr($digits, 1);
+                                }
+                                $telHref = '+' . $digits;
+                            @endphp
                             <li class="text-warm-gray">
-                                <i class="fas fa-phone text-gold mr-2"></i>{{ $siteSettings[\App\Models\SiteSettings::CONTACT_PHONE] }}
+                                <a href="tel:{{ $telHref }}" class="hover:text-gold transition-colors">
+                                    <i class="fas fa-phone text-gold mr-2"></i>{{ $rawPhone }}
+                                </a>
                             </li>
                         @endif
                         @if(!empty($siteSettings[\App\Models\SiteSettings::CONTACT_ADDRESS]))
