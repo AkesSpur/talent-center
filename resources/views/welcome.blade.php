@@ -67,7 +67,7 @@
 <header class="bg-cream shadow-sm sticky top-0 z-50" x-data="{ open: false }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-20 gap-4">
-            <a href="/" class="flex items-center space-x-3 shrink-0">
+            <a href="/" class="flex items-center space-x-3">
                 @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_LOGO]))
                     <img src="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_LOGO]) }}"
                          alt="Талант-центр" class="h-11 w-auto max-w-[44px] object-contain">
