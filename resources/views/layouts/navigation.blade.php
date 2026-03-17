@@ -12,11 +12,11 @@
                         <i class="fas fa-award text-white text-lg"></i>
                     </div>
                 @endif
-                <div class="min-w-0">
-                    <h1 class="font-serif text-lg font-bold leading-tight"
+                <div class="min-w-0 overflow-hidden">
+                    <h1 class="font-serif text-lg font-bold leading-tight truncate"
                         style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME_COLOR] ?? '#8B4513' }}">
                         {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}</h1>
-                    <p class="text-xs leading-tight"
+                    <p class="text-xs leading-tight truncate"
                         style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE_COLOR] ?? '#9A8B7A' }}">
                         {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE] ?? 'Всероссийский центр талантов' }}
                     </p>
