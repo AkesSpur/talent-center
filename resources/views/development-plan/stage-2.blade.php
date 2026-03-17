@@ -1,60 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@extends('layouts.public')
 
-    <title>Этап 2 — Панели управления, профили и организации — {{ config('app.name', 'Талант-центр') }}</title>
+@section('title', 'Этап 2 — Панели управления, профили и организации — ' . config('app.name', 'Талант-центр'))
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="font-sans antialiased bg-cream text-dark">
-
-    <!-- ========== HEADER ========== -->
-    <header class="bg-cream shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <a href="/" class="flex items-center space-x-3">
-                    <div class="w-12 h-12 gradient-gold rounded-full flex items-center justify-center shadow-sm">
-                        <i class="fas fa-award text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-serif text-xl font-bold text-primary">Талант-центр</h1>
-                        <p class="text-xs text-warm-gray">Всероссийский центр талантов</p>
-                    </div>
-                </a>
-
-                <div class="flex items-center space-x-4">
-                    @auth
-                        <a href="{{ route('dashboard') }}" class="px-4 py-2 text-primary hover:text-primary-dark font-medium text-sm transition">
-                            <i class="fas fa-th-large mr-1"></i> Личный кабинет
-                        </a>
-                    @else
-                        @if (Route::has('login'))
-                            <a href="{{ route('login') }}" class="px-4 py-2 text-primary hover:text-primary-dark font-medium text-sm transition">
-                                Войти
-                            </a>
-                        @endif
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="hidden sm:inline-block px-6 py-2 gradient-gold text-dark font-semibold rounded-lg text-sm hover:opacity-90 transition">
-                                Регистрация
-                            </a>
-                        @endif
-                    @endauth
-                </div>
-            </div>
-        </div>
-    </header>
+@section('content')
 
     <!-- ========== HERO ========== -->
     <section class="pattern-bg py-16 sm:py-24 px-4">
@@ -210,59 +158,4 @@
         </div>
     </section>
 
-    <!-- ========== FOOTER ========== -->
-    <footer class="bg-dark text-cream py-12 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div class="md:col-span-1">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 gradient-gold rounded-full flex items-center justify-center">
-                            <i class="fas fa-award text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-serif font-bold text-cream">Талант-центр</h4>
-                        </div>
-                    </div>
-                    <p class="text-warm-gray text-sm">
-                        Всероссийская платформа для проведения онлайн-конкурсов, оценки работ и выдачи дипломов.
-                    </p>
-                </div>
-
-                <div>
-                    <h5 class="font-serif font-semibold text-gold mb-4">Разделы</h5>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="{{ route('home') }}" class="text-warm-gray hover:text-gold transition-colors">Главная</a></li>
-                        <li><a href="#" class="text-warm-gray hover:text-gold transition-colors">Конкурсы</a></li>
-                        <li><a href="{{ route('development-plan') }}" class="text-warm-gray hover:text-gold transition-colors">План развития</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h5 class="font-serif font-semibold text-gold mb-4">Организаторам</h5>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="text-warm-gray hover:text-gold transition-colors">Создать организацию</a></li>
-                        <li><a href="#" class="text-warm-gray hover:text-gold transition-colors">Провести конкурс</a></li>
-                        <li><a href="#" class="text-warm-gray hover:text-gold transition-colors">Документация</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h5 class="font-serif font-semibold text-gold mb-4">Контакты</h5>
-                    <ul class="space-y-2 text-sm">
-                        <li class="text-warm-gray"><i class="fas fa-envelope text-gold mr-2"></i>info@talentcenter.ru</li>
-                        <li class="text-warm-gray"><i class="fas fa-phone text-gold mr-2"></i>+7 (800) 000-00-00</li>
-                        <li class="text-warm-gray"><i class="fas fa-map-marker-alt text-gold mr-2"></i>Россия</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="border-t border-warm-gray/30 pt-6">
-                <p class="text-warm-gray text-sm text-center">
-                    &copy; {{ date('Y') }} Талант-центр. Все права защищены.
-                </p>
-            </div>
-        </div>
-    </footer>
-
-</body>
-</html>
+@endsection

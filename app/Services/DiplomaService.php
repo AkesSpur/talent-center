@@ -78,7 +78,7 @@ class DiplomaService
             'contactEmail'    => SiteSettings::get(SiteSettings::CONTACT_EMAIL, 'info@talant-centr.ru'),
         ])->render();
 
-        $pdf = Pdf::loadHTML($html, 'UTF-8')->setPaper('a4', 'portrait');
+        $pdf = Pdf::loadHTML(mb_convert_encoding($html, 'UTF-8', 'UTF-8'), 'UTF-8')->setPaper('a4', 'portrait');
 
         $directory = 'diplomas';
         if (! Storage::disk('public')->exists($directory)) {
