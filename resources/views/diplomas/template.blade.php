@@ -96,18 +96,6 @@
             margin-top: 2mm; */
         }
 
-        .org-name-repeat {
-            /* font-family: 'Arial Black Custom', sans-serif; */
-            /* Added Arial Black */
-            font-size: 10pt;
-            font-weight: bold;
-            color: #000000;
-            text-transform: uppercase;
-            /* letter-spacing: 0.04em;
-            line-height: 1;
-            margin-top: 2mm; */
-        }
-
         .org-city {
             /* font-family: 'Calibri Custom', sans-serif; */
             /* Added Calibri */
@@ -224,25 +212,18 @@
             color: #aa8345;
         }
 
-        /* ── Bottom row: jury + qr ── */
-        .bottom-row {
-            margin-top: auto;
-            display: table;
-            width: 100%;
+        /* ── Bottom blocks (absolutely positioned) ── */
+        .bottom-left-block {
+            position: absolute;
+            bottom: 10mm;
+            left: 14mm;
+            width: 85mm;
         }
 
-        .bottom-left {
-            display: table-cell;
-            width: 55%;
-            vertical-align: bottom;
-            padding-right: 5mm;
-        }
-
-        .bottom-right {
-            display: table-cell;
-            width: 45%;
-            vertical-align: bottom;
-            text-align: right;
+        .bottom-right-block {
+            position: absolute;
+            bottom: 10mm;
+            right: 14mm;
         }
 
         .jury-label {
@@ -300,7 +281,6 @@
                     <div class="org-city">г.{{ $orgCity }}</div>
                 @endif
                 <div class="contest-title">{{ $contestTitle }}</div>
-                <div class="org-name-repeat">{{ $orgName }}</div>
             </div>
 
             <!-- Diploma word -->
@@ -311,8 +291,8 @@
 
             <div class="gold-divider"></div>
 
-            <!-- вручается -->
-            <div class="awarded-label">вручается</div>
+            <!-- награждается -->
+            <div class="awarded-label">награждается</div>
 
             <!-- Participant name -->
             <div class="participant-last-name">{{ $participantLastName }}</div>
@@ -337,34 +317,35 @@
                 @endif
             </div>
 
-            <!-- Bottom row: jury (left) + QR code (right) -->
-            <div class="bottom-row">
-                <div class="bottom-left">
-                    @if(!empty($juryMembers))
-                        <div class="jury-label">Жюри:</div>
-                        @foreach($juryMembers as $juryMember)
-                            <div class="jury-member">{{ $juryMember }}</div>
-                        @endforeach
-                    @endif
-
-                    <div class="diploma-meta">
-                        Диплом № {{ $diplomaNumber }}<br>
-                        {{ $awardedDate }}
-                    </div>
-                    <div class="diploma-contacts">
-                        talant-centr.ru<br>
-                        info@talant-centr.ru
-                    </div>
-                </div>
-
-                <div class="bottom-right">
-                    <div class="qr-code">
-                        <img src="{{ $qrCodeDataUri }}" alt="QR">
-                    </div>
-                </div>
-            </div>
 
         </div>
+
+        <!-- Bottom-left: jury + diploma number + contacts (fixed) -->
+        <div class="bottom-left-block">
+            @if(!empty($juryMembers))
+                <div class="jury-label">Жюри:</div>
+                @foreach($juryMembers as $juryMember)
+                    <div class="jury-member">{{ $juryMember }}</div>
+                @endforeach
+            @endif
+
+            <div class="diploma-meta">
+                Диплом № {{ $diplomaNumber }}<br>
+                {{ $awardedDate }}
+            </div>
+            <div class="diploma-contacts">
+                talant-centr.ru<br>
+                {{ $contactEmail }}
+            </div>
+        </div>
+
+        <!-- Bottom-right: QR code (fixed) -->
+        <div class="bottom-right-block">
+            <div class="qr-code">
+                <img src="{{ $qrCodeDataUri }}" alt="QR">
+            </div>
+        </div>
+
     </div>
 </body>
 

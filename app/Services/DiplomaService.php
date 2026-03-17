@@ -8,6 +8,7 @@ use App\Enums\ApplicationStatus;
 use App\Models\Application;
 use App\Models\Contest;
 use App\Models\Diploma;
+use App\Models\SiteSettings;
 use BaconQrCode\Common\ErrorCorrectionLevel;
 use BaconQrCode\Encoder\Encoder;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -74,6 +75,7 @@ class DiplomaService
             'backgroundPath'  => $backgroundPath,
             'fontAriblk'      => $fontAriblk,
             'fontCalibri'     => $fontCalibri,
+            'contactEmail'    => SiteSettings::get(SiteSettings::CONTACT_EMAIL, 'info@talant-centr.ru'),
         ])->render();
 
         $pdf = Pdf::loadHTML($html, 'UTF-8')->setPaper('a4', 'portrait');
@@ -157,10 +159,12 @@ class DiplomaService
         $imgSize     = ($moduleCount + $margin * 2) * $moduleSize;
 
         $image = imagecreatetruecolor($imgSize, $imgSize);
-        $white = imagecolorallocate($image, 255, 255, 255);
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+        $transparent = imagecolorallocatealpha($image, 0, 0, 0, 127);
+        imagefilledrectangle($image, 0, 0, $imgSize - 1, $imgSize - 1, $transparent);
+        imagealphablending($image, true);
         $black = imagecolorallocate($image, 0, 0, 0);
-
-        imagefilledrectangle($image, 0, 0, $imgSize - 1, $imgSize - 1, $white);
 
         for ($y = 0; $y < $moduleCount; $y++) {
             for ($x = 0; $x < $moduleCount; $x++) {
