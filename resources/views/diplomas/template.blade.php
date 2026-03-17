@@ -189,7 +189,7 @@
 
         .age-line {
             font-size: 12pt;
-            font-weight: 600;
+            font-weight: medium;
             color: #000000;
             line-height: 1.7;
         }
@@ -202,7 +202,7 @@
 
         .teacher-line {
             font-size: 12pt;
-            font-weight: bold;
+            font-weight: medium;
             color: #000000;
             line-height: 1.7;
         }
