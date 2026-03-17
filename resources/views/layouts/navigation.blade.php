@@ -6,15 +6,20 @@
             <a href="/" class="flex items-center space-x-3">
                 @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_LOGO]))
                     <img src="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_LOGO]) }}"
-                         alt="Талант-центр" class="h-11 w-auto max-w-[44px] object-contain shrink-0">
+                        alt="Талант-центр" class="h-11 w-auto max-w-[44px] object-contain shrink-0">
                 @else
                     <div class="w-11 h-11 gradient-gold rounded-full flex items-center justify-center shadow-sm shrink-0">
                         <i class="fas fa-award text-white text-lg"></i>
                     </div>
                 @endif
                 <div class="flex flex-col leading-tight">
-                    <h1 class="font-serif text-lg font-bold leading-tight" style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME_COLOR] ?? '#8B4513' }}">{{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}</h1>
-                    <p class="text-xs leading-tight" style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE_COLOR] ?? '#9A8B7A' }}">{{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE] ?? 'Всероссийский центр талантов' }}</p>
+                    <h1 class="font-serif text-lg font-bold leading-tight"
+                        style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME_COLOR] ?? '#8B4513' }}">
+                        {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}</h1>
+                    <p class="text-xs leading-tight"
+                        style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE_COLOR] ?? '#9A8B7A' }}">
+                        {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE] ?? 'Всероссийский центр талантов' }}
+                    </p>
                 </div>
             </a>
 
@@ -23,24 +28,32 @@
                 <a href="/" class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
                     Главная
                 </a>
-                <a href="{{ route('contests.index') }}" class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
+                <a href="{{ route('contests.index') }}"
+                    class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
                     Конкурсы
                 </a>
+                {{-- <a href="{{ route('diplomvtrifi.search') }}"
+                    class="text-sm font-medium {{ request()->routeIs('diplomvtrifi.*') ? 'text-primary border-b-2 border-primary pb-0.5' : 'text-warm-gray hover:text-primary transition-colors' }}">
+                    Проверить диплом
+                </a> --}}
             </div>
 
             <!-- Right Side: User Dropdown (all screens) -->
             <x-dropdown align="right" width="72">
                 <x-slot name="trigger">
-                    <button class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
+                    <button
+                        class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
                         <x-user-avatar :user="Auth::user()" size="sm" />
-                        <span class="hidden sm:inline">{{ Auth::user()->last_name }} {{ mb_substr(Auth::user()->first_name, 0, 1) }}.{{ Auth::user()->patronymic ? mb_substr(Auth::user()->patronymic, 0, 1) . '.' : '' }}</span>
+                        <span class="hidden sm:inline">{{ Auth::user()->last_name }}
+                            {{ mb_substr(Auth::user()->first_name, 0, 1) }}.{{ Auth::user()->patronymic ? mb_substr(Auth::user()->patronymic, 0, 1) . '.' : '' }}</span>
                         <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
                     </button>
                 </x-slot>
 
                 <x-slot name="content">
                     <!-- Participant section -->
-                    <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Участник конкурсов</div>
+                    <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Участник
+                        конкурсов</div>
                     <x-dropdown-link :href="route('profile.edit')">
                         <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Профиль представителя
                     </x-dropdown-link>
@@ -56,7 +69,8 @@
 
                     <!-- Organizer section -->
                     <div class="border-t border-gold/10 mt-1 pt-1">
-                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор конкурсов</div>
+                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор
+                            конкурсов</div>
                         <x-dropdown-link :href="route('dashboard.contests')">
                             <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
                         </x-dropdown-link>
@@ -68,7 +82,8 @@
                     <!-- Admin section -->
                     @if(auth()->user()->isAdmin())
                         <div class="border-t border-gold/10 mt-1 pt-1">
-                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Администрирование</div>
+                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">
+                                Администрирование</div>
                             <x-dropdown-link :href="route('admin.dashboard')">
                                 <i class="fas fa-cog mr-2 text-warm-gray w-5 text-center"></i> Админ-панель
                             </x-dropdown-link>
@@ -99,7 +114,8 @@
                     <!-- Support section -->
                     @if(auth()->user()->isSupport())
                         <div class="border-t border-gold/10 mt-1 pt-1">
-                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Поддержка</div>
+                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Поддержка
+                            </div>
                             <x-dropdown-link :href="route('support.dashboard')">
                                 <i class="fas fa-headset mr-2 text-warm-gray w-5 text-center"></i> Панель поддержки
                             </x-dropdown-link>
@@ -120,8 +136,8 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault(); this.closest('form').submit();"
-                                    class="text-red-600 hover:bg-red-50">
+                                onclick="event.preventDefault(); this.closest('form').submit();"
+                                class="text-red-600 hover:bg-red-50">
                                 <i class="fas fa-sign-out-alt mr-2 w-5 text-center"></i> Выйти
                             </x-dropdown-link>
                         </form>
