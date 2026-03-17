@@ -51,7 +51,9 @@
                     <ul class="space-y-2 text-sm">
                         @if(!empty($siteSettings[\App\Models\SiteSettings::CONTACT_EMAIL]))
                             <li class="text-warm-gray">
-                                <i class="fas fa-envelope text-gold mr-2"></i>{{ $siteSettings[\App\Models\SiteSettings::CONTACT_EMAIL] }}
+                                <a href="mailto:{{ $siteSettings[\App\Models\SiteSettings::CONTACT_EMAIL] }}" class="hover:text-gold transition-colors">
+                                    <i class="fas fa-envelope text-gold mr-2"></i>{{ $siteSettings[\App\Models\SiteSettings::CONTACT_EMAIL] }}
+                                </a>
                             </li>
                         @endif
                         @if(!empty($siteSettings[\App\Models\SiteSettings::CONTACT_PHONE]))
