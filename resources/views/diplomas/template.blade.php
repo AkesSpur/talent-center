@@ -75,6 +75,8 @@
         .org-block {
             text-align: right;
             margin-bottom: 8mm;
+            max-width: 65%;
+            margin-left: auto;
         }
 
         .org-name {
