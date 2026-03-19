@@ -236,7 +236,7 @@
                                     {{-- Age groups for this nomination --}}
                                     <div class="mt-3 pt-3 border-t border-gold/10">
                                         <div class="flex items-center justify-between mb-2">
-                                            <span class="text-xs font-medium text-warm-gray">Возрастные группы</span>
+                                            <span class="text-xs font-medium text-warm-gray">Возрастные группы / классы / курсы</span>
                                             <button type="button" @click="addAgeGroup(cat)"
                                                 class="text-xs text-primary hover:text-primary-dark font-medium">
                                                 <i class="fas fa-plus mr-0.5"></i>Добавить
@@ -247,12 +247,6 @@
                                                 <input type="text" :name="'categories[' + index + '][age_groups][' + agIdx + '][name]'" x-model="ag.name"
                                                     placeholder="Название группы"
                                                     class="flex-1 px-2 py-1.5 border border-primary/20 rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" />
-                                                <input type="number" :name="'categories[' + index + '][age_groups][' + agIdx + '][min_age]'" x-model="ag.min_age"
-                                                    placeholder="От"
-                                                    class="w-16 px-2 py-1.5 border border-primary/20 rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" min="0" />
-                                                <input type="number" :name="'categories[' + index + '][age_groups][' + agIdx + '][max_age]'" x-model="ag.max_age"
-                                                    placeholder="До"
-                                                    class="w-16 px-2 py-1.5 border border-primary/20 rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary/30" min="0" />
                                                 <button type="button" @click="cat.age_groups.splice(agIdx, 1)"
                                                     class="text-warm-gray hover:text-red-500 transition-colors">
                                                     <i class="fas fa-times text-xs"></i>
@@ -274,7 +268,7 @@
                     <div class="space-y-4" x-show="categories.length === 0">
                         <div class="flex items-center justify-between border-b border-gold/20 pb-2">
                             <div>
-                                <h3 class="font-serif text-lg font-semibold text-dark">Возрастные группы</h3>
+                                <h3 class="font-serif text-lg font-semibold text-dark">Возрастные группы / классы / курсы</h3>
                                 <p class="text-xs text-warm-gray mt-0.5">Необязательно. Укажите возрастные группы для конкурса.</p>
                             </div>
                             <button type="button" @click="addContestAgeGroup()"
@@ -288,12 +282,6 @@
                                     <input type="text" :name="'contest_age_groups[' + agIdx + '][name]'" x-model="ag.name"
                                         placeholder="Название группы"
                                         class="flex-1 px-3 py-2 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                                    <input type="number" :name="'contest_age_groups[' + agIdx + '][min_age]'" x-model="ag.min_age"
-                                        placeholder="От"
-                                        class="w-20 px-3 py-2 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" min="0" />
-                                    <input type="number" :name="'contest_age_groups[' + agIdx + '][max_age]'" x-model="ag.max_age"
-                                        placeholder="До"
-                                        class="w-20 px-3 py-2 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" min="0" />
                                     <button type="button" @click="contestAgeGroups.splice(agIdx, 1)"
                                         class="text-warm-gray hover:text-red-500 transition-colors shrink-0">
                                         <i class="fas fa-times text-sm"></i>

@@ -362,8 +362,8 @@ class ContestController extends Controller
                         $contest->ageGroups()->create([
                             'contest_category_id' => $categoryModels[$index]->id,
                             'name'                => $ag['name'],
-                            'min_age'             => $ag['min_age'] ?: null,
-                            'max_age'             => $ag['max_age'] ?: null,
+                            'min_age'             => ($ag['min_age'] ?? null) ?: null,
+                            'max_age'             => ($ag['max_age'] ?? null) ?: null,
                         ]);
                     }
                 }
@@ -376,8 +376,8 @@ class ContestController extends Controller
                 $contest->ageGroups()->create([
                     'contest_category_id' => null,
                     'name'                => $ag['name'],
-                    'min_age'             => $ag['min_age'] ?: null,
-                    'max_age'             => $ag['max_age'] ?: null,
+                    'min_age'             => ($ag['min_age'] ?? null) ?: null,
+                    'max_age'             => ($ag['max_age'] ?? null) ?: null,
                 ]);
             }
         }
