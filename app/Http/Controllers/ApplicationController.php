@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\ApplicationStatus;
 use App\Enums\FileType;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
 use App\Models\Contest;
 use App\Models\Organization;
+use App\Models\SiteSettings;
 use App\Models\User;
 use App\Notifications\ApplicationSubmitted;
 use App\Services\ActionLogService;
@@ -62,6 +64,68 @@ class ApplicationController extends Controller
         ])->values();
 
         return view('applications.create', compact('contest', 'children', 'alreadyAppliedIds', 'ageGroupsData'));
+    }
+
+    /**
+     * GET /contests/{contest}/diploma-preview
+     * Returns the diploma HTML template rendered as a sample (Образец).
+     */
+    public function diplomaPreview(Request $request, Contest $contest): View
+    {
+        $this->authorize('create', Application::class);
+
+        $contest->load('organization');
+        $user = $request->user();
+
+        $backgroundPath = null;
+        if ($contest->diploma_background) {
+            $path = Storage::disk('public')->path($contest->diploma_background);
+            if (file_exists($path)) {
+                $backgroundPath = $path;
+            }
+        }
+
+        $juryMembers = $contest->organization
+            ->representatives()
+            ->wherePivot('can_evaluate', true)
+            ->get()
+            ->map(fn ($u) => $u->full_name)
+            ->all();
+
+        $months = [
+            1 => 'январь', 2 => 'февраль', 3 => 'март',
+            4 => 'апрель', 5 => 'май', 6 => 'июнь',
+            7 => 'июль', 8 => 'август', 9 => 'сентябрь',
+            10 => 'октябрь', 11 => 'ноябрь', 12 => 'декабрь',
+        ];
+        $now         = now();
+        $awardedDate = $months[(int) $now->format('n')] . ' ' . $now->format('Y');
+
+        $fontAriblk  = str_replace('\\', '/', public_path('fonts/ariblk.ttf'));
+        $fontCalibri = str_replace('\\', '/', public_path('fonts/calibri.ttf'));
+
+        return view('diplomas.template', [
+            'participantLastName'        => $user->last_name,
+            'participantFirstPatronymic' => trim(($user->first_name ?? '') . ' ' . ($user->patronymic ?? '')),
+            'contestTitle'              => $contest->title,
+            'orgName'                   => $contest->organization->name,
+            'orgCity'                   => $contest->organization->city,
+            'categoryName'              => null,
+            'ageGroupName'              => null,
+            'statusLabel'               => ApplicationStatus::Participant->diplomaLabel(),
+            'teacherName'               => null,
+            'awardedDate'               => $awardedDate,
+            'diplomaNumber'             => '—',
+            'qrCodeDataUri'             => null,
+            'juryMembers'               => $juryMembers,
+            'backgroundPath'            => $backgroundPath,
+            'fontAriblk'                => $fontAriblk,
+            'fontCalibri'               => $fontCalibri,
+            'contactEmail'              => SiteSettings::get(SiteSettings::CONTACT_EMAIL, 'info@talant-centr.ru'),
+            'participantInstitution'    => $user->organization,
+            'participantGroup'          => $user->group,
+            'isPreview'                 => true,
+        ]);
     }
 
     /**

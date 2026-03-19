@@ -102,6 +102,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // ── Applications ─────────────────────────────────────
     Route::get('/contests/{contest}/apply', [ApplicationController::class, 'create'])->name('applications.create');
+    Route::get('/contests/{contest}/diploma-preview', [ApplicationController::class, 'diplomaPreview'])->name('applications.diploma-preview');
     Route::post('/contests/{contest}/apply', [ApplicationController::class, 'store'])->name('applications.store');
     Route::get('/dashboard/applications', [ApplicationController::class, 'myIndex'])->name('dashboard.applications');
     Route::get('/organizations/{organization}/applications', [ApplicationController::class, 'orgIndex'])

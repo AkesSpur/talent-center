@@ -289,6 +289,26 @@
             width: 38mm;
             height: 38mm;
         }
+
+        /* ── Sample watermark stamp ── */
+        .sample-stamp {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 62pt;
+            font-weight: bold;
+            font-style: italic;
+            color: rgba(190, 0, 0, 0.50);
+            border: 7px solid rgba(190, 0, 0, 0.50);
+            padding: 4mm 12mm;
+            border-radius: 6px;
+            white-space: nowrap;
+            z-index: 100;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
     </style>
 </head>
 
@@ -296,6 +316,10 @@
     <div class="diploma-page">
         @if($backgroundPath)
             <div class="diploma-bg"></div>
+        @endif
+
+        @if($isPreview ?? false)
+            <div class="sample-stamp">Образец</div>
         @endif
 
         <!-- Main content -->
@@ -383,11 +407,13 @@
         </div>
 
         <!-- Bottom-right: QR code (fixed) -->
-        <div class="bottom-right-block">
-            <div class="qr-code">
-                <img src="{{ $qrCodeDataUri }}" alt="QR">
+        @if($qrCodeDataUri ?? null)
+            <div class="bottom-right-block">
+                <div class="qr-code">
+                    <img src="{{ $qrCodeDataUri }}" alt="QR">
+                </div>
             </div>
-        </div>
+        @endif
 
     </div>
 </body>

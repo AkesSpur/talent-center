@@ -251,82 +251,26 @@
                         </div>
 
                         {{-- ════════════════════════
-                             DIPLOMA PREVIEW
+                             DIPLOMA PREVIEW (real template, sample stamp)
                              ════════════════════════ --}}
-                        <div
-                            x-show="hasWork"
-                            x-cloak
-                            x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 translate-y-3"
-                            x-transition:enter-end="opacity-100 translate-y-0"
-                            x-transition:leave="transition ease-in duration-150"
-                            x-transition:leave-start="opacity-100"
-                            x-transition:leave-end="opacity-0"
-                        >
-                            <div class="border-t border-gold/20 pt-6 space-y-4">
-
-                                {{-- Section label --}}
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-7 h-7 gradient-gold rounded-lg flex items-center justify-center shrink-0">
-                                        <i class="fas fa-medal text-white text-xs"></i>
-                                    </div>
-                                    <h3 class="font-serif font-semibold text-dark">Предварительный просмотр диплома</h3>
+                        <div class="border-t border-gold/20 pt-6 space-y-4">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-7 h-7 gradient-gold rounded-lg flex items-center justify-center shrink-0">
+                                    <i class="fas fa-medal text-white text-xs"></i>
                                 </div>
+                                <h3 class="font-serif font-semibold text-dark">Образец диплома</h3>
+                            </div>
 
-                                {{-- Diploma card --}}
-                                <div class="relative rounded-xl overflow-hidden select-none"
-                                     style="background: linear-gradient(145deg, #FEFCF7 0%, #FAF8F2 100%); border: 1.5px solid rgba(212,175,55,0.4); box-shadow: 0 2px 16px rgba(44,36,22,0.06);">
-
-                                    <div class="diploma-corner diploma-corner-tl"></div>
-                                    <div class="diploma-corner diploma-corner-tr"></div>
-                                    <div class="diploma-corner diploma-corner-bl"></div>
-                                    <div class="diploma-corner diploma-corner-br"></div>
-
-                                    <div class="px-8 py-8 text-center">
-
-                                        <p class="text-xs font-bold uppercase mb-5"
-                                           style="color: rgba(212,175,55,0.85); letter-spacing: 0.22em;">
-                                            Диплом участника
-                                        </p>
-
-                                        <p class="font-serif font-bold text-dark leading-snug text-base">{{ $contest->title }}</p>
-                                        <p class="text-xs text-warm-gray mt-0.5">{{ $contest->organization->name }}</p>
-                                        <p class="text-xs mt-0.5" style="color: rgba(154,139,122,0.7);">
-                                            {{ $contest->applications_start_at->format('d.m.Y') }} — {{ $contest->applications_end_at->format('d.m.Y') }}
-                                        </p>
-
-                                        <div class="flex items-center gap-2 my-5">
-                                            <div class="flex-1 h-px" style="background: linear-gradient(to right, transparent, rgba(212,175,55,0.3), transparent);"></div>
-                                            <div class="w-1.5 h-1.5 rounded-full" style="background: rgba(212,175,55,0.45);"></div>
-                                            <div class="flex-1 h-px" style="background: linear-gradient(to right, transparent, rgba(212,175,55,0.3), transparent);"></div>
-                                        </div>
-
-                                        <p class="text-xs font-semibold uppercase mb-2"
-                                           style="color: rgba(212,175,55,0.85); letter-spacing: 0.18em;">Участник</p>
-                                        <p class="font-serif font-bold text-dark text-xl leading-tight" x-text="participantName"></p>
-                                        <p class="text-xs text-warm-gray mt-1" x-show="ageGroupLabel" x-text="ageGroupLabel"></p>
-                                        <p class="text-xs mt-0.5" style="color: rgba(154,139,122,0.75);"
-                                           x-show="showTeacher && teacherName.trim().length > 0">
-                                            Руководитель: <span x-text="teacherName"></span>
-                                        </p>
-
-                                        <div class="flex items-center gap-2 my-5">
-                                            <div class="flex-1 h-px" style="background: linear-gradient(to right, transparent, rgba(212,175,55,0.3), transparent);"></div>
-                                            <div class="w-1.5 h-1.5 rounded-full" style="background: rgba(212,175,55,0.45);"></div>
-                                            <div class="flex-1 h-px" style="background: linear-gradient(to right, transparent, rgba(212,175,55,0.3), transparent);"></div>
-                                        </div>
-
-                                        <p class="text-xs font-semibold uppercase mb-2"
-                                           style="color: rgba(212,175,55,0.85); letter-spacing: 0.18em;">Работа</p>
-                                        <p class="text-sm font-semibold text-dark px-4 truncate" x-text="workLabel"></p>
-                                        <p class="text-xs mt-1" style="color: rgba(154,139,122,0.8);" x-show="categoryName">
-                                            Номинация: <span class="font-medium text-dark/60" x-text="categoryName"></span>
-                                        </p>
-
-                                    </div>
-                                </div>
-
-
+                            {{-- Scaled iframe wrapper --}}
+                            <div
+                                x-data="{ frameScale: 1 }"
+                                x-init="$nextTick(() => { frameScale = $el.offsetWidth / 794 })"
+                                :style="'overflow: hidden; width: 100%; height: ' + Math.round(1123 * frameScale) + 'px; border-radius: 0.5rem; border: 1.5px solid rgba(212,175,55,0.35);'"
+                            >
+                                <iframe
+                                    src="{{ route('applications.diploma-preview', $contest) }}"
+                                    :style="'transform: scale(' + frameScale + '); transform-origin: top left; width: 794px; height: 1123px; border: none; display: block;'"
+                                ></iframe>
                             </div>
                         </div>
 
