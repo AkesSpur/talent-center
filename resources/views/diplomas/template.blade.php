@@ -213,6 +213,32 @@
             color: #aa8345;
         }
 
+        .institution-line {
+            font-size: 12pt;
+            font-weight: medium;
+            color: #000000;
+            line-height: 1.7;
+        }
+
+        .institution-label {
+            font-size: 12pt;
+            font-weight: normal;
+            color: #aa8345;
+        }
+
+        .group-line {
+            font-size: 12pt;
+            font-weight: medium;
+            color: #000000;
+            line-height: 1.7;
+        }
+
+        .group-label {
+            font-size: 12pt;
+            font-weight: normal;
+            color: #aa8345;
+        }
+
         /* ── Bottom blocks (absolutely positioned) ── */
         .bottom-left-block {
             position: absolute;
@@ -298,6 +324,22 @@
             <!-- Participant name -->
             <div class="participant-last-name">{{ $participantLastName }}</div>
             <div class="participant-first-patronymic">{{ $participantFirstPatronymic }}</div>
+
+            <!-- Institution / Group (right-aligned, right after name) -->
+            @if($participantInstitution || $participantGroup)
+                <div class="details-block" style="margin-bottom: 2mm;">
+                    @if($participantInstitution)
+                        <div class="institution-line">
+                            <span class="institution-label">учреждение: </span>{{ $participantInstitution }}
+                        </div>
+                    @endif
+                    @if($participantGroup)
+                        <div class="group-line">
+                            <span class="group-label">класс/группа: </span>{{ $participantGroup }}
+                        </div>
+                    @endif
+                </div>
+            @endif
 
             <!-- Details (right-aligned) -->
             <div class="details-block">

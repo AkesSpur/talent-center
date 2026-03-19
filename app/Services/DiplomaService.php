@@ -62,10 +62,12 @@ class DiplomaService
             'contestTitle'    => $application->contest->title,
             'orgName'         => $application->contest->organization->name,
             'orgCity'         => $application->contest->organization->city,
-            'categoryName'    => $application->category?->name,
-            'ageGroupName'    => $application->ageGroup?->name,
-            'statusLabel'     => $application->status->diplomaLabel(),
-            'teacherName'     => $application->teacher_name,
+            'categoryName'          => $application->category?->name,
+            'ageGroupName'          => $application->ageGroup?->name,
+            'statusLabel'           => $application->status->diplomaLabel(),
+            'teacherName'           => $application->teacher_name,
+            'participantInstitution' => $application->user->organization,
+            'participantGroup'       => $application->user->group,
             'awardedDate'     => $this->russianMonthYear(
                 $application->evaluated_at ?? now()
             ),
