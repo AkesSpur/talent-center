@@ -78,11 +78,8 @@ class ApplicationController extends Controller
         $user = $request->user();
 
         $backgroundPath = null;
-        if ($contest->diploma_background) {
-            $path = Storage::disk('public')->path($contest->diploma_background);
-            if (file_exists($path)) {
-                $backgroundPath = $path;
-            }
+        if ($contest->diploma_background && Storage::disk('public')->exists($contest->diploma_background)) {
+            $backgroundPath = Storage::url($contest->diploma_background);
         }
 
         $juryMembers = $contest->organization
