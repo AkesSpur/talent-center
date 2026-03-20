@@ -79,7 +79,8 @@ class ApplicationController extends Controller
 
         $backgroundPath = null;
         if ($contest->diploma_background && Storage::disk('public')->exists($contest->diploma_background)) {
-            $backgroundPath = Storage::url($contest->diploma_background);
+            $content        = Storage::disk('public')->get($contest->diploma_background);
+            $backgroundPath = 'data:image/webp;base64,' . base64_encode($content);
         }
 
         $juryMembers = $contest->organization
@@ -98,8 +99,8 @@ class ApplicationController extends Controller
         $now         = now();
         $awardedDate = $months[(int) $now->format('n')] . ' ' . $now->format('Y');
 
-        $fontAriblk  = str_replace('\\', '/', public_path('fonts/ariblk.ttf'));
-        $fontCalibri = str_replace('\\', '/', public_path('fonts/calibri.ttf'));
+        $fontAriblk  = asset('fonts/ariblk.ttf');
+        $fontCalibri = asset('fonts/calibri.ttf');
 
         return view('diplomas.template', [
             'participantLastName'        => $user->last_name,

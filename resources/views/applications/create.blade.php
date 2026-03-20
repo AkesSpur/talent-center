@@ -261,15 +261,20 @@
                                 <h3 class="font-serif font-semibold text-dark">Образец диплома</h3>
                             </div>
 
-                            {{-- Scaled iframe wrapper --}}
+                        {{-- Scaled iframe wrapper --}}
                             <div
-                                x-data="{ frameScale: 1 }"
-                                x-init="$nextTick(() => { frameScale = $el.offsetWidth / 794 })"
-                                :style="'overflow: hidden; width: 100%; height: ' + Math.round(1123 * frameScale) + 'px; border-radius: 0.5rem; border: 1.5px solid rgba(212,175,55,0.35);'"
+                                class="relative w-full overflow-hidden rounded-lg"
+                                style="aspect-ratio: 794 / 1123; border: 1.5px solid rgba(212,175,55,0.35);"
+                                x-data="{ scale: 1 }"
+                                x-init="
+                                    const upd = () => { scale = $el.offsetWidth / 794 };
+                                    $nextTick(upd);
+                                    window.addEventListener('resize', upd);
+                                "
                             >
                                 <iframe
                                     src="{{ route('applications.diploma-preview', $contest) }}"
-                                    :style="'transform: scale(' + frameScale + '); transform-origin: top left; width: 794px; height: 1123px; border: none; display: block;'"
+                                    :style="'position: absolute; top: 0; left: 0; width: 794px; height: 1123px; border: none; transform: scale(' + scale + '); transform-origin: top left;'"
                                 ></iframe>
                             </div>
                         </div>
