@@ -16,6 +16,7 @@ use App\Traits\HandlesImages;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -149,15 +150,19 @@ class ContestController extends Controller
             );
         }
 
-        $contest = Contest::create($data);
+        $contest = DB::transaction(function () use ($data, $request) {
+            $contest = Contest::create($data);
 
-        $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
-        $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
-        $this->syncJuries($contest, $request->input('juries', []));
+            $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
+            $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
+            $this->syncJuries($contest, $request->input('juries', []));
 
-        // Determine and apply correct status based on dates
-        $contest->status = $contest->determineCurrentStatus();
-        $contest->save();
+            // Determine and apply correct status based on dates
+            $contest->status = $contest->determineCurrentStatus();
+            $contest->save();
+
+            return $contest;
+        });
 
         ActionLogService::log('contest.created', $contest, [
             'organization_id' => $organization->id,
@@ -279,21 +284,23 @@ class ContestController extends Controller
             );
         }
 
-        $contest->update($data);
+        DB::transaction(function () use ($contest, $data, $request) {
+            $contest->update($data);
 
-        $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
-        $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
-        $this->syncJuries($contest, $request->input('juries', []));
+            $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
+            $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
+            $this->syncJuries($contest, $request->input('juries', []));
 
-        // Re-evaluate status after date changes (only if not cancelled)
-        if (! $contest->isCancelled()) {
-            $contest->refresh();
-            $newStatus = $contest->determineCurrentStatus();
-            if ($contest->status !== $newStatus) {
-                $contest->status = $newStatus;
-                $contest->save();
+            // Re-evaluate status after date changes (only if not cancelled)
+            if (! $contest->isCancelled()) {
+                $contest->refresh();
+                $newStatus = $contest->determineCurrentStatus();
+                if ($contest->status !== $newStatus) {
+                    $contest->status = $newStatus;
+                    $contest->save();
+                }
             }
-        }
+        });
 
         ActionLogService::log('contest.updated', $contest, [
             'title' => $contest->title,

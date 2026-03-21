@@ -29,13 +29,25 @@
                         'min_age' => $ag->min_age,
                         'max_age' => $ag->max_age,
                     ])->toArray();
+                    $restoredJuryIds = old('juries') ? array_map('intval', old('juries')) : $selectedJuryIds;
+                    $restoredGenreId = old('platform_category_id', $contest->platform_category_id);
+                    $restoredDiplomaBg = old('selected_diploma_background_path', $contest->diploma_background);
                 @endphp
                 <form method="POST" action="{{ route('contests.update', $contest) }}"
                       enctype="multipart/form-data"
-                      x-data="contestForm({{ \Illuminate\Support\Js::from($initialCategories) }}, {{ \Illuminate\Support\Js::from($orgsData) }}, {{ $contest->organization_id }}, {{ \Illuminate\Support\Js::from($selectedJuryIds) }}, {{ \Illuminate\Support\Js::from($initialContestAgeGroups) }}, {{ \Illuminate\Support\Js::from($diplomaBackgrounds) }}, {{ $contest->platform_category_id ?: 'null' }})"
+                      x-data="contestForm({{ \Illuminate\Support\Js::from($initialCategories) }}, {{ \Illuminate\Support\Js::from($orgsData) }}, {{ $contest->organization_id }}, {{ \Illuminate\Support\Js::from($restoredJuryIds) }}, {{ \Illuminate\Support\Js::from($initialContestAgeGroups) }}, {{ \Illuminate\Support\Js::from($diplomaBackgrounds) }}, {{ \Illuminate\Support\Js::from($restoredGenreId) }}, {{ \Illuminate\Support\Js::from($restoredDiplomaBg) }})"
                       class="space-y-8">
                     @csrf
                     @method('PUT')
+
+                    @if($errors->any())
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="text-sm text-red-600 font-medium">
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                Пожалуйста, исправьте ошибки в форме.
+                            </p>
+                        </div>
+                    @endif
 
                     {{-- Section 0: Organization (read-only) --}}
                     <div class="space-y-3">
@@ -446,12 +458,12 @@
 </x-app-layout>
 
 <script>
-function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds, initialContestAgeGroups, diplomaBgData, initialGenreId) {
+function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds, initialContestAgeGroups, diplomaBgData, initialGenreId, initialDiplomaBg) {
     return {
-        categories: (initialCategories && initialCategories.length > 0
-            ? initialCategories
-            : []).map(c => ({ ...c, age_groups: c.age_groups || [] })),
-        contestAgeGroups: initialContestAgeGroups || [],
+        categories: (initialCategories && (Array.isArray(initialCategories) ? initialCategories.length > 0 : Object.keys(initialCategories).length > 0)
+            ? Object.values(initialCategories)
+            : []).map(c => ({ ...c, age_groups: c.age_groups ? Object.values(c.age_groups) : [] })),
+        contestAgeGroups: initialContestAgeGroups ? Object.values(initialContestAgeGroups) : [],
         orgs: orgsData || [],
         selectedOrgId: contestOrgId,
         selectedJuries: (selectedJuryIds || []).map(Number),
@@ -465,7 +477,7 @@ function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds,
         juryInviteSent: false,
         selectedGenreId: initialGenreId || '',
         diplomaBackgrounds: diplomaBgData || [],
-        selectedDefaultBg: null,
+        selectedDefaultBg: initialDiplomaBg || null,
         fullscreenUrl: null,
         diplomaPreview: null,
         get filteredBackgrounds() {
