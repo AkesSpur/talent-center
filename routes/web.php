@@ -59,6 +59,8 @@ Route::get('/contests', [ContestController::class, 'index'])->name('contests.ind
 Route::get('/contests/create', [ContestController::class, 'create'])
     ->middleware(['auth', 'verified'])
     ->name('contests.create');
+// Redirect legacy ID-based URLs to canonical slug URLs (301 permanent)
+Route::get('/contests/{id}', [ContestController::class, 'redirectById'])->whereNumber('id');
 Route::get('/contests/{contest}', [ContestController::class, 'show'])->middleware(['auth', 'verified'])->name('contests.show');
 
 // ── Authenticated (any role) ────────────────────────────

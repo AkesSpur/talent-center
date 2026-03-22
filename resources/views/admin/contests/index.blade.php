@@ -152,6 +152,13 @@
                                                     class="px-2.5 py-1.5 border border-primary/20 text-primary text-xs rounded-lg hover:bg-primary/5 transition-colors" title="Заявки">
                                                     <i class="fas fa-inbox mr-1"></i>Заявки
                                                 </a>
+                                                <button type="button" x-data="{ copied: false }"
+                                                    @click="navigator.clipboard.writeText('{{ route('contests.show', $contest) }}'); copied = true; setTimeout(() => copied = false, 2000)"
+                                                    :title="copied ? 'Ссылка скопирована!' : 'Скопировать ссылку'"
+                                                    :class="copied ? 'border-green-300 text-green-600 bg-green-50' : 'border-green-200 text-green-600 hover:bg-green-50'"
+                                                    class="px-2.5 py-1.5 border text-xs rounded-lg transition-colors">
+                                                    <i :class="copied ? 'fa-check' : 'fa-link'" class="fas"></i>
+                                                </button>
                                                 <a href="{{ route('contests.edit', $contest) }}"
                                                     class="px-2.5 py-1.5 border border-gold/30 text-dark text-xs rounded-lg hover:bg-cream/50 transition-colors" title="Редактировать">
                                                     <i class="fas fa-pen"></i>

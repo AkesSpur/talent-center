@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class Contest extends Model
 {
@@ -21,6 +22,7 @@ class Contest extends Model
         'platform_category_id',
         'created_by',
         'title',
+        'slug',
         'description',
         'rules',
         'status',
@@ -31,6 +33,38 @@ class Contest extends Model
         'cover_image',
         'regulations_url',
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (Contest $contest) {
+            if (empty($contest->slug)) {
+                $contest->slug = static::generateUniqueSlug($contest->title);
+            }
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    private static function generateUniqueSlug(string $title): string
+    {
+        $base = Str::slug($title);
+        if (empty($base)) {
+            $base = 'contest';
+        }
+
+        $slug  = $base;
+        $count = 2;
+        while (static::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $count++;
+        }
+
+        return $slug;
+    }
 
     protected function casts(): array
     {
