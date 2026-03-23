@@ -127,7 +127,7 @@
                     </div>
                 </div>
 
-                <!-- Stage 4 — LARGELY COMPLETE -->
+                <!-- Stage 4 — COMPLETED -->
                 <div class="relative flex items-start group">
                     <!-- Dot -->
                     <div class="relative z-10 flex-shrink-0 w-10 h-10 sm:w-16 sm:h-16 gradient-gold rounded-full flex items-center justify-center shadow-lg">
@@ -137,11 +137,11 @@
                     <div class="ml-4 sm:ml-6 flex-1 min-w-0">
                         <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                             <span class="text-xs font-semibold text-gold uppercase tracking-wider">Этап 4</span>
-                            <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                <i class="fas fa-spinner fa-spin mr-1"></i> Почти завершён
+                            <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <i class="fas fa-check-circle mr-1"></i> Завершён
                             </span>
                         </div>
-                        <a href="{{ route('development-plan.stage', 'stage-4') }}" class="block bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200 hover-lift group-hover:border-gold/30 transition-colors">
+                        <a href="{{ route('development-plan.stage', 'stage-4') }}" class="block bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gold/10 hover-lift group-hover:border-gold/30 transition-colors">
                             <h3 class="font-serif text-base sm:text-xl md:text-2xl font-bold text-dark mb-2 group-hover:text-primary transition-colors">
                                 Оценка, дипломы и уведомления
                                 <i class="fas fa-arrow-right text-warm-gray text-sm ml-2 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:inline"></i>
@@ -171,11 +171,11 @@
 
             <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gold/10">
                 <div class="flex justify-between text-xs sm:text-sm text-warm-gray mb-2">
-                    <span>Финальное тестирование: этап 4 в завершающей стадии</span>
-                    <span class="font-semibold text-primary">90%</span>
+                    <span>Все этапы разработки завершены</span>
+                    <span class="font-semibold text-primary">100%</span>
                 </div>
                 <div class="w-full bg-cream-dark rounded-full h-3 sm:h-4 overflow-hidden">
-                    <div class="gradient-gold h-3 sm:h-4 rounded-full transition-all duration-1000" style="width: 90%"></div>
+                    <div class="gradient-gold h-3 sm:h-4 rounded-full transition-all duration-1000" style="width: 100%"></div>
                 </div>
 
                 <div class="grid grid-cols-4 gap-1 sm:gap-2 mt-3 sm:mt-4 text-xs text-warm-gray">
@@ -192,7 +192,7 @@
                         <div>Этап 3</div>
                     </div>
                     <div class="text-center">
-                        <i class="fas fa-spinner fa-spin text-gold mb-1"></i>
+                        <i class="fas fa-check-circle text-green-500 mb-1"></i>
                         <div>Этап 4</div>
                     </div>
                 </div>

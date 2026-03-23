@@ -87,7 +87,7 @@ class ContestController extends Controller
         ])->values();
 
         $platformCategories = PlatformCategory::active()->get();
-        $preselectedOrgId   = (int) old('organization_id', (string) $request->integer('organization_id', 0));
+        $preselectedOrgId   = (int) old('organization_id', $request->integer('organization_id', 0));
 
         $diplomaBackgrounds = DiplomaBackground::with('platformCategories')->get()->map(fn ($bg) => [
             'id'          => $bg->id,
@@ -172,17 +172,6 @@ class ContestController extends Controller
 
         return redirect()->route('contests.show', $contest)
             ->with('status', 'contest-created');
-    }
-
-    /**
-     * GET /contests/{id}  (numeric segment only)
-     * Redirect legacy ID-based URLs to the canonical slug URL.
-     */
-    public function redirectById(int $id): RedirectResponse
-    {
-        $contest = Contest::findOrFail($id);
-
-        return redirect()->route('contests.show', $contest, 301);
     }
 
     /**

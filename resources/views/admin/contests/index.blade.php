@@ -143,7 +143,15 @@
                                             <div>— {{ $contest->applications_end_at->format('d.m.Y') }}</div>
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            <div class="flex items-center justify-end gap-1.5">
+                                            <div class="flex items-center justify-end gap-1.5" x-data="{ copied_{{ $contest->id }}: false }">
+                                                <button
+                                                    type="button"
+                                                    @click="navigator.clipboard.writeText('{{ route('contests.show', $contest) }}').then(() => { copied_{{ $contest->id }} = true; setTimeout(() => copied_{{ $contest->id }} = false, 2000) })"
+                                                    :title="copied_{{ $contest->id }} ? 'Скопировано!' : 'Скопировать ссылку'"
+                                                    :class="copied_{{ $contest->id }} ? 'border-green-300 text-green-600 bg-green-50' : 'border-green-200 text-green-600 hover:bg-green-50'"
+                                                    class="px-2.5 py-1.5 border text-xs rounded-lg transition-colors">
+                                                    <i :class="copied_{{ $contest->id }} ? 'fa-check' : 'fa-link'" class="fas"></i>
+                                                </button>
                                                 <a href="{{ route('admin.evaluation.show', $contest) }}"
                                                     class="px-2.5 py-1.5 border border-gold/30 text-gold text-xs rounded-lg hover:bg-gold/10 transition-colors" title="Оценка и дипломы">
                                                     <i class="fas fa-star mr-1"></i>Оценка
@@ -152,13 +160,6 @@
                                                     class="px-2.5 py-1.5 border border-primary/20 text-primary text-xs rounded-lg hover:bg-primary/5 transition-colors" title="Заявки">
                                                     <i class="fas fa-inbox mr-1"></i>Заявки
                                                 </a>
-                                                <button type="button" x-data="{ copied: false }"
-                                                    @click="navigator.clipboard.writeText('{{ route('contests.show', $contest) }}'); copied = true; setTimeout(() => copied = false, 2000)"
-                                                    :title="copied ? 'Ссылка скопирована!' : 'Скопировать ссылку'"
-                                                    :class="copied ? 'border-green-300 text-green-600 bg-green-50' : 'border-green-200 text-green-600 hover:bg-green-50'"
-                                                    class="px-2.5 py-1.5 border text-xs rounded-lg transition-colors">
-                                                    <i :class="copied ? 'fa-check' : 'fa-link'" class="fas"></i>
-                                                </button>
                                                 <a href="{{ route('contests.edit', $contest) }}"
                                                     class="px-2.5 py-1.5 border border-gold/30 text-dark text-xs rounded-lg hover:bg-cream/50 transition-colors" title="Редактировать">
                                                     <i class="fas fa-pen"></i>

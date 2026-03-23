@@ -93,11 +93,13 @@
                     {{-- Copy link card --}}
                     <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-4" x-data="{ copied: false }">
                         <button
-                            @click="navigator.clipboard.writeText('{{ route('contests.show', $contest) }}'); copied = true; setTimeout(() => copied = false, 3000)"
-                            class="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-green-300 text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium">
-                            <i class="fas fa-link"></i>Скопировать ссылку на конкурс
+                            type="button"
+                            @click="navigator.clipboard.writeText('{{ route('contests.show', $contest) }}').then(() => { copied = true; setTimeout(() => copied = false, 3000) })"
+                            class="w-full px-4 py-2.5 border border-green-300 text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2">
+                            <i class="fas fa-link"></i>
+                            Скопировать ссылку на конкурс
                         </button>
-                        <p x-show="copied" x-transition class="text-xs text-green-600 mt-2 text-center">
+                        <p x-show="copied" x-transition class="text-xs text-green-600 text-center mt-2">
                             <i class="fas fa-check mr-1"></i>Ссылка скопирована в буфер обмена
                         </p>
                     </div>
