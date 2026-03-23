@@ -87,7 +87,7 @@ class ContestController extends Controller
         ])->values();
 
         $platformCategories = PlatformCategory::active()->get();
-        $preselectedOrgId   = (int) old('organization_id', $request->integer('organization_id', 0));
+        $preselectedOrgId   = (int) old('organization_id', (string) $request->integer('organization_id', 0));
 
         $diplomaBackgrounds = DiplomaBackground::with('platformCategories')->get()->map(fn ($bg) => [
             'id'          => $bg->id,
@@ -182,7 +182,7 @@ class ContestController extends Controller
     {
         abort_unless(Gate::allows('view', $contest), 403);
 
-        $contest->load(['organization', 'categories', 'createdBy', 'juries', 'platformCategory']);
+        $contest->load(['organization.createdBy', 'categories', 'createdBy', 'juries', 'platformCategory']);
 
         $hasApplied = false;
         if ($request->user()) {

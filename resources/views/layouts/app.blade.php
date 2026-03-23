@@ -22,6 +22,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @stack('styles')
     </head>
     <body class="font-sans antialiased bg-cream">
         <x-notify />
@@ -44,5 +45,6 @@
         </div>
         
         @include('layouts.footer')
+        @stack('scripts')
     </body>
 </html>

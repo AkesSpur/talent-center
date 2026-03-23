@@ -57,14 +57,14 @@
                     {{-- Description --}}
                     <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
                         <h3 class="font-serif text-xl font-semibold text-dark mb-4">О конкурсе</h3>
-                        <div class="text-dark whitespace-pre-wrap leading-relaxed">{{ $contest->description }}</div>
+                        <div class="text-dark leading-relaxed rich-content">{!! $contest->description !!}</div>
                     </div>
 
                     {{-- Rules --}}
                     @if($contest->rules)
                         <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
                             <h3 class="font-serif text-xl font-semibold text-dark mb-4">Правила участия</h3>
-                            <div class="text-dark whitespace-pre-wrap leading-relaxed">{{ $contest->rules }}</div>
+                            <div class="text-dark leading-relaxed rich-content">{!! $contest->rules !!}</div>
                         </div>
                     @endif
 
@@ -187,11 +187,16 @@
                             <x-org-avatar :organization="$contest->organization" size="sm" />
                             <div class="min-w-0">
                                 <a href="{{ route('organizations.show', $contest->organization) }}"
-                                    class="font-medium text-dark hover:text-primary transition-colors block truncate text-sm">
+                                    class="font-medium text-dark hover:text-primary transition-colors block break-words text-sm">
                                     {{ $contest->organization->name }}
                                 </a>
                                 @if($contest->organization->isVerified())
                                     <span class="text-xs text-green-600"><i class="fas fa-check-circle mr-1"></i>Верифицирована</span>
+                                @endif
+                                @if($contest->organization->createdBy)
+                                    <p class="text-xs text-warm-gray mt-1">
+                                        <i class="fas fa-user mr-1"></i>{{ $contest->organization->createdBy->full_name }}
+                                    </p>
                                 @endif
                             </div>
                         </div>

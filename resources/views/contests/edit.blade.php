@@ -33,7 +33,7 @@
                     $restoredGenreId = old('platform_category_id', $contest->platform_category_id);
                     $restoredDiplomaBg = old('selected_diploma_background_path', $contest->diploma_background);
                 @endphp
-                <form method="POST" action="{{ route('contests.update', $contest) }}"
+                <form id="contest-edit-form" method="POST" action="{{ route('contests.update', $contest) }}"
                       enctype="multipart/form-data"
                       x-data="contestForm({{ \Illuminate\Support\Js::from($initialCategories) }}, {{ \Illuminate\Support\Js::from($orgsData) }}, {{ $contest->organization_id }}, {{ \Illuminate\Support\Js::from($restoredJuryIds) }}, {{ \Illuminate\Support\Js::from($initialContestAgeGroups) }}, {{ \Illuminate\Support\Js::from($diplomaBackgrounds) }}, {{ \Illuminate\Support\Js::from($restoredGenreId) }}, {{ \Illuminate\Support\Js::from($restoredDiplomaBg) }})"
                       class="space-y-8">
@@ -83,16 +83,16 @@
                         </div>
 
                         <div>
-                            <label for="description" class="block text-sm font-medium text-dark mb-2">Описание <span class="text-red-500">*</span></label>
-                            <textarea id="description" name="description" rows="5"
-                                class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none">{{ old('description', $contest->description) }}</textarea>
+                            <label class="block text-sm font-medium text-dark mb-2">Описание <span class="text-red-500">*</span></label>
+                            <div id="description-editor" class="ql-contest-editor"></div>
+                            <input type="hidden" name="description" id="description-input">
                             <x-input-error class="mt-2" :messages="$errors->get('description')" />
                         </div>
 
                         <div>
-                            <label for="rules" class="block text-sm font-medium text-dark mb-2">Правила участия</label>
-                            <textarea id="rules" name="rules" rows="4"
-                                class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none">{{ old('rules', $contest->rules) }}</textarea>
+                            <label class="block text-sm font-medium text-dark mb-2">Правила участия</label>
+                            <div id="rules-editor" class="ql-contest-editor"></div>
+                            <input type="hidden" name="rules" id="rules-input">
                             <x-input-error class="mt-2" :messages="$errors->get('rules')" />
                         </div>
 
@@ -454,6 +454,53 @@
             confirmClass="bg-red-600 text-white"
         />
     @endcan
+
+    @push('styles')
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <style>
+        .ql-toolbar.ql-snow { border: 1px solid rgba(139,69,19,.2); border-bottom: none; border-radius: .5rem .5rem 0 0; background: #FAF8F5; }
+        .ql-container.ql-snow { border: 1px solid rgba(139,69,19,.2); border-radius: 0 0 .5rem .5rem; font-family: 'Inter', sans-serif; font-size: .875rem; }
+        .ql-editor { min-height: 130px; color: #2C2416; }
+        .ql-editor.ql-blank::before { color: #9A8B7A; font-style: normal; }
+        .ql-toolbar.ql-snow .ql-formats button:hover .ql-stroke, .ql-toolbar.ql-snow .ql-formats button.ql-active .ql-stroke { stroke: #8B4513; }
+        .ql-toolbar.ql-snow .ql-formats button:hover .ql-fill, .ql-toolbar.ql-snow .ql-formats button.ql-active .ql-fill { fill: #8B4513; }
+    </style>
+    @endpush
+
+    @push('scripts')
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+    (function () {
+        var toolbarOptions = [
+            [{ header: [2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ align: [] }],
+            ['link'],
+            ['clean']
+        ];
+        var descEditor = new Quill('#description-editor', {
+            theme: 'snow',
+            placeholder: 'Расскажите о конкурсе: цели, задачи, кто может участвовать...',
+            modules: { toolbar: toolbarOptions }
+        });
+        var rulesEditor = new Quill('#rules-editor', {
+            theme: 'snow',
+            placeholder: 'Условия подачи работ, требования к участникам, критерии оценки...',
+            modules: { toolbar: toolbarOptions }
+        });
+        var initDesc = @json(old('description', $contest->description ?? ''));
+        var initRules = @json(old('rules', $contest->rules ?? ''));
+        if (initDesc) descEditor.clipboard.dangerouslyPasteHTML(initDesc);
+        if (initRules) rulesEditor.clipboard.dangerouslyPasteHTML(initRules);
+        document.getElementById('contest-edit-form').addEventListener('submit', function () {
+            document.getElementById('description-input').value = descEditor.root.innerHTML;
+            var rulesHtml = rulesEditor.root.innerHTML;
+            document.getElementById('rules-input').value = (rulesHtml === '<p><br></p>') ? '' : rulesHtml;
+        });
+    })();
+    </script>
+    @endpush
 
 </x-app-layout>
 

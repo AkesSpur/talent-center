@@ -43,7 +43,7 @@
                                                 @endif
                                                 <div class="min-w-0">
                                                     <a href="{{ route('contests.show', $contest) }}"
-                                                        class="font-medium text-dark hover:text-primary transition-colors block truncate">
+                                                        class="font-medium text-dark hover:text-primary transition-colors block break-words">
                                                         {{ $contest->title }}
                                                     </a>
                                                     @if($contest->platformCategory)

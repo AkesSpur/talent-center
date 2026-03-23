@@ -76,7 +76,7 @@
                                                         <i class="fas fa-trophy text-primary text-sm"></i>
                                                     </div>
                                                 @endif
-                                                <span class="font-medium text-dark truncate">{{ $contest->title }}</span>
+                                                <span class="font-medium text-dark break-words">{{ $contest->title }}</span>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 hidden md:table-cell text-dark text-sm">{{ $contest->organization->name }}</td>

@@ -122,7 +122,7 @@
                                                     </div>
                                                 @endif
                                                 <a href="{{ route('contests.show', $contest) }}"
-                                                    class="font-medium text-dark hover:text-primary transition-colors block truncate max-w-[200px]">
+                                                    class="font-medium text-dark hover:text-primary transition-colors block break-words">
                                                     {{ $contest->title }}
                                                 </a>
                                             </div>
