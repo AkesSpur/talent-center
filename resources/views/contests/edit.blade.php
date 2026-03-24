@@ -32,10 +32,11 @@
                     $restoredJuryIds = old('juries') ? array_map('intval', old('juries')) : $selectedJuryIds;
                     $restoredGenreId = old('platform_category_id', $contest->platform_category_id);
                     $restoredDiplomaBg = old('selected_diploma_background_path', $contest->diploma_background);
+                    $restoredCoverPath = old('selected_cover_path', '');
                 @endphp
                 <form id="contest-edit-form" method="POST" action="{{ route('contests.update', $contest) }}"
                       enctype="multipart/form-data"
-                      x-data="contestForm({{ \Illuminate\Support\Js::from($initialCategories) }}, {{ \Illuminate\Support\Js::from($orgsData) }}, {{ $contest->organization_id }}, {{ \Illuminate\Support\Js::from($restoredJuryIds) }}, {{ \Illuminate\Support\Js::from($initialContestAgeGroups) }}, {{ \Illuminate\Support\Js::from($diplomaBackgrounds) }}, {{ \Illuminate\Support\Js::from($restoredGenreId) }}, {{ \Illuminate\Support\Js::from($restoredDiplomaBg) }})"
+                      x-data="contestForm({{ \Illuminate\Support\Js::from($initialCategories) }}, {{ \Illuminate\Support\Js::from($orgsData) }}, {{ $contest->organization_id }}, {{ \Illuminate\Support\Js::from($restoredJuryIds) }}, {{ \Illuminate\Support\Js::from($initialContestAgeGroups) }}, {{ \Illuminate\Support\Js::from($diplomaBackgrounds) }}, {{ \Illuminate\Support\Js::from($restoredGenreId) }}, {{ \Illuminate\Support\Js::from($restoredDiplomaBg) }}, {{ \Illuminate\Support\Js::from($contestCovers) }}, {{ \Illuminate\Support\Js::from($restoredCoverPath) }})"
                       class="space-y-8">
                     @csrf
                     @method('PUT')
@@ -326,38 +327,66 @@
                     </div>
 
                     {{-- Section 5: Cover Image --}}
-                    <div class="space-y-3" x-data="{ coverPreview: null }">
+                    <div class="space-y-3">
                         <h3 class="font-serif text-lg font-semibold text-dark border-b border-gold/20 pb-2">Обложка конкурса</h3>
-                        <div class="flex items-start gap-5">
+
+                        {{-- Current cover (if exists and no gallery selection / upload preview) --}}
+                        @if($contest->cover_image)
+                            <div x-show="!selectedCoverPath && !coverPreview" class="flex items-center gap-3 p-3 bg-cream rounded-lg border border-gold/10">
+                                <img src="{{ asset('storage/' . $contest->cover_image) }}" class="w-20 h-15 object-cover rounded-lg shrink-0" style="height:60px" alt="" />
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-dark font-medium">Текущая обложка</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="checkbox" id="delete_cover" name="delete_cover_image" value="1" class="rounded border-primary/30 text-primary">
+                                        <label for="delete_cover" class="text-sm text-warm-gray cursor-pointer">Удалить</label>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Gallery of admin covers --}}
+                        <div x-show="filteredContestCovers.length > 0" class="space-y-2">
+                            <p class="text-xs text-warm-gray">Выберите из готовых обложек или загрузите свою:</p>
+                            <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                <template x-for="cover in filteredContestCovers" :key="cover.id">
+                                    <div class="relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all aspect-[4/3]"
+                                         :class="selectedCoverPath === cover.image_path ? 'border-primary ring-2 ring-primary/30' : 'border-primary/10 hover:border-primary/30'"
+                                         @click="selectCoverFromGallery(cover)">
+                                        <img :src="cover.image_url" class="w-full h-full object-cover" />
+                                        <div x-show="selectedCoverPath === cover.image_path"
+                                             class="absolute top-1 right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                                            <i class="fas fa-check text-white text-xs"></i>
+                                        </div>
+                                        <button type="button" @click.stop="fullscreenUrl = cover.image_url"
+                                            class="absolute bottom-1 right-1 w-6 h-6 bg-black/50 rounded flex items-center justify-center text-white hover:bg-black/70 transition-colors">
+                                            <i class="fas fa-expand text-xs"></i>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                            <input type="hidden" name="selected_cover_path" :value="selectedCoverPath || ''">
+                        </div>
+
+                        {{-- Custom upload --}}
+                        <div class="flex items-start gap-5" :class="filteredContestCovers.length > 0 ? 'pt-3 border-t border-gold/10' : ''">
                             <div class="w-32 h-24 rounded-lg border-2 border-dashed border-primary/20 flex items-center justify-center bg-cream overflow-hidden shrink-0">
-                                @if($contest->cover_image)
-                                    <img src="{{ asset('storage/' . $contest->cover_image) }}"
-                                        class="w-full h-full object-cover"
-                                        x-show="!coverPreview" />
-                                @endif
                                 <template x-if="coverPreview">
                                     <img :src="coverPreview" class="w-full h-full object-cover" />
                                 </template>
-                                @if(! $contest->cover_image)
-                                    <div class="text-center text-warm-gray" x-show="!coverPreview">
+                                <template x-if="!coverPreview">
+                                    <div class="text-center text-warm-gray">
                                         <i class="fas fa-image text-2xl mb-1"></i>
                                         <p class="text-xs">Предпросмотр</p>
                                     </div>
-                                @endif
+                                </template>
                             </div>
-                            <div class="space-y-2">
+                            <div>
                                 <label for="cover-image-input" class="inline-flex items-center gap-2 px-4 py-2 border border-primary/30 text-primary text-sm font-medium rounded-lg hover:bg-primary/5 cursor-pointer transition-colors">
-                                    <i class="fas fa-upload"></i> Загрузить обложку
+                                    <i class="fas fa-upload"></i> Загрузить свою обложку
                                 </label>
                                 <input id="cover-image-input" name="cover_image" type="file" accept="image/*" class="hidden"
-                                    @change="coverPreview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null">
-                                @if($contest->cover_image)
-                                    <div class="flex items-center gap-2">
-                                        <input type="checkbox" id="delete_cover" name="delete_cover_image" value="1" class="rounded border-primary/30 text-primary">
-                                        <label for="delete_cover" class="text-sm text-warm-gray cursor-pointer">Удалить текущую обложку</label>
-                                    </div>
-                                @endif
-                                <p class="text-xs text-warm-gray">JPG, PNG, WebP — до 2 МБ.</p>
+                                    @change="onCoverUpload($event)">
+                                <p class="text-xs text-warm-gray mt-2">JPG, PNG, WebP — до 2 МБ.</p>
                                 <x-input-error class="mt-2" :messages="$errors->get('cover_image')" />
                             </div>
                         </div>
@@ -524,7 +553,7 @@
 </x-app-layout>
 
 <script>
-function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds, initialContestAgeGroups, diplomaBgData, initialGenreId, initialDiplomaBg) {
+function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds, initialContestAgeGroups, diplomaBgData, initialGenreId, initialDiplomaBg, contestCoverData, initialCoverPath) {
     return {
         categories: (initialCategories && (Array.isArray(initialCategories) ? initialCategories.length > 0 : Object.keys(initialCategories).length > 0)
             ? Object.values(initialCategories)
@@ -546,10 +575,19 @@ function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds,
         selectedDefaultBg: initialDiplomaBg || null,
         fullscreenUrl: null,
         diplomaPreview: null,
+        contestCovers: contestCoverData || [],
+        selectedCoverPath: initialCoverPath || null,
+        coverPreview: null,
         get filteredBackgrounds() {
             if (!this.selectedGenreId) return [];
             return this.diplomaBackgrounds.filter(bg =>
                 bg.category_ids.length === 0 || bg.category_ids.includes(parseInt(this.selectedGenreId))
+            );
+        },
+        get filteredContestCovers() {
+            if (!this.selectedGenreId) return [];
+            return this.contestCovers.filter(c =>
+                c.category_ids.length === 0 || c.category_ids.includes(parseInt(this.selectedGenreId))
             );
         },
         selectDefaultBg(bg) {
@@ -560,6 +598,25 @@ function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds,
                 this.diplomaPreview = null;
                 const input = document.getElementById('diploma-bg-input');
                 if (input) input.value = '';
+            }
+        },
+        selectCoverFromGallery(cover) {
+            if (this.selectedCoverPath === cover.image_path) {
+                this.selectedCoverPath = null;
+            } else {
+                this.selectedCoverPath = cover.image_path;
+                this.coverPreview = null;
+                const input = document.getElementById('cover-image-input');
+                if (input) input.value = '';
+            }
+        },
+        onCoverUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.coverPreview = URL.createObjectURL(file);
+                this.selectedCoverPath = null;
+            } else {
+                this.coverPreview = null;
             }
         },
         onCustomDiplomaUpload(event) {

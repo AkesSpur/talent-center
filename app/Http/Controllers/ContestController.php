@@ -8,6 +8,7 @@ use App\Enums\ContestStatus;
 use App\Http\Requests\StoreContestRequest;
 use App\Http\Requests\UpdateContestRequest;
 use App\Models\Contest;
+use App\Models\ContestCover;
 use App\Models\DiplomaBackground;
 use App\Models\Organization;
 use App\Models\PlatformCategory;
@@ -97,7 +98,15 @@ class ContestController extends Controller
             'category_ids' => $bg->platformCategories->pluck('id')->toArray(),
         ])->values();
 
-        return view('contests.create', compact('orgsData', 'platformCategories', 'preselectedOrgId', 'diplomaBackgrounds'));
+        $contestCovers = ContestCover::with('platformCategories')->get()->map(fn ($c) => [
+            'id'           => $c->id,
+            'name'         => $c->name,
+            'image_url'    => asset('storage/' . $c->image_path),
+            'image_path'   => $c->image_path,
+            'category_ids' => $c->platformCategories->pluck('id')->toArray(),
+        ])->values();
+
+        return view('contests.create', compact('orgsData', 'platformCategories', 'preselectedOrgId', 'diplomaBackgrounds', 'contestCovers'));
     }
 
     /**
@@ -118,7 +127,7 @@ class ContestController extends Controller
         }
 
         $data = array_merge(
-            $request->safe()->except(['diploma_background', 'cover_image', 'categories', 'juries', 'organization_id', 'contest_age_groups', 'selected_diploma_background_path', 'is_permanent']),
+            $request->safe()->except(['diploma_background', 'cover_image', 'categories', 'juries', 'organization_id', 'contest_age_groups', 'selected_diploma_background_path', 'selected_cover_path', 'is_permanent']),
             [
                 'organization_id' => $organization->id,
                 'created_by'      => $request->user()->id,
@@ -153,6 +162,8 @@ class ContestController extends Controller
                 1200,
                 85
             );
+        } elseif ($request->filled('selected_cover_path')) {
+            $data['cover_image'] = $request->input('selected_cover_path');
         }
 
         $contest = DB::transaction(function () use ($data, $request) {
@@ -231,7 +242,15 @@ class ContestController extends Controller
             'category_ids' => $bg->platformCategories->pluck('id')->toArray(),
         ])->values();
 
-        return view('contests.edit', compact('contest', 'orgsData', 'platformCategories', 'selectedJuryIds', 'diplomaBackgrounds'));
+        $contestCovers = ContestCover::with('platformCategories')->get()->map(fn ($c) => [
+            'id'           => $c->id,
+            'name'         => $c->name,
+            'image_url'    => asset('storage/' . $c->image_path),
+            'image_path'   => $c->image_path,
+            'category_ids' => $c->platformCategories->pluck('id')->toArray(),
+        ])->values();
+
+        return view('contests.edit', compact('contest', 'orgsData', 'platformCategories', 'selectedJuryIds', 'diplomaBackgrounds', 'contestCovers'));
     }
 
     /**
@@ -245,7 +264,7 @@ class ContestController extends Controller
             'diploma_background', 'delete_diploma_background',
             'cover_image', 'delete_cover_image',
             'categories', 'juries', 'contest_age_groups',
-            'selected_diploma_background_path', 'is_permanent',
+            'selected_diploma_background_path', 'selected_cover_path', 'is_permanent',
         ]);
 
         $data['is_permanent']          = $request->boolean('is_permanent');
@@ -292,6 +311,8 @@ class ContestController extends Controller
                 1200,
                 85
             );
+        } elseif ($request->filled('selected_cover_path')) {
+            $data['cover_image'] = $request->input('selected_cover_path');
         }
 
         DB::transaction(function () use ($contest, $data, $request) {

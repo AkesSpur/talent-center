@@ -43,6 +43,7 @@ class StoreContestRequest extends FormRequest
             'juries'                              => ['nullable', 'array'],
             'juries.*'                            => ['integer', 'exists:users,id'],
             'selected_diploma_background_path'    => ['nullable', 'string', 'max:500'],
+            'selected_cover_path'                 => ['nullable', 'string', 'max:500'],
         ];
     }
 

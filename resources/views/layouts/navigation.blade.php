@@ -102,6 +102,9 @@
                             <x-dropdown-link :href="route('admin.platform-categories.index')">
                                 <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Жанры
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.contest-covers.index')">
+                                <i class="fas fa-images mr-2 text-warm-gray w-5 text-center"></i> Обложки конкурсов
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.diploma-backgrounds.index')">
                                 <i class="fas fa-image mr-2 text-warm-gray w-5 text-center"></i> Фоны дипломов
                             </x-dropdown-link>

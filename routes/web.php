@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ContestController as AdminContestController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EvaluationController as AdminEvaluationController;
 use App\Http\Controllers\Admin\OrganizationController as AdminOrganizationController;
+use App\Http\Controllers\Admin\ContestCoverController as AdminContestCoverController;
 use App\Http\Controllers\Admin\DiplomaBackgroundController as AdminDiplomaBackgroundController;
 use App\Http\Controllers\Admin\PlatformCategoryController;
 use App\Http\Controllers\Admin\SiteSettingsController as AdminSiteSettingsController;
@@ -148,6 +149,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/platform-categories', [PlatformCategoryController::class, 'store'])->name('platform-categories.store');
     Route::put('/platform-categories/{platformCategory}', [PlatformCategoryController::class, 'update'])->name('platform-categories.update');
     Route::delete('/platform-categories/{platformCategory}', [PlatformCategoryController::class, 'destroy'])->name('platform-categories.destroy');
+
+    // Contest covers
+    Route::get('/contest-covers', [AdminContestCoverController::class, 'index'])->name('contest-covers.index');
+    Route::post('/contest-covers', [AdminContestCoverController::class, 'store'])->name('contest-covers.store');
+    Route::put('/contest-covers/{contestCover}', [AdminContestCoverController::class, 'update'])->name('contest-covers.update');
+    Route::delete('/contest-covers/{contestCover}', [AdminContestCoverController::class, 'destroy'])->name('contest-covers.destroy');
 
     // Diploma backgrounds
     Route::get('/diploma-backgrounds', [AdminDiplomaBackgroundController::class, 'index'])->name('diploma-backgrounds.index');
