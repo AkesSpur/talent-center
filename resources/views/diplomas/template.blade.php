@@ -356,12 +356,12 @@
                 <div class="details-block" style="margin-bottom: 2mm;">
                     @if($ageGroupName)
                         <div class="age-line">
-                            <span class="age-label">возрастная группа: </span>{{ $ageGroupName }}
+                            <span class="age-label">возрастная категория: </span>{{ $ageGroupName }}
                         </div>
                     @endif
                     @if($teacherName)
                         <div class="teacher-line">
-                            <span class="teacher-label">преподаватель: </span>{{ $teacherName }}
+                            <span class="teacher-label">Преподаватель: </span>{{ $teacherName }}
                         </div>
                     @endif
                 </div>

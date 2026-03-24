@@ -42,14 +42,19 @@ class DiplomaService
             ->map(fn ($u) => $u->full_name)
             ->all();
 
-        // ── Background image (embed as base64 so dompdf works on any server) ──
+        // ── Background image as base64 data URI ─────────────
         $backgroundPath = null;
-        if ($application->contest->diploma_background) {
-            $absPath = Storage::disk('public')->path($application->contest->diploma_background);
-            if (file_exists($absPath)) {
-                $mime           = mime_content_type($absPath) ?: 'image/webp';
-                $backgroundPath = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($absPath));
-            }
+        if ($application->contest->diploma_background
+            && Storage::disk('public')->exists($application->contest->diploma_background)) {
+            $content  = Storage::disk('public')->get($application->contest->diploma_background);
+            $ext      = strtolower(pathinfo($application->contest->diploma_background, PATHINFO_EXTENSION));
+            $mime     = match($ext) {
+                'png'  => 'image/png',
+                'gif'  => 'image/gif',
+                'webp' => 'image/webp',
+                default => 'image/jpeg',
+            };
+            $backgroundPath = 'data:' . $mime . ';base64,' . base64_encode($content);
         }
 
         // ── Font paths (forward slashes required for dompdf CSS url()) ───
