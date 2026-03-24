@@ -371,7 +371,7 @@
 
                             {{-- Description --}}
                             @if($contest->description)
-                                <p class="text-xs text-warm-gray mb-3 line-clamp-2 leading-relaxed flex-1">{{ $contest->description }}</p>
+                                <p class="text-xs text-warm-gray mb-3 line-clamp-2 leading-relaxed flex-1">{{ Str::limit(strip_tags($contest->description), 160) }}</p>
                             @else
                                 <div class="flex-1"></div>
                             @endif
@@ -475,10 +475,10 @@
                 ></p>
 
                 <template x-if="modal && modal.description">
-                    <p
-                        class="text-dark text-sm leading-relaxed mb-5 whitespace-pre-line"
-                        x-text="modal.description"
-                    ></p>
+                    <div
+                        class="rich-content text-dark text-sm leading-relaxed mb-5"
+                        x-html="modal.description"
+                    ></div>
                 </template>
 
                 <div class="bg-cream rounded-xl p-4 space-y-2 mb-4 text-sm">

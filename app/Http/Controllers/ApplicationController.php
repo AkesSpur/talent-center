@@ -75,7 +75,14 @@ class ApplicationController extends Controller
         $this->authorize('create', Application::class);
 
         $contest->load('organization');
-        $user = $request->user();
+        $authUser = $request->user();
+
+        // Resolve whose name to show: the auth user or one of their children
+        $requestedId = (int) $request->query('user_id', $authUser->id);
+        $allowedIds  = $authUser->children()->pluck('id')->push($authUser->id);
+        $user        = $allowedIds->contains($requestedId)
+            ? User::find($requestedId) ?? $authUser
+            : $authUser;
 
         $backgroundPath = null;
         if ($contest->diploma_background && Storage::disk('public')->exists($contest->diploma_background)) {

@@ -273,7 +273,7 @@
                                 "
                             >
                                 <iframe
-                                    src="{{ route('applications.diploma-preview', $contest) }}"
+                                    :src="'{{ route('applications.diploma-preview', $contest) }}?user_id=' + submittedForUserId"
                                     :style="'position: absolute; top: 0; left: 0; width: 794px; height: 1123px; border: none; transform: scale(' + scale + '); transform-origin: top left;'"
                                 ></iframe>
                             </div>
