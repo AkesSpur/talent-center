@@ -351,23 +351,7 @@
             <div class="participant-last-name">{{ $participantLastName }}</div>
             <div class="participant-first-patronymic">{{ $participantFirstPatronymic }}</div>
 
-            <!-- Age group + Teacher (right after name) -->
-            @if($ageGroupName || $teacherName)
-                <div class="details-block" style="margin-bottom: 2mm;">
-                    @if($ageGroupName)
-                        <div class="age-line">
-                            <span class="age-label">возрастная категория: </span>{{ $ageGroupName }}
-                        </div>
-                    @endif
-                    @if($teacherName)
-                        <div class="teacher-line">
-                            <span class="teacher-label">Преподаватель: </span>{{ $teacherName }}
-                        </div>
-                    @endif
-                </div>
-            @endif
-
-            <!-- Institution / Group -->
+            <!-- Institution / Group (right-aligned, right after name) -->
             @if($participantInstitution || $participantGroup)
                 <div class="details-block" style="margin-bottom: 2mm;">
                     @if($participantInstitution)
@@ -383,14 +367,24 @@
                 </div>
             @endif
 
-            <!-- Nomination -->
-            @if($categoryName)
-                <div class="details-block">
+            <!-- Details (right-aligned) -->
+            <div class="details-block">
+                @if($categoryName)
                     <div class="nomination-line">
                         <span class="nomination-label">номинация: </span>«{{ $categoryName }}»
                     </div>
-                </div>
-            @endif
+                @endif
+                @if($ageGroupName)
+                    <div class="age-line">
+                        <span class="age-label">возрастная категория: </span>{{ $ageGroupName }}
+                    </div>
+                @endif
+                @if($teacherName)
+                    <div class="teacher-line">
+                        <span class="teacher-label">Преподаватель: </span>{{ $teacherName }}
+                    </div>
+                @endif
+            </div>
 
 
         </div>

@@ -10,7 +10,8 @@
       "Bash(mysql:*)",
       "Bash(npm run build:*)",
       "Bash(xargs:*)",
-      "Bash(php -r \":*)"
+      "Bash(php -r \":*)",
+      "Bash(composer show:*)"
     ]
   }
 }

@@ -86,15 +86,8 @@ class ApplicationController extends Controller
 
         $backgroundPath = null;
         if ($contest->diploma_background && Storage::disk('public')->exists($contest->diploma_background)) {
-            $content  = Storage::disk('public')->get($contest->diploma_background);
-            $ext      = strtolower(pathinfo($contest->diploma_background, PATHINFO_EXTENSION));
-            $mime     = match($ext) {
-                'png'  => 'image/png',
-                'gif'  => 'image/gif',
-                'webp' => 'image/webp',
-                default => 'image/jpeg',
-            };
-            $backgroundPath = 'data:' . $mime . ';base64,' . base64_encode($content);
+            $content        = Storage::disk('public')->get($contest->diploma_background);
+            $backgroundPath = 'data:image/webp;base64,' . base64_encode($content);
         }
 
         $juryMembers = $contest->organization

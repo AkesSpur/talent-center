@@ -42,19 +42,13 @@ class DiplomaService
             ->map(fn ($u) => $u->full_name)
             ->all();
 
-        // ── Background image as base64 data URI ─────────────
+        // ── Background image ────────────────────────────────
         $backgroundPath = null;
-        if ($application->contest->diploma_background
-            && Storage::disk('public')->exists($application->contest->diploma_background)) {
-            $content  = Storage::disk('public')->get($application->contest->diploma_background);
-            $ext      = strtolower(pathinfo($application->contest->diploma_background, PATHINFO_EXTENSION));
-            $mime     = match($ext) {
-                'png'  => 'image/png',
-                'gif'  => 'image/gif',
-                'webp' => 'image/webp',
-                default => 'image/jpeg',
-            };
-            $backgroundPath = 'data:' . $mime . ';base64,' . base64_encode($content);
+        if ($application->contest->diploma_background) {
+            $backgroundPath = Storage::disk('public')->path($application->contest->diploma_background);
+            if (! file_exists($backgroundPath)) {
+                $backgroundPath = null;
+            }
         }
 
         // ── Font paths (forward slashes required for dompdf CSS url()) ───
