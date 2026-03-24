@@ -53,6 +53,7 @@
             </div>
 
             {{-- Applications grouped by category --}}
+            @php $canEvaluateNow = $contest->isEvaluation() || ($contest->isPermanent() && $contest->isAccepting()); @endphp
             @if($applications->isEmpty())
                 <div class="bg-white rounded-xl shadow-sm p-10 text-center">
                     <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -170,7 +171,7 @@
                                         </div>
 
                                         {{-- Evaluate toggle --}}
-                                        @if($contest->isEvaluation())
+                                        @if($canEvaluateNow)
                                             <button @click="showForm = !showForm"
                                                 class="shrink-0 text-xs px-3 py-1.5 border border-primary/20 text-primary rounded-lg hover:bg-primary/5 transition-colors"
                                                 :class="showForm ? 'bg-primary/5' : ''">
@@ -187,7 +188,7 @@
                                     </div>
 
                                     {{-- Inline evaluation form (AJAX) --}}
-                                    @if($contest->isEvaluation())
+                                    @if($canEvaluateNow)
                                         <div x-show="showForm" x-cloak class="mt-4 pt-4 border-t border-gold/10">
                                             <form @submit.prevent="save($el)"
                                                 action="{{ route('evaluation.evaluate', [$organization, $application]) }}">

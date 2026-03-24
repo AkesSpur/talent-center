@@ -140,7 +140,7 @@
                                         </td>
                                         <td class="px-6 py-4 hidden lg:table-cell text-warm-gray text-xs">
                                             <div>{{ $contest->applications_start_at->format('d.m.Y') }}</div>
-                                            <div>— {{ $contest->applications_end_at->format('d.m.Y') }}</div>
+                                            <div>— {{ $contest->applications_end_at?->format('d.m.Y') ?? 'бессрочно' }}</div>
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex items-center justify-end gap-1.5" x-data="{ copied_{{ $contest->id }}: false }">

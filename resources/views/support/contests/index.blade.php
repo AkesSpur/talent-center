@@ -88,7 +88,7 @@
                                         </td>
                                         <td class="px-6 py-4 hidden lg:table-cell text-warm-gray text-xs">
                                             <div>{{ $contest->applications_start_at->format('d.m.Y') }}</div>
-                                            <div>— {{ $contest->applications_end_at->format('d.m.Y') }}</div>
+                                            <div>— {{ $contest->applications_end_at?->format('d.m.Y') ?? 'бессрочно' }}</div>
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <a href="{{ route('support.contests.show', $contest) }}"

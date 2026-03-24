@@ -120,6 +120,12 @@
                                     <i class="fas fa-paper-plane mr-2"></i>Подать заявку
                                 </a>
                             @endif
+                            @if($contest->isPermanent() && auth()->check() && (auth()->user()->isAdmin() || auth()->user()->canInOrg('evaluate', $contest->organization)))
+                                <a href="{{ route('evaluation.show', [$contest->organization, $contest]) }}"
+                                    class="block text-center mt-3 px-4 py-2.5 border border-primary/20 text-primary rounded-lg hover:bg-primary/5 transition-colors text-sm">
+                                    <i class="fas fa-gavel mr-2"></i>Оценить заявки
+                                </a>
+                            @endif
                         @elseif($contest->isPending())
                             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-700">
                                 <i class="fas fa-clock mr-2"></i>Приём заявок начнётся {{ $contest->applications_start_at->isoFormat('D MMMM YYYY [г.]') }}.
@@ -165,18 +171,24 @@
                                     <p class="font-medium text-dark">
                                         с {{ $contest->applications_start_at->isoFormat('D MMMM YYYY [г.]') }}
                                     </p>
-                                    <p class="font-medium text-dark">
-                                        до {{ $contest->applications_end_at->isoFormat('D MMMM YYYY [г.]') }}
-                                    </p>
+                                    @if($contest->applications_end_at)
+                                        <p class="font-medium text-dark">
+                                            до {{ $contest->applications_end_at->isoFormat('D MMMM YYYY [г.]') }}
+                                        </p>
+                                    @else
+                                        <p class="font-medium text-dark">бессрочно</p>
+                                    @endif
                                 </div>
                             </div>
-                            <div class="flex items-start gap-3">
-                                <i class="fas fa-trophy text-primary mt-0.5 w-4 text-center shrink-0"></i>
-                                <div>
-                                    <p class="text-warm-gray text-xs mb-1">Результаты</p>
-                                    <p class="font-medium text-dark">{{ $contest->evaluation_end_at->isoFormat('D MMMM YYYY [г.]') }}</p>
+                            @if($contest->evaluation_end_at)
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-trophy text-primary mt-0.5 w-4 text-center shrink-0"></i>
+                                    <div>
+                                        <p class="text-warm-gray text-xs mb-1">Результаты</p>
+                                        <p class="font-medium text-dark">{{ $contest->evaluation_end_at->isoFormat('D MMMM YYYY [г.]') }}</p>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
                     </div>
 

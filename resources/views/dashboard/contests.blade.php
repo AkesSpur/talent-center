@@ -58,7 +58,12 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 hidden lg:table-cell text-warm-gray text-sm">
-                                            {{ $contest->applications_start_at->format('d.m.Y') }} — {{ $contest->applications_end_at->format('d.m.Y') }}
+                                            {{ $contest->applications_start_at->format('d.m.Y') }}
+                                            @if($contest->applications_end_at)
+                                                — {{ $contest->applications_end_at->format('d.m.Y') }}
+                                            @else
+                                                — бессрочно
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 hidden sm:table-cell text-center">
                                             <a href="{{ route('organizations.applications', $contest->organization) }}"
@@ -69,7 +74,7 @@
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex items-center justify-end gap-1.5">
-                                                @if($contest->isEvaluation() && auth()->user()->canInOrg('evaluate', $contest->organization))
+                                                @if(($contest->isEvaluation() || ($contest->isPermanent() && $contest->isAccepting())) && (auth()->user()->isAdmin() || auth()->user()->canInOrg('evaluate', $contest->organization)))
                                                     <a href="{{ route('evaluation.show', [$contest->organization, $contest]) }}"
                                                         title="Оценить заявки"
                                                         class="w-8 h-8 flex items-center justify-center border border-gold/30 text-gold rounded-lg hover:bg-gold/10 transition-colors">

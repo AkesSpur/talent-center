@@ -24,6 +24,7 @@ class Contest extends Model
         'description',
         'rules',
         'status',
+        'is_permanent',
         'applications_start_at',
         'applications_end_at',
         'evaluation_end_at',
@@ -36,6 +37,7 @@ class Contest extends Model
     {
         return [
             'status'                => ContestStatus::class,
+            'is_permanent'          => 'boolean',
             'applications_start_at' => 'datetime',
             'applications_end_at'   => 'datetime',
             'evaluation_end_at'     => 'datetime',
@@ -52,12 +54,14 @@ class Contest extends Model
     {
         $now = Carbon::now();
 
-        if ($now->greaterThan($this->evaluation_end_at)) {
-            return ContestStatus::Archive;
-        }
+        if (! $this->is_permanent) {
+            if ($this->evaluation_end_at && $now->greaterThan($this->evaluation_end_at)) {
+                return ContestStatus::Archive;
+            }
 
-        if ($now->greaterThan($this->applications_end_at)) {
-            return ContestStatus::Evaluation;
+            if ($this->applications_end_at && $now->greaterThan($this->applications_end_at)) {
+                return ContestStatus::Evaluation;
+            }
         }
 
         if ($now->greaterThanOrEqualTo($this->applications_start_at)) {
@@ -92,6 +96,11 @@ class Contest extends Model
     public function isCancelled(): bool
     {
         return $this->status === ContestStatus::Cancelled;
+    }
+
+    public function isPermanent(): bool
+    {
+        return (bool) $this->is_permanent;
     }
 
     // ── Relationships ──────────────────────────────────

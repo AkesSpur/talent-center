@@ -29,12 +29,14 @@
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-4 text-sm">
                     <p class="text-warm-gray text-xs mb-0.5">Окончание приёма заявок</p>
-                    <p class="font-semibold text-dark">{{ $contest->applications_end_at->format('d.m.Y') }}</p>
+                    <p class="font-semibold text-dark">{{ $contest->applications_end_at?->format('d.m.Y') ?? 'бессрочно' }}</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-4 text-sm">
-                    <p class="text-warm-gray text-xs mb-0.5">Публикация результатов</p>
-                    <p class="font-semibold text-dark">{{ $contest->evaluation_end_at->format('d.m.Y') }}</p>
-                </div>
+                @if($contest->evaluation_end_at)
+                    <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-4 text-sm">
+                        <p class="text-warm-gray text-xs mb-0.5">Публикация результатов</p>
+                        <p class="font-semibold text-dark">{{ $contest->evaluation_end_at->format('d.m.Y') }}</p>
+                    </div>
+                @endif
             </div>
 
             {{-- Filter --}}

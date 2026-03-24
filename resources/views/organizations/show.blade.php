@@ -120,7 +120,7 @@
                                             <a href="{{ route('contests.show', $contest) }}" class="flex-1 min-w-0 block">
                                                 <p class="font-medium text-dark truncate text-sm">{{ $contest->title }}</p>
                                                 <p class="text-xs text-warm-gray mt-0.5">
-                                                    {{ $contest->applications_start_at->format('d.m.Y') }} — {{ $contest->applications_end_at->format('d.m.Y') }}
+                                                    {{ $contest->applications_start_at->format('d.m.Y') }} — {{ $contest->applications_end_at?->format('d.m.Y') ?? 'бессрочно' }}
                                                 </p>
                                             </a>
                                             <div class="flex items-center gap-2 shrink-0">

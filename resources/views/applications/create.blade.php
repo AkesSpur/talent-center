@@ -53,7 +53,11 @@
                             <p class="font-semibold text-dark truncate">{{ $contest->title }}</p>
                             <p class="text-sm text-warm-gray">{{ $contest->organization->name }}</p>
                             <p class="text-xs text-warm-gray mt-0.5">
-                                Приём заявок до: {{ $contest->applications_end_at->format('d.m.Y') }}
+                                @if($contest->applications_end_at)
+                                    Приём заявок до: {{ $contest->applications_end_at->format('d.m.Y') }}
+                                @else
+                                    Бессрочный конкурс
+                                @endif
                             </p>
                         </div>
                     </div>

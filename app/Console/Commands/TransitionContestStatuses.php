@@ -33,8 +33,9 @@ class TransitionContestStatuses extends Command
                 $transitioned++;
             });
 
-        // accepting → evaluation: applications_end_at < now
+        // accepting → evaluation: applications_end_at < now (timed contests only)
         Contest::where('status', ContestStatus::Accepting->value)
+            ->where('is_permanent', false)
             ->where('applications_end_at', '<', $now)
             ->each(function (Contest $contest) use (&$transitioned): void {
                 $contest->update(['status' => ContestStatus::Evaluation->value]);

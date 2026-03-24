@@ -325,8 +325,8 @@
                             'category'           => $contest->platformCategory?->name,
                             'org_name'           => $contest->organization->name,
                             'applications_start' => $contest->applications_start_at->isoFormat('D MMM YYYY'),
-                            'applications_end'   => $contest->applications_end_at->isoFormat('D MMM YYYY'),
-                            'evaluation_end'     => $contest->evaluation_end_at->isoFormat('D MMM YYYY'),
+                            'applications_end'   => $contest->applications_end_at ? $contest->applications_end_at->isoFormat('D MMM YYYY') : 'бессрочно',
+                            'evaluation_end'     => $contest->evaluation_end_at ? $contest->evaluation_end_at->isoFormat('D MMM YYYY') : null,
                             'apply_url'          => route('applications.create', $contest),
                             'show_url'           => route('contests.show', $contest),
                             'categories'         => $contest->categories->map(fn ($c) => $c->name)->values()->toArray(),
@@ -380,7 +380,11 @@
                             <div class="flex items-center justify-between pt-3 border-t border-gold/10">
                                 <div class="flex items-center gap-1.5 text-xs text-warm-gray">
                                     <i class="fas fa-calendar-alt text-gold"></i>
-                                    до {{ $contest->applications_end_at->isoFormat('D MMM') }}
+                                    @if($contest->applications_end_at)
+                                        до {{ $contest->applications_end_at->isoFormat('D MMM') }}
+                                    @else
+                                        бессрочно
+                                    @endif
                                 </div>
                                 <span class="text-xs font-semibold text-primary group-hover:underline flex items-center gap-1">
                                     Подробнее <i class="fas fa-arrow-right text-xs"></i>
@@ -497,14 +501,13 @@
                             x-text="modal ? (modal.applications_start + ' — ' + modal.applications_end) : ''"
                         ></span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-flag-checkered text-primary w-4 text-center shrink-0"></i>
-                        <span class="text-warm-gray shrink-0">Результаты:</span>
-                        <span
-                            class="font-medium text-dark"
-                            x-text="modal ? modal.evaluation_end : ''"
-                        ></span>
-                    </div>
+                    <template x-if="modal && modal.evaluation_end">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-flag-checkered text-primary w-4 text-center shrink-0"></i>
+                            <span class="text-warm-gray shrink-0">Результаты:</span>
+                            <span class="font-medium text-dark" x-text="modal.evaluation_end"></span>
+                        </div>
+                    </template>
                 </div>
 
                 <template x-if="modal && modal.categories && modal.categories.length">

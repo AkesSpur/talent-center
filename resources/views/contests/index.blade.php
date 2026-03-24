@@ -81,8 +81,8 @@
                                 'category'           => $contest->platformCategory?->name,
                                 'org_name'           => $contest->organization->name,
                                 'applications_start' => $contest->applications_start_at->isoFormat('D MMM'),
-                                'applications_end'   => $contest->applications_end_at->isoFormat('D MMM'),
-                                'evaluation_end'     => $contest->evaluation_end_at->isoFormat('D MMM'),
+                                'applications_end'   => $contest->applications_end_at ? $contest->applications_end_at->isoFormat('D MMM') : 'бессрочно',
+                                'evaluation_end'     => $contest->evaluation_end_at ? $contest->evaluation_end_at->isoFormat('D MMM') : null,
                                 'apply_url'          => route('applications.create', $contest),
                                 'show_url'           => route('contests.show', $contest),
                                 'categories'         => $contest->categories->map(fn ($c) => $c->name)->values()->toArray(),
@@ -130,12 +130,19 @@
                                 <div class="text-xs text-warm-gray space-y-1 mb-4">
                                     <div>
                                         <i class="fas fa-calendar-alt mr-1.5"></i>
-                                        {{ $contest->applications_start_at->isoFormat('D MMM') }} — {{ $contest->applications_end_at->isoFormat('D MMM') }}
+                                        {{ $contest->applications_start_at->isoFormat('D MMM') }}
+                                        @if($contest->applications_end_at)
+                                            — {{ $contest->applications_end_at->isoFormat('D MMM') }}
+                                        @else
+                                            — бессрочно
+                                        @endif
                                     </div>
-                                    <div>
-                                        <i class="fas fa-flag-checkered mr-1.5"></i>
-                                        Результаты: {{ $contest->evaluation_end_at->isoFormat('D MMM') }}
-                                    </div>
+                                    @if($contest->evaluation_end_at)
+                                        <div>
+                                            <i class="fas fa-flag-checkered mr-1.5"></i>
+                                            Результаты: {{ $contest->evaluation_end_at->isoFormat('D MMM') }}
+                                        </div>
+                                    @endif
                                 </div>
 
                                 {{-- Org row --}}
@@ -260,14 +267,13 @@
                                 x-text="modal ? (modal.applications_start + ' — ' + modal.applications_end) : ''"
                             ></span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-flag-checkered text-primary w-4 text-center shrink-0"></i>
-                            <span class="text-warm-gray shrink-0">Результаты:</span>
-                            <span
-                                class="font-medium text-dark"
-                                x-text="modal ? modal.evaluation_end : ''"
-                            ></span>
-                        </div>
+                        <template x-if="modal && modal.evaluation_end">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-flag-checkered text-primary w-4 text-center shrink-0"></i>
+                                <span class="text-warm-gray shrink-0">Результаты:</span>
+                                <span class="font-medium text-dark" x-text="modal.evaluation_end"></span>
+                            </div>
+                        </template>
                     </div>
 
                     {{-- Nominations --}}

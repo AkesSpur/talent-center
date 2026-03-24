@@ -118,17 +118,22 @@ class ContestController extends Controller
         }
 
         $data = array_merge(
-            $request->safe()->except(['diploma_background', 'cover_image', 'categories', 'juries', 'organization_id', 'contest_age_groups', 'selected_diploma_background_path']),
+            $request->safe()->except(['diploma_background', 'cover_image', 'categories', 'juries', 'organization_id', 'contest_age_groups', 'selected_diploma_background_path', 'is_permanent']),
             [
                 'organization_id' => $organization->id,
                 'created_by'      => $request->user()->id,
                 'status'          => ContestStatus::Draft->value,
+                'is_permanent'    => $request->boolean('is_permanent'),
             ]
         );
 
         $data['applications_start_at'] = Carbon::parse($data['applications_start_at'])->startOfDay();
-        $data['applications_end_at']   = Carbon::parse($data['applications_end_at'])->endOfDay();
-        $data['evaluation_end_at']     = Carbon::parse($data['evaluation_end_at'])->endOfDay();
+        $data['applications_end_at']   = isset($data['applications_end_at'])
+            ? Carbon::parse($data['applications_end_at'])->endOfDay()
+            : null;
+        $data['evaluation_end_at']     = isset($data['evaluation_end_at'])
+            ? Carbon::parse($data['evaluation_end_at'])->endOfDay()
+            : null;
 
         if ($request->hasFile('diploma_background')) {
             $data['diploma_background'] = $this->storeImageAsWebp(
@@ -240,12 +245,17 @@ class ContestController extends Controller
             'diploma_background', 'delete_diploma_background',
             'cover_image', 'delete_cover_image',
             'categories', 'juries', 'contest_age_groups',
-            'selected_diploma_background_path',
+            'selected_diploma_background_path', 'is_permanent',
         ]);
 
+        $data['is_permanent']          = $request->boolean('is_permanent');
         $data['applications_start_at'] = Carbon::parse($data['applications_start_at'])->startOfDay();
-        $data['applications_end_at']   = Carbon::parse($data['applications_end_at'])->endOfDay();
-        $data['evaluation_end_at']     = Carbon::parse($data['evaluation_end_at'])->endOfDay();
+        $data['applications_end_at']   = isset($data['applications_end_at'])
+            ? Carbon::parse($data['applications_end_at'])->endOfDay()
+            : null;
+        $data['evaluation_end_at']     = isset($data['evaluation_end_at'])
+            ? Carbon::parse($data['evaluation_end_at'])->endOfDay()
+            : null;
 
         // Diploma background
         if ($request->boolean('delete_diploma_background') && $contest->diploma_background) {

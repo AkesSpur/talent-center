@@ -38,9 +38,13 @@
                                             Заявок: {{ $contest->applications_count }}
                                         </p>
                                     </div>
-                                    @if($allDone)
+                                    @if($allDone && $contest->isEvaluation())
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 shrink-0">
                                             <i class="fas fa-check mr-1"></i>Готово к завершению
+                                        </span>
+                                    @elseif($allDone && $contest->isPermanent())
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 shrink-0">
+                                            <i class="fas fa-check mr-1"></i>Все оценены
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 shrink-0">
@@ -69,7 +73,7 @@
                             <i class="fas fa-gavel text-2xl text-primary"></i>
                         </div>
                         <h4 class="font-serif text-lg font-semibold text-dark mb-2">Нет конкурсов на оценке</h4>
-                        <p class="text-warm-gray text-sm">Конкурсы появятся здесь, когда завершится приём заявок.</p>
+                        <p class="text-warm-gray text-sm">Конкурсы появятся здесь, когда завершится приём заявок, или для бессрочных конкурсов.</p>
                     </div>
                 @endif
             </div>

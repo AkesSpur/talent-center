@@ -36,7 +36,11 @@ class EvaluationController extends Controller
         }
 
         $evaluationContests = $organization->contests()
-            ->where('status', ContestStatus::Evaluation->value)
+            ->where(function ($query) {
+                $query->where('status', ContestStatus::Evaluation->value)
+                    ->orWhere(fn ($q) => $q->where('status', ContestStatus::Accepting->value)
+                        ->where('is_permanent', true));
+            })
             ->withCount([
                 'applications',
                 'applications as evaluated_count' => fn ($q) => $q->where('status', '!=', ApplicationStatus::New->value),
@@ -64,7 +68,11 @@ class EvaluationController extends Controller
             abort(403);
         }
 
-        if (! $contest->isEvaluation() && ! $contest->isArchive()) {
+        $canAccess = $contest->isEvaluation()
+            || $contest->isArchive()
+            || ($contest->isPermanent() && $contest->isAccepting());
+
+        if (! $canAccess) {
             return redirect()->route('evaluation.index', $organization)
                 ->with('error', 'Конкурс не находится в стадии оценки.');
         }
@@ -104,7 +112,11 @@ class EvaluationController extends Controller
         $this->authorize('update', $application);
 
         $contest = $application->contest;
-        if (! $contest->isEvaluation()) {
+
+        $canEvaluate = $contest->isEvaluation()
+            || ($contest->isPermanent() && $contest->isAccepting());
+
+        if (! $canEvaluate) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Оценка заявок закрыта — конкурс уже не находится в стадии оценки.'], 422);
             }
@@ -130,6 +142,18 @@ class EvaluationController extends Controller
             'new_status' => $newStatus->value,
             'by'         => $request->user()->id,
         ]);
+
+        // For permanent contests: generate diploma immediately upon place assignment
+        $eligibleStatuses = [
+            ApplicationStatus::Participant,
+            ApplicationStatus::Place1,
+            ApplicationStatus::Place2,
+            ApplicationStatus::Place3,
+        ];
+
+        if ($contest->isPermanent() && in_array($newStatus, $eligibleStatuses, true)) {
+            $this->diplomaService->generateForApplication($application);
+        }
 
         // Send notification to applicant
         $application->load('user', 'diploma');

@@ -107,8 +107,18 @@
                     </div>
 
                     {{-- Section 2: Dates --}}
-                    <div class="space-y-5">
+                    <div class="space-y-5" x-data="{ isPermanent: {{ old('is_permanent', $contest->is_permanent) ? 'true' : 'false' }} }">
                         <h3 class="font-serif text-lg font-semibold text-dark border-b border-gold/20 pb-2">Даты</h3>
+
+                        {{-- Permanent toggle --}}
+                        <label class="flex items-center gap-3 cursor-pointer select-none w-fit">
+                            <input type="checkbox" name="is_permanent" value="1"
+                                x-model="isPermanent"
+                                {{ old('is_permanent', $contest->is_permanent) ? 'checked' : '' }}
+                                class="rounded border-primary/30 text-primary focus:ring-primary/30">
+                            <span class="text-sm font-medium text-dark">Бессрочный конкурс</span>
+                            <span class="text-xs text-warm-gray">(без даты окончания приёма заявок)</span>
+                        </label>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                             <div>
@@ -118,21 +128,30 @@
                                     class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                                 <x-input-error class="mt-2" :messages="$errors->get('applications_start_at')" />
                             </div>
-                            <div>
+                            <div x-show="!isPermanent" x-cloak>
                                 <label for="applications_end_at" class="block text-sm font-medium text-dark mb-2">Окончание приёма заявок <span class="text-red-500">*</span></label>
                                 <input id="applications_end_at" name="applications_end_at" type="date"
-                                    value="{{ old('applications_end_at', $contest->applications_end_at->format('Y-m-d')) }}" required
+                                    value="{{ old('applications_end_at', $contest->applications_end_at?->format('Y-m-d')) }}"
                                     class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                                 <x-input-error class="mt-2" :messages="$errors->get('applications_end_at')" />
                             </div>
-                            <div>
+                            <div x-show="!isPermanent" x-cloak>
                                 <label for="evaluation_end_at" class="block text-sm font-medium text-dark mb-2">Дата рассылки результатов <span class="text-red-500">*</span></label>
                                 <input id="evaluation_end_at" name="evaluation_end_at" type="date"
-                                    value="{{ old('evaluation_end_at', $contest->evaluation_end_at->format('Y-m-d')) }}" required
+                                    value="{{ old('evaluation_end_at', $contest->evaluation_end_at?->format('Y-m-d')) }}"
                                     class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                                 <x-input-error class="mt-2" :messages="$errors->get('evaluation_end_at')" />
                             </div>
                         </div>
+
+                        <p class="text-xs text-warm-gray">
+                            <template x-if="!isPermanent">
+                                <span><i class="fas fa-info-circle mr-1 text-primary"></i>Конкурс автоматически изменит статус в соответствии с указанными датами.</span>
+                            </template>
+                            <template x-if="isPermanent">
+                                <span><i class="fas fa-infinity mr-1 text-primary"></i>Бессрочный конкурс остаётся открытым для приёма заявок, а жюри может оценивать работы в любой момент.</span>
+                            </template>
+                        </p>
                     </div>
 
                     {{-- Section 3: Jury --}}
