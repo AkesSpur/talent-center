@@ -13,15 +13,6 @@
     </x-slot>
 
     @php
-        $usersPreviewData = [];
-        if (!in_array(auth()->id(), $alreadyAppliedIds)) {
-            $usersPreviewData[(string) auth()->id()] = auth()->user()->full_name;
-        }
-        foreach ($children as $child) {
-            if (!in_array($child->id, $alreadyAppliedIds)) {
-                $usersPreviewData[(string) $child->id] = $child->full_name;
-            }
-        }
         $categoriesPreviewData = [];
         foreach ($contest->categories as $cat) {
             $categoriesPreviewData[(string) $cat->id] = $cat->name;
@@ -80,6 +71,13 @@
                             allAgeGroups: {{ \Illuminate\Support\Js::from($ageGroupsData) }},
                             categoriesData: {{ \Illuminate\Support\Js::from($categoriesPreviewData) }},
                             usersData: {{ \Illuminate\Support\Js::from($usersPreviewData) }},
+                            diplomaBg: @js($diplomaBgUrl),
+                            juryMembers: @js($juryMembers),
+                            orgName: @js($contest->organization->name),
+                            orgCity: @js($contest->organization->city),
+                            contestTitle: @js($contest->title),
+                            contactEmail: @js($contactEmail),
+                            previewDate: @js($previewDate),
                             get filteredAgeGroups() {
                                 if (this.selectedCategoryId) {
                                     return this.allAgeGroups.filter(ag => ag.contest_category_id == this.selectedCategoryId);
@@ -95,7 +93,19 @@
                                 return this.confirmChecked;
                             },
                             get participantName() {
-                                return this.usersData[String(this.submittedForUserId)] || '';
+                                return (this.usersData[String(this.submittedForUserId)] || {}).fullName || '';
+                            },
+                            get previewLastName() {
+                                return (this.usersData[String(this.submittedForUserId)] || {}).lastName || '';
+                            },
+                            get previewFirstPat() {
+                                return (this.usersData[String(this.submittedForUserId)] || {}).firstPat || '';
+                            },
+                            get previewInstitution() {
+                                return (this.usersData[String(this.submittedForUserId)] || {}).institution || '';
+                            },
+                            get previewGroup() {
+                                return (this.usersData[String(this.submittedForUserId)] || {}).group || '';
                             },
                             get categoryName() {
                                 if (!this.selectedCategoryId) return '';
@@ -265,7 +275,7 @@
                                 <h3 class="font-serif font-semibold text-dark">Образец диплома</h3>
                             </div>
 
-                        {{-- Scaled iframe wrapper --}}
+                        {{-- Frontend diploma preview — fully reactive, no backend calls --}}
                             <div
                                 class="relative w-full overflow-hidden rounded-lg"
                                 style="aspect-ratio: 794 / 1123; border: 1.5px solid rgba(212,175,55,0.35);"
@@ -276,10 +286,76 @@
                                     window.addEventListener('resize', upd);
                                 "
                             >
-                                <iframe
-                                    :src="'{{ route('applications.diploma-preview', $contest) }}?user_id=' + submittedForUserId"
-                                    :style="'position: absolute; top: 0; left: 0; width: 794px; height: 1123px; border: none; transform: scale(' + scale + '); transform-origin: top left;'"
-                                ></iframe>
+                                <div :style="`position:absolute;top:0;left:0;width:794px;height:1123px;transform:scale(${scale});transform-origin:top left;background-color:#FAF8F5;overflow:hidden;font-family:Georgia,serif;`">
+
+                                    {{-- Background image --}}
+                                    <template x-if="diplomaBg">
+                                        <div :style="`position:absolute;inset:0;background-image:url('${diplomaBg}');background-size:cover;background-position:center;background-repeat:no-repeat;`"></div>
+                                    </template>
+
+                                    {{-- "Образец" watermark --}}
+                                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:62pt;font-weight:bold;font-style:italic;color:rgba(190,0,0,0.5);border:7px solid rgba(190,0,0,0.5);padding:15px 45px;border-radius:6px;white-space:nowrap;z-index:100;text-transform:uppercase;letter-spacing:0.08em;pointer-events:none;">Образец</div>
+
+                                    {{-- Main content --}}
+                                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:53px 53px 38px 53px;">
+
+                                        {{-- Org block --}}
+                                        <div style="text-align:right;margin-bottom:30px;max-width:65%;margin-left:auto;">
+                                            <div style="font-size:10pt;font-weight:bold;color:#000;text-transform:uppercase;" x-text="orgName"></div>
+                                            <template x-if="orgCity">
+                                                <div style="font-size:10pt;font-weight:bold;color:#000;line-height:1;margin-top:4px;" x-text="'г.'+orgCity"></div>
+                                            </template>
+                                            <div style="font-size:16pt;font-weight:bold;color:#763609;" x-text="contestTitle"></div>
+                                        </div>
+
+                                        {{-- "Диплом" heading --}}
+                                        <div style="text-align:right;font-size:56pt;margin-top:60px;color:#ca9848;font-weight:bold;font-style:italic;letter-spacing:0.01em;margin-bottom:-8px;">Диплом</div>
+                                        <div style="text-align:right;font-size:22pt;font-weight:bold;color:#aa8345;margin-bottom:8px;">участника</div>
+                                        <div style="width:227px;height:2px;background:linear-gradient(90deg,transparent,#A67C00,transparent);margin:8px 0 8px auto;"></div>
+                                        <div style="text-align:right;font-size:12pt;font-weight:bold;color:#aa8345;margin-bottom:4px;">награждается</div>
+
+                                        {{-- Participant name (reactive) --}}
+                                        <div style="text-align:right;font-size:21pt;font-weight:bold;font-style:italic;color:#000;line-height:1.2;" x-text="previewLastName"></div>
+                                        <div style="text-align:right;font-size:21pt;font-weight:bold;font-style:italic;color:#000;line-height:1.2;margin-bottom:19px;" x-text="previewFirstPat"></div>
+
+                                        {{-- Age group (reactive) --}}
+                                        <template x-if="ageGroupLabel">
+                                            <div style="text-align:right;font-size:12pt;color:#000;line-height:1.7;"><span style="color:#aa8345;">возрастная группа: </span><span x-text="ageGroupLabel"></span></div>
+                                        </template>
+
+                                        {{-- Teacher (reactive) --}}
+                                        <template x-if="showTeacher && teacherName">
+                                            <div style="text-align:right;font-size:12pt;color:#000;line-height:1.7;"><span style="color:#aa8345;">Преподаватель: </span><span x-text="teacherName"></span></div>
+                                        </template>
+
+                                        {{-- Institution / group --}}
+                                        <template x-if="previewInstitution">
+                                            <div style="text-align:right;font-size:12pt;color:#000;line-height:1.7;margin-top:8px;"><span style="color:#aa8345;">учреждение: </span><span x-text="previewInstitution"></span></div>
+                                        </template>
+                                        <template x-if="previewGroup">
+                                            <div style="text-align:right;font-size:12pt;color:#000;line-height:1.7;"><span style="color:#aa8345;">класс/группа: </span><span x-text="previewGroup"></span></div>
+                                        </template>
+
+                                        {{-- Category --}}
+                                        <template x-if="categoryName">
+                                            <div style="text-align:right;font-size:12pt;color:#000;line-height:1.7;"><span style="color:#aa8345;">номинация: </span>«<span x-text="categoryName"></span>»</div>
+                                        </template>
+                                    </div>
+
+                                    {{-- Bottom-left: jury + meta --}}
+                                    <div style="position:absolute;bottom:38px;left:53px;width:321px;">
+                                        <template x-if="juryMembers.length > 0">
+                                            <div>
+                                                <div style="font-size:11pt;font-weight:bold;color:#000;">Жюри:</div>
+                                                <template x-for="m in juryMembers" :key="m">
+                                                    <div style="font-size:11pt;font-weight:bold;color:#000;" x-text="m"></div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                        <div style="font-size:10pt;color:#000;margin-top:15px;">Диплом № —<br><span x-text="previewDate"></span></div>
+                                        <div style="font-size:9pt;color:#000;margin-top:15px;">talant-centr.ru<br><span x-text="contactEmail"></span></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

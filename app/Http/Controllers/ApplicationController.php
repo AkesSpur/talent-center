@@ -52,7 +52,7 @@ class ApplicationController extends Controller
                 ->with('warning', 'Все участники уже подали заявки на этот конкурс.');
         }
 
-        $contest->load(['categories', 'ageGroups']);
+        $contest->load(['categories', 'ageGroups', 'organization']);
 
         // Build age groups data for Alpine.js filtering
         $ageGroupsData = $contest->ageGroups->map(fn ($ag) => [
@@ -63,7 +63,42 @@ class ApplicationController extends Controller
             'max_age'             => $ag->max_age,
         ])->values();
 
-        return view('applications.create', compact('contest', 'children', 'alreadyAppliedIds', 'ageGroupsData'));
+        // Rich user data for frontend diploma preview
+        $usersPreviewData = collect([$user])->concat($children)
+            ->filter(fn ($u) => ! in_array($u->id, $alreadyAppliedIds))
+            ->mapWithKeys(fn ($u) => [
+                (string) $u->id => [
+                    'fullName'    => $u->full_name,
+                    'lastName'    => $u->last_name,
+                    'firstPat'    => trim(($u->first_name ?? '') . ' ' . ($u->patronymic ?? '')),
+                    'institution' => $u->organization ?? '',
+                    'group'       => $u->group ?? '',
+                ],
+            ])
+            ->all();
+
+        // Diploma background for preview (URL, not base64 — browser renders it natively)
+        $diplomaBgUrl = ($contest->diploma_background && Storage::disk('public')->exists($contest->diploma_background))
+            ? Storage::url($contest->diploma_background)
+            : null;
+
+        // Jury members for preview
+        $juryMembers = $contest->organization
+            ->representatives()
+            ->wherePivot('can_evaluate', true)
+            ->get()
+            ->map(fn ($u) => $u->full_name)
+            ->all();
+
+        $contactEmail = SiteSettings::get(SiteSettings::CONTACT_EMAIL, 'info@talant-centr.ru');
+
+        $months      = [1 => 'январь', 2 => 'февраль', 3 => 'март', 4 => 'апрель', 5 => 'май', 6 => 'июнь', 7 => 'июль', 8 => 'август', 9 => 'сентябрь', 10 => 'октябрь', 11 => 'ноябрь', 12 => 'декабрь'];
+        $previewDate = $months[(int) now()->format('n')] . ' ' . now()->format('Y');
+
+        return view('applications.create', compact(
+            'contest', 'children', 'alreadyAppliedIds', 'ageGroupsData',
+            'usersPreviewData', 'diplomaBgUrl', 'juryMembers', 'contactEmail', 'previewDate'
+        ));
     }
 
     /**
