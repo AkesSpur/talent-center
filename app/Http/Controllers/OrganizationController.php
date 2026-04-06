@@ -83,6 +83,9 @@ class OrganizationController extends Controller
     {
         $data = $request->safe()->except(['avatar', 'delete_avatar']);
 
+        // Explicitly set offer_accepted from request (unchecked checkbox = not sent = false)
+        $data['offer_accepted'] = $request->boolean('offer_accepted');
+
         if ($request->boolean('delete_avatar') && $organization->avatar_path) {
             $this->deleteStoredImage($organization->avatar_path);
             $data['avatar_path'] = null;

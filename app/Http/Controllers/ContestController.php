@@ -78,10 +78,11 @@ class ContestController extends Controller
         }
 
         $orgsData = $userOrgs->map(fn (Organization $org) => [
-            'id'        => $org->id,
-            'name'      => $org->name,
-            'canManage' => $user->isAdmin() || $user->canInOrg('manage', $org),
-            'reps'      => $org->representatives->map(fn ($rep) => [
+            'id'              => $org->id,
+            'name'            => $org->name,
+            'canManage'       => $user->isAdmin() || $user->canInOrg('manage', $org),
+            'can_host_paid'   => $org->canHostPaidContests(),
+            'reps'            => $org->representatives->map(fn ($rep) => [
                 'id'   => $rep->id,
                 'name' => $rep->full_name,
             ])->values()->toArray(),
@@ -126,13 +127,20 @@ class ContestController extends Controller
             }
         }
 
+        $isPaid = $request->boolean('is_paid');
+
         $data = array_merge(
-            $request->safe()->except(['diploma_background', 'cover_image', 'categories', 'juries', 'organization_id', 'contest_age_groups', 'selected_diploma_background_path', 'selected_cover_path', 'is_permanent']),
+            $request->safe()->except(['diploma_background', 'cover_image', 'categories', 'juries', 'organization_id', 'contest_age_groups', 'selected_diploma_background_path', 'selected_cover_path', 'is_permanent', 'is_paid', 'entry_fee', 'application_limit']),
             [
-                'organization_id' => $organization->id,
-                'created_by'      => $request->user()->id,
-                'status'          => ContestStatus::Draft->value,
-                'is_permanent'    => $request->boolean('is_permanent'),
+                'organization_id'   => $organization->id,
+                'created_by'        => $request->user()->id,
+                'status'            => ContestStatus::Draft->value,
+                'is_permanent'      => $request->boolean('is_permanent'),
+                'is_paid'           => $isPaid,
+                'entry_fee'         => $isPaid ? (int) $request->input('entry_fee') : null,
+                'application_limit' => $isPaid
+                    ? max(0, (int) $request->input('application_limit', 0))
+                    : min(50, max(1, (int) $request->input('application_limit', \App\Models\SiteSettings::get(\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT, '50')))),
             ]
         );
 
@@ -222,10 +230,11 @@ class ContestController extends Controller
         $user     = request()->user();
         $org      = $contest->organization;
         $orgsData = collect([[
-            'id'        => $org->id,
-            'name'      => $org->name,
-            'canManage' => $user->isAdmin() || $user->canInOrg('manage', $org),
-            'reps'      => $org->representatives->map(fn ($rep) => [
+            'id'            => $org->id,
+            'name'          => $org->name,
+            'canManage'     => $user->isAdmin() || $user->canInOrg('manage', $org),
+            'can_host_paid' => $org->canHostPaidContests(),
+            'reps'          => $org->representatives->map(fn ($rep) => [
                 'id'   => $rep->id,
                 'name' => $rep->full_name,
             ])->values()->toArray(),

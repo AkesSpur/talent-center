@@ -20,7 +20,9 @@ class SiteSettings extends Model
     const SITE_NAME          = 'site_name';
     const SITE_NAME_COLOR    = 'site_name_color';
     const SITE_SUBTITLE      = 'site_subtitle';
-    const SITE_SUBTITLE_COLOR = 'site_subtitle_color';
+    const SITE_SUBTITLE_COLOR        = 'site_subtitle_color';
+    const OFFER_DOCUMENT             = 'offer_document_path';
+    const DEFAULT_APPLICATION_LIMIT  = 'default_application_limit';
 
     public static function get(string $key, ?string $default = null): ?string
     {

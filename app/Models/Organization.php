@@ -31,14 +31,21 @@ class Organization extends Model
         'verified_by',
         'verified_at',
         'is_blocked',
+        'bank_name',
+        'bank_bik',
+        'bank_account',
+        'correspondent_account',
+        'kpp',
+        'offer_accepted',
     ];
 
     protected function casts(): array
     {
         return [
-            'status' => OrganizationStatus::class,
-            'verified_at' => 'datetime',
-            'is_blocked' => 'boolean',
+            'status'         => OrganizationStatus::class,
+            'verified_at'    => 'datetime',
+            'is_blocked'     => 'boolean',
+            'offer_accepted' => 'boolean',
         ];
     }
 
@@ -74,6 +81,20 @@ class Organization extends Model
     public function isBlocked(): bool
     {
         return $this->is_blocked;
+    }
+
+    public function hasCompleteBankDetails(): bool
+    {
+        return ! empty($this->bank_name)
+            && ! empty($this->bank_bik)
+            && ! empty($this->bank_account)
+            && ! empty($this->correspondent_account)
+            && ! empty($this->kpp);
+    }
+
+    public function canHostPaidContests(): bool
+    {
+        return $this->hasCompleteBankDetails() && $this->offer_accepted;
     }
 
     // ── Relationships ──────────────────────────────────

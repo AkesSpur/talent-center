@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\DiplomaBackgroundController as AdminDiplomaBackgr
 use App\Http\Controllers\Admin\PlatformCategoryController;
 use App\Http\Controllers\Admin\SiteSettingsController as AdminSiteSettingsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\PayoutRegistryController as AdminPayoutRegistryController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\DashboardController;
@@ -22,6 +24,8 @@ use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PayoutRegistryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RepresentativeController;
 use App\Http\Controllers\Support\ContestController as SupportContestController;
@@ -36,6 +40,9 @@ Route::get('/', HomeController::class)->name('home');
 
 // ── Privacy policy (public) ──────────────────────────
 Route::get('/privacy-policy', [AdminSiteSettingsController::class, 'privacyPolicy'])->name('privacy-policy');
+
+// ── T-Bank payment callback (public, CSRF-excluded via bootstrap/app.php) ──
+Route::post('/payments/callback', [PaymentController::class, 'callback'])->name('payments.callback');
 
 // ── Diploma verification (public) ────────────────────
 Route::get('/diplomvtrifi', [DiplomaVerifyController::class, 'index'])->name('diplomvtrifi.search');
@@ -118,6 +125,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ── Diplomas ──────────────────────────────────────────
     Route::get('/dashboard/diplomas', [DiplomaController::class, 'index'])->name('dashboard.diplomas');
     Route::get('/diplomas/{diploma}/download', [DiplomaController::class, 'download'])->name('diplomas.download');
+
+    // ── Payments ──────────────────────────────────────────
+    Route::post('/applications/{application}/pay', [PaymentController::class, 'initiate'])->name('payments.initiate');
+    Route::get('/payments/success', [PaymentController::class, 'success'])->name('payments.success');
+    Route::get('/payments/fail', [PaymentController::class, 'fail'])->name('payments.fail');
+
+    // ── Org payout registry ───────────────────────────────
+    Route::get('/organizations/{organization}/payouts', [PayoutRegistryController::class, 'orgIndex'])->name('organizations.payouts.index');
+    Route::post('/organizations/{organization}/payouts/{payoutRegistry}/confirm', [PayoutRegistryController::class, 'confirm'])->name('organizations.payouts.confirm');
 });
 
 // ── Admin ───────────────────────────────────────────────
@@ -178,6 +194,15 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     // Action logs
     Route::get('/action-logs', [ActionLogController::class, 'index'])->name('action-logs.index');
 
+    // Payments (admin view)
+    Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+
+    // Payout registries
+    Route::get('/payout-registries', [AdminPayoutRegistryController::class, 'index'])->name('payout-registries.index');
+    Route::post('/payout-registries', [AdminPayoutRegistryController::class, 'store'])->name('payout-registries.store');
+    Route::put('/payout-registries/{payoutRegistry}', [AdminPayoutRegistryController::class, 'update'])->name('payout-registries.update');
+    Route::post('/payout-registries/{payoutRegistry}/document', [AdminPayoutRegistryController::class, 'uploadDocument'])->name('payout-registries.upload-document');
+
     // Site settings
     Route::get('/settings', [AdminSiteSettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/contacts', [AdminSiteSettingsController::class, 'updateContacts'])->name('settings.contacts');
@@ -188,6 +213,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/settings/favicon', [AdminSiteSettingsController::class, 'updateFavicon'])->name('settings.favicon');
     Route::delete('/settings/favicon', [AdminSiteSettingsController::class, 'deleteFavicon'])->name('settings.favicon.delete');
     Route::post('/settings/brand-text', [AdminSiteSettingsController::class, 'updateBrandText'])->name('settings.brand-text');
+    Route::post('/settings/offer-document', [AdminSiteSettingsController::class, 'updateOfferDocument'])->name('settings.offer-document');
+    Route::delete('/settings/offer-document', [AdminSiteSettingsController::class, 'deleteOfferDocument'])->name('settings.offer-document.delete');
+    Route::post('/settings/contest-settings', [AdminSiteSettingsController::class, 'updateContestSettings'])->name('settings.contest-settings');
 });
 
 // ── Support ─────────────────────────────────────────────

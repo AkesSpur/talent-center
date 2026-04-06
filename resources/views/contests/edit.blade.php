@@ -105,6 +105,69 @@
                             <p class="text-xs text-warm-gray mt-1">Ссылка на документ в облачном хранилище или на сайте. Необязательное поле.</p>
                             <x-input-error class="mt-2" :messages="$errors->get('regulations_url')" />
                         </div>
+
+                        {{-- Paid contest toggle + entry fee + application limit --}}
+                        <div
+                            x-data="{
+                                isPaid: {{ old('is_paid', $contest->is_paid) ? 'true' : 'false' }},
+                                entryFee: '{{ old('entry_fee', $contest->entry_fee) }}',
+                                applicationLimit: '{{ old('application_limit', $contest->application_limit) }}',
+                                orgCanHostPaid: {{ $contest->organization->canHostPaidContests() ? 'true' : 'false' }}
+                            }"
+                            class="p-4 border border-primary/15 rounded-xl bg-cream/30 space-y-4"
+                        >
+                            {{-- Row: checkbox | entry fee | limit --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+
+                                {{-- Paid checkbox --}}
+                                <div>
+                                    <p class="block text-sm font-medium text-dark mb-2">Тип конкурса</p>
+                                    <label class="inline-flex items-center gap-2 cursor-pointer select-none"
+                                        :class="{ 'opacity-50 cursor-not-allowed': !orgCanHostPaid }">
+                                        <input type="checkbox" name="is_paid" value="1"
+                                            x-model="isPaid"
+                                            :disabled="!orgCanHostPaid"
+                                            class="rounded border-primary/30 text-primary focus:ring-primary/30 w-4 h-4">
+                                        <span class="text-sm font-medium text-dark">Платный конкурс</span>
+                                    </label>
+                                    <div x-show="!orgCanHostPaid" class="mt-1.5 text-xs text-warm-gray leading-snug">
+                                        Заполните реквизиты организации и примите оферту.
+                                        <a href="{{ route('organizations.edit', $contest->organization) }}" class="text-primary underline">Редактировать организацию</a>.
+                                    </div>
+                                </div>
+
+                                {{-- Entry fee (visible when paid) --}}
+                                <div x-show="isPaid" x-cloak>
+                                    <label for="entry_fee" class="block text-sm font-medium text-dark mb-2">
+                                        Сумма оргвзноса, ₽ <span class="text-red-500">*</span>
+                                    </label>
+                                    <input id="entry_fee" name="entry_fee" type="number"
+                                        x-model="entryFee"
+                                        min="100" max="100000" step="1"
+                                        class="no-spinner w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white"
+                                        placeholder="500">
+                                    <p class="text-xs text-warm-gray mt-1">От 100 до 100 000 ₽, без копеек.</p>
+                                    @error('entry_fee')
+                                        <p class="mt-1 text-xs text-red-600"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                {{-- Spacer when not paid --}}
+                                <div x-show="!isPaid"></div>
+
+                                {{-- Application limit --}}
+                                <div>
+                                    <label for="application_limit" class="block text-sm font-medium text-dark mb-2">Лимит заявок</label>
+                                    <input id="application_limit" name="application_limit" type="number"
+                                        x-model="applicationLimit"
+                                        :min="isPaid ? 0 : 1"
+                                        :max="isPaid ? 10000 : 50"
+                                        class="no-spinner w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white text-sm">
+                                    <p class="text-xs text-warm-gray mt-1" x-show="!isPaid">1–50 заявок</p>
+                                    <p class="text-xs text-warm-gray mt-1" x-show="isPaid">0 = без ограничений</p>
+                                    <x-input-error class="mt-1" :messages="$errors->get('application_limit')" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- Section 2: Dates --}}

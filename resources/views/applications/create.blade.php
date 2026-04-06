@@ -374,6 +374,22 @@
                             </div>
                         </label>
 
+                        {{-- Org fee block (paid contests only) --}}
+                        @if($contest->is_paid)
+                            <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                                        <i class="fas fa-ruble-sign text-amber-600 text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-dark">Организационный взнос</p>
+                                        <p class="text-sm text-dark">Сумма оргвзноса: <span class="font-bold">{{ number_format($contest->entry_fee, 0, '.', ' ') }} рублей</span></p>
+                                        <p class="text-xs text-warm-gray mt-0.5">После нажатия кнопки вы будете перенаправлены на страницу оплаты.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                         {{-- Submit --}}
                         <div class="flex gap-3 pt-2">
                             <button type="submit"
@@ -383,7 +399,7 @@
                                     : 'bg-warm-gray/10 text-warm-gray/50 cursor-not-allowed border border-warm-gray/15'"
                                 class="flex-1 py-3 font-semibold rounded-lg transition-all duration-300 text-sm">
                                 <i class="fas fa-paper-plane mr-2"
-                                   :class="canSubmit ? '' : 'opacity-40'"></i>Подать заявку
+                                   :class="canSubmit ? '' : 'opacity-40'"></i>@if($contest->is_paid)Подать заявку и оплатить оргвзнос {{ number_format($contest->entry_fee, 0, '.', ' ') }} рублей@else Подать заявку@endif
                             </button>
                             <a href="{{ route('contests.show', $contest) }}"
                                 class="px-6 py-3 border border-primary/30 text-primary font-medium rounded-lg hover:bg-primary/5 transition-colors text-sm whitespace-nowrap">

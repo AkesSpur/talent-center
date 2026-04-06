@@ -23,6 +23,13 @@ class UpdateContestRequest extends FormRequest
             'rules'                     => ['nullable', 'string', 'max:20000'],
             'regulations_url'           => ['nullable', 'url', 'max:2048'],
             'is_permanent'              => ['nullable', 'boolean'],
+            'is_paid'                   => ['nullable', 'boolean'],
+            'entry_fee'                 => ['nullable', 'required_if:is_paid,1', 'integer', 'min:100', 'max:100000'],
+            'application_limit'         => [
+                'nullable', 'integer',
+                $this->boolean('is_paid') ? 'min:0' : 'min:1',
+                $this->boolean('is_paid') ? 'max:10000' : 'max:50',
+            ],
             'applications_start_at'     => ['required', 'date'],
             'applications_end_at'       => ['nullable', 'required_unless:is_permanent,1', 'date', 'after_or_equal:applications_start_at'],
             'evaluation_end_at'         => ['nullable', 'required_unless:is_permanent,1', 'date', 'after_or_equal:applications_end_at'],

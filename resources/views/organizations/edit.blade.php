@@ -125,6 +125,103 @@
                         <x-input-error class="mt-2" :messages="$errors->get('city')" />
                     </div>
 
+                    {{-- Bank Details & Offer --}}
+                    <div
+                        x-data="{
+                            bankName: '{{ old('bank_name', $organization->bank_name) }}',
+                            bankBik: '{{ old('bank_bik', $organization->bank_bik) }}',
+                            bankAccount: '{{ old('bank_account', $organization->bank_account) }}',
+                            correspondentAccount: '{{ old('correspondent_account', $organization->correspondent_account) }}',
+                            kpp: '{{ old('kpp', $organization->kpp) }}',
+                            get allFilled() {
+                                return this.bankName.trim() !== ''
+                                    && this.bankBik.trim() !== ''
+                                    && this.bankAccount.trim() !== ''
+                                    && this.correspondentAccount.trim() !== ''
+                                    && this.kpp.trim() !== '';
+                            }
+                        }"
+                        class="border border-primary/20 rounded-xl p-5 space-y-4"
+                    >
+                        <h3 class="font-semibold text-dark text-base">Реквизиты организации</h3>
+                        <p class="text-sm text-warm-gray -mt-2">Заполните реквизиты, чтобы иметь возможность проводить платные конкурсы.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label for="bank_name" class="block text-sm font-medium text-dark mb-2">Название банка</label>
+                                <input id="bank_name" name="bank_name" type="text"
+                                    value="{{ old('bank_name', $organization->bank_name) }}"
+                                    x-model="bankName"
+                                    class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                    placeholder="ПАО «Сбербанк»" />
+                                <x-input-error class="mt-2" :messages="$errors->get('bank_name')" />
+                            </div>
+                            <div>
+                                <label for="bank_bik" class="block text-sm font-medium text-dark mb-2">БИК</label>
+                                <input id="bank_bik" name="bank_bik" type="text"
+                                    value="{{ old('bank_bik', $organization->bank_bik) }}"
+                                    x-model="bankBik"
+                                    class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                    placeholder="044525225" maxlength="9" />
+                                <x-input-error class="mt-2" :messages="$errors->get('bank_bik')" />
+                            </div>
+                            <div>
+                                <label for="kpp" class="block text-sm font-medium text-dark mb-2">КПП</label>
+                                <input id="kpp" name="kpp" type="text"
+                                    value="{{ old('kpp', $organization->kpp) }}"
+                                    x-model="kpp"
+                                    class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                    placeholder="773601001" maxlength="9" />
+                                <x-input-error class="mt-2" :messages="$errors->get('kpp')" />
+                            </div>
+                            <div>
+                                <label for="bank_account" class="block text-sm font-medium text-dark mb-2">Расчётный счёт</label>
+                                <input id="bank_account" name="bank_account" type="text"
+                                    value="{{ old('bank_account', $organization->bank_account) }}"
+                                    x-model="bankAccount"
+                                    class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                    placeholder="40702810000000000000" maxlength="20" />
+                                <x-input-error class="mt-2" :messages="$errors->get('bank_account')" />
+                            </div>
+                            <div>
+                                <label for="correspondent_account" class="block text-sm font-medium text-dark mb-2">Корреспондентский счёт</label>
+                                <input id="correspondent_account" name="correspondent_account" type="text"
+                                    value="{{ old('correspondent_account', $organization->correspondent_account) }}"
+                                    x-model="correspondentAccount"
+                                    class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                    placeholder="30101810400000000225" maxlength="20" />
+                                <x-input-error class="mt-2" :messages="$errors->get('correspondent_account')" />
+                            </div>
+                        </div>
+
+                        {{-- Offer acceptance checkbox --}}
+                        <div class="pt-2">
+                            <label class="flex items-start gap-3 cursor-pointer" :class="{ 'opacity-50 cursor-not-allowed': !allFilled }">
+                                <input type="checkbox" name="offer_accepted" value="1"
+                                    :disabled="!allFilled"
+                                    {{ old('offer_accepted', $organization->offer_accepted) ? 'checked' : '' }}
+                                    class="mt-1 rounded border-gray-300 text-primary focus:ring-primary/30 w-4 h-4 shrink-0"
+                                    x-bind:checked="{{ $organization->offer_accepted ? 'true' : 'false' }}"
+                                >
+                                <span class="text-sm text-dark">
+                                    Ознакомлен и принимаю
+                                    @php $offerUrl = \App\Models\SiteSettings::get(\App\Models\SiteSettings::OFFER_DOCUMENT); @endphp
+                                    @if($offerUrl)
+                                        <a href="{{ asset('storage/' . $offerUrl) }}" target="_blank"
+                                            class="text-primary underline hover:text-primary/80">оферту</a>,
+                                    @else
+                                        <span class="text-primary">оферту</span>,
+                                    @endif
+                                    готов проводить конкурсы с оплатой оргвзносов
+                                </span>
+                            </label>
+                            <p x-show="!allFilled" class="mt-2 text-xs text-warm-gray">
+                                Чтобы принять оферту, необходимо заполнить все поля реквизитов выше.
+                            </p>
+                            <x-input-error class="mt-2" :messages="$errors->get('offer_accepted')" />
+                        </div>
+                    </div>
+
                     <div class="flex gap-4">
                         <button type="submit" class="px-6 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
                             Сохранить изменения
