@@ -155,4 +155,14 @@ class TBankService
     {
         return 'app-' . $application->id . '-' . Str::random(6);
     }
+
+    /**
+     * Expose the resolved password for testing (allows tests to compute expected tokens
+     * using the same source value, avoiding config resolution differences between
+     * test bootstrap and service construction).
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
 }

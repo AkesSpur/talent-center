@@ -7,13 +7,16 @@ namespace App\Http\Controllers;
 use App\Enums\ContestStatus;
 use App\Http\Requests\StoreContestRequest;
 use App\Http\Requests\UpdateContestRequest;
+use App\Models\AgeGroup;
 use App\Models\Contest;
+use App\Models\ContestCategory;
 use App\Models\ContestCover;
 use App\Models\DiplomaBackground;
 use App\Models\Organization;
 use App\Models\PlatformCategory;
 use App\Services\ActionLogService;
 use App\Traits\HandlesImages;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -174,18 +177,19 @@ class ContestController extends Controller
             $data['cover_image'] = $request->input('selected_cover_path');
         }
 
-        $contest = DB::transaction(function () use ($data, $request) {
-            $contest = Contest::create($data);
+        $contest = $this->withDbRetry(3, function () use ($data, $request) {
+            return DB::transaction(function () use ($data, $request) {
+                $contest = Contest::create($data);
 
-            $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
-            $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
-            $this->syncJuries($contest, $request->input('juries', []));
+                $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
+                $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
+                $this->syncJuries($contest, $request->input('juries', []));
 
-            // Determine and apply correct status based on dates
-            $contest->status = $contest->determineCurrentStatus();
-            $contest->save();
+                $contest->status = $contest->determineCurrentStatus();
+                $contest->save();
 
-            return $contest;
+                return $contest;
+            });
         });
 
         ActionLogService::log('contest.created', $contest, [
@@ -324,22 +328,23 @@ class ContestController extends Controller
             $data['cover_image'] = $request->input('selected_cover_path');
         }
 
-        DB::transaction(function () use ($contest, $data, $request) {
-            $contest->update($data);
+        $this->withDbRetry(3, function () use ($contest, $data, $request) {
+            DB::transaction(function () use ($contest, $data, $request) {
+                $contest->update($data);
 
-            $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
-            $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
-            $this->syncJuries($contest, $request->input('juries', []));
+                $categoryModels = $this->syncCategories($contest, $request->input('categories', []));
+                $this->syncAgeGroups($contest, $request->input('categories', []), $request->input('contest_age_groups', []), $categoryModels);
+                $this->syncJuries($contest, $request->input('juries', []));
 
-            // Re-evaluate status after date changes (only if not cancelled)
-            if (! $contest->isCancelled()) {
-                $contest->refresh();
-                $newStatus = $contest->determineCurrentStatus();
-                if ($contest->status !== $newStatus) {
-                    $contest->status = $newStatus;
-                    $contest->save();
+                if (! $contest->isCancelled()) {
+                    $contest->refresh();
+                    $newStatus = $contest->determineCurrentStatus();
+                    if ($contest->status !== $newStatus) {
+                        $contest->status = $newStatus;
+                        $contest->save();
+                    }
                 }
-            }
+            });
         });
 
         ActionLogService::log('contest.updated', $contest, [
@@ -369,22 +374,26 @@ class ContestController extends Controller
 
     /**
      * Sync contest categories: delete all existing, recreate from input array.
-     * Returns an index-mapped array of created ContestCategory models.
+     * Uses DB::table() directly to avoid Eloquent HasMany adding a redundant
+     * "AND contest_id IS NOT NULL" condition that can trigger MySQL error 1615
+     * on shared hosting servers with unstable metadata caches.
      *
      * @param  array<int, array{name: string, description?: string|null}>  $categories
-     * @return array<int, \App\Models\ContestCategory>
+     * @return array<int, ContestCategory>
      */
     private function syncCategories(Contest $contest, array $categories): array
     {
-        $contest->categories()->delete();
+        DB::table('contest_categories')->where('contest_id', $contest->id)->delete();
 
         $created = [];
         foreach ($categories as $index => $cat) {
             if (! empty($cat['name'])) {
-                $created[$index] = $contest->categories()->create([
+                $model = ContestCategory::create([
+                    'contest_id'  => $contest->id,
                     'name'        => $cat['name'],
                     'description' => $cat['description'] ?? null,
                 ]);
+                $created[$index] = $model;
             }
         }
 
@@ -392,21 +401,25 @@ class ContestController extends Controller
     }
 
     /**
-     * Sync age groups for a contest.
-     * Category-level age groups are cascaded via syncCategories delete.
-     * Contest-level age groups (no category) are handled separately.
+     * Sync age groups. Uses DB::table() for deletes to avoid MySQL 1615 on shared hosting.
+     * Category-level age groups cascade via the category delete above.
+     * Contest-level age groups (no category) are deleted and recreated explicitly.
      */
     private function syncAgeGroups(Contest $contest, array $categoriesInput, array $contestAgeGroupsInput, array $categoryModels): void
     {
-        // Delete contest-level age groups (category-level ones cascade via category delete)
-        $contest->contestLevelAgeGroups()->delete();
+        // Delete contest-level age groups only (category-level ones cascade from category delete)
+        DB::table('age_groups')
+            ->where('contest_id', $contest->id)
+            ->whereNull('contest_category_id')
+            ->delete();
 
         // Create category-level age groups
         foreach ($categoriesInput as $index => $cat) {
             if (isset($categoryModels[$index]) && ! empty($cat['age_groups'])) {
                 foreach ($cat['age_groups'] as $ag) {
                     if (! empty($ag['name'])) {
-                        $contest->ageGroups()->create([
+                        AgeGroup::create([
+                            'contest_id'          => $contest->id,
                             'contest_category_id' => $categoryModels[$index]->id,
                             'name'                => $ag['name'],
                             'min_age'             => ($ag['min_age'] ?? null) ?: null,
@@ -417,10 +430,11 @@ class ContestController extends Controller
             }
         }
 
-        // Create contest-level age groups (when no categories)
+        // Create contest-level age groups
         foreach ($contestAgeGroupsInput as $ag) {
             if (! empty($ag['name'])) {
-                $contest->ageGroups()->create([
+                AgeGroup::create([
+                    'contest_id'          => $contest->id,
                     'contest_category_id' => null,
                     'name'                => $ag['name'],
                     'min_age'             => ($ag['min_age'] ?? null) ?: null,
@@ -438,5 +452,37 @@ class ContestController extends Controller
     private function syncJuries(Contest $contest, array $juryIds): void
     {
         $contest->juries()->sync($juryIds);
+    }
+
+    /**
+     * Execute a callback, retrying on MySQL error 1615 (prepared statement needs re-prepare).
+     *
+     * Error 1615 occurs on shared MySQL servers (e.g. reg.ru) when the server's internal
+     * metadata/table-definition cache is flushed between a statement being compiled and
+     * executed. PDO::ATTR_EMULATE_PREPARES reduces but does not eliminate this on all hosts.
+     *
+     * Strategy: catch 1615, force a full DB reconnect to get a fresh PDO handle,
+     * wait briefly, then retry. The transaction is replayed from scratch each attempt,
+     * so all or nothing semantics are preserved.
+     */
+    private function withDbRetry(int $maxAttempts, \Closure $callback): mixed
+    {
+        $attempt = 0;
+        while (true) {
+            try {
+                return $callback();
+            } catch (QueryException $e) {
+                $attempt++;
+                $is1615 = str_contains($e->getMessage(), '1615');
+
+                if (! $is1615 || $attempt >= $maxAttempts) {
+                    throw $e;
+                }
+
+                // Reconnect to get a fresh PDO handle before retrying
+                DB::reconnect();
+                usleep(100_000 * $attempt); // 100ms first retry, 200ms second
+            }
+        }
     }
 }
