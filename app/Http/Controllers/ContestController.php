@@ -374,16 +374,26 @@ class ContestController extends Controller
 
     /**
      * Sync contest categories: delete all existing, recreate from input array.
-     * Uses DB::table() directly to avoid Eloquent HasMany adding a redundant
-     * "AND contest_id IS NOT NULL" condition that can trigger MySQL error 1615
-     * on shared hosting servers with unstable metadata caches.
+     *
+     * Uses DB::unprepared() for DELETE statements to permanently avoid MySQL error 1615
+     * ("Prepared statement needs to be re-prepared") on shared hosting (e.g. reg.ru).
+     *
+     * Root cause: the hosting provider runs ProxySQL or a similar connection pool in front
+     * of MySQL. Even with PDO::ATTR_EMULATE_PREPARES => true (which prevents PHP from
+     * sending PREPARE commands), the proxy re-converts queries to server-side prepared
+     * statements internally. When MySQL's table_open_cache is exhausted or refreshed, it
+     * invalidates those statements and returns 1615.
+     *
+     * DB::unprepared() sends a raw SQL string with NO parameter binding at any layer —
+     * PHP, proxy, or MySQL — making 1615 structurally impossible for these statements.
+     * The (int) cast on contest_id guarantees injection safety.
      *
      * @param  array<int, array{name: string, description?: string|null}>  $categories
      * @return array<int, ContestCategory>
      */
     private function syncCategories(Contest $contest, array $categories): array
     {
-        DB::table('contest_categories')->where('contest_id', $contest->id)->delete();
+        DB::unprepared('DELETE FROM contest_categories WHERE contest_id = ' . (int) $contest->id);
 
         $created = [];
         foreach ($categories as $index => $cat) {
@@ -401,17 +411,16 @@ class ContestController extends Controller
     }
 
     /**
-     * Sync age groups. Uses DB::table() for deletes to avoid MySQL 1615 on shared hosting.
-     * Category-level age groups cascade via the category delete above.
-     * Contest-level age groups (no category) are deleted and recreated explicitly.
+     * Sync age groups. See syncCategories() for full explanation of why DB::unprepared()
+     * is used instead of QueryBuilder for DELETE statements.
      */
     private function syncAgeGroups(Contest $contest, array $categoriesInput, array $contestAgeGroupsInput, array $categoryModels): void
     {
         // Delete contest-level age groups only (category-level ones cascade from category delete)
-        DB::table('age_groups')
-            ->where('contest_id', $contest->id)
-            ->whereNull('contest_category_id')
-            ->delete();
+        DB::unprepared(
+            'DELETE FROM age_groups WHERE contest_id = ' . (int) $contest->id .
+            ' AND contest_category_id IS NULL'
+        );
 
         // Create category-level age groups
         foreach ($categoriesInput as $index => $cat) {
@@ -445,13 +454,26 @@ class ContestController extends Controller
     }
 
     /**
-     * Sync contest jury members.
+     * Sync contest jury members using raw SQL to avoid 1615 on shared hosting.
+     * See syncCategories() for the full explanation.
      *
      * @param  array<int, int>  $juryIds
      */
     private function syncJuries(Contest $contest, array $juryIds): void
     {
-        $contest->juries()->sync($juryIds);
+        $contestId = (int) $contest->id;
+
+        // Delete existing jury assignments
+        DB::unprepared("DELETE FROM contest_juries WHERE contest_id = {$contestId}");
+
+        // Re-insert the requested jury members
+        if (! empty($juryIds)) {
+            $values = implode(', ', array_map(
+                fn (int $userId) => "({$contestId}, {$userId})",
+                array_map('intval', $juryIds)
+            ));
+            DB::unprepared("INSERT INTO contest_juries (contest_id, user_id) VALUES {$values}");
+        }
     }
 
     /**
