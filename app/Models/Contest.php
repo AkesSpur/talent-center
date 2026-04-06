@@ -25,6 +25,9 @@ class Contest extends Model
         'rules',
         'status',
         'is_permanent',
+        'is_paid',
+        'entry_fee',
+        'application_limit',
         'applications_start_at',
         'applications_end_at',
         'evaluation_end_at',
@@ -38,6 +41,7 @@ class Contest extends Model
         return [
             'status'                => ContestStatus::class,
             'is_permanent'          => 'boolean',
+            'is_paid'               => 'boolean',
             'applications_start_at' => 'datetime',
             'applications_end_at'   => 'datetime',
             'evaluation_end_at'     => 'datetime',
@@ -103,6 +107,27 @@ class Contest extends Model
         return (bool) $this->is_permanent;
     }
 
+    public function isPaid(): bool
+    {
+        return (bool) $this->is_paid;
+    }
+
+    public function hasApplicationLimit(): bool
+    {
+        return $this->application_limit > 0;
+    }
+
+    public function isApplicationLimitReached(): bool
+    {
+        if (! $this->hasApplicationLimit()) {
+            return false;
+        }
+
+        return $this->applications()
+            ->whereNotIn('status', ['payment_pending'])
+            ->count() >= $this->application_limit;
+    }
+
     // ── Relationships ──────────────────────────────────
 
     public function organization(): BelongsTo
@@ -143,5 +168,15 @@ class Contest extends Model
     public function contestLevelAgeGroups(): HasMany
     {
         return $this->hasMany(AgeGroup::class)->whereNull('contest_category_id');
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function payoutRegistry(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(PayoutRegistry::class);
     }
 }

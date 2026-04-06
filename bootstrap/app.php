@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'org.permission' => CheckOrgPermission::class,
             'verified.org' => EnsureOrgVerified::class,
         ]);
+
+        // Exclude T-Bank webhook from CSRF verification (bank sends POST without CSRF token)
+        $middleware->validateCsrfTokens(except: [
+            'payments/callback',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

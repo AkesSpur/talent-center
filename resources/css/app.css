@@ -39,4 +39,9 @@
     .rich-content .ql-align-center { text-align: center; }
     .rich-content .ql-align-right { text-align: right; }
     .rich-content .ql-align-justify { text-align: justify; }
+
+    /* Hide browser spinner arrows on number inputs */
+    .no-spinner { -moz-appearance: textfield; appearance: textfield; }
+    .no-spinner::-webkit-outer-spin-button,
+    .no-spinner::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 }

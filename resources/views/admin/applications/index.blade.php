@@ -136,7 +136,7 @@
                                         <td class="px-6 py-4 text-right">
                                             <a href="{{ route('admin.contests.applications', $application->contest) }}"
                                                 class="px-2.5 py-1.5 border border-primary/20 text-primary text-xs rounded-lg hover:bg-primary/5 transition-colors" title="Перейти к заявкам конкурса">
-                                                <i class="fas fa-inbox mr-1"></i>Конкурс
+                                                <i class="fas fa-inbox mr-1"></i>
                                             </a>
                                         </td>
                                     </tr>

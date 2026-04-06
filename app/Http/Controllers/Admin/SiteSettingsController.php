@@ -179,6 +179,62 @@ class SiteSettingsController extends Controller
             ->with('status', 'brand-text-saved');
     }
 
+    public function updateOfferDocument(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'offer_document' => ['required', 'file', 'mimes:pdf', 'max:10240'],
+        ], [
+            'offer_document.required' => 'Выберите PDF-файл.',
+            'offer_document.mimes'    => 'Файл должен быть в формате PDF.',
+            'offer_document.max'      => 'Файл не должен превышать 10 МБ.',
+        ]);
+
+        $existing = SiteSettings::get(SiteSettings::OFFER_DOCUMENT);
+        if ($existing && Storage::disk('public')->exists($existing)) {
+            Storage::disk('public')->delete($existing);
+        }
+
+        $path = $request->file('offer_document')->store('site', 'public');
+
+        SiteSettings::set(SiteSettings::OFFER_DOCUMENT, $path);
+        $this->clearSettingsCache();
+
+        return redirect()->route('admin.settings.index', ['tab' => 'privacy'])
+            ->with('status', 'offer-document-saved');
+    }
+
+    public function deleteOfferDocument(): RedirectResponse
+    {
+        $existing = SiteSettings::get(SiteSettings::OFFER_DOCUMENT);
+        if ($existing && Storage::disk('public')->exists($existing)) {
+            Storage::disk('public')->delete($existing);
+        }
+
+        SiteSettings::set(SiteSettings::OFFER_DOCUMENT, null);
+        $this->clearSettingsCache();
+
+        return redirect()->route('admin.settings.index', ['tab' => 'privacy'])
+            ->with('status', 'offer-document-deleted');
+    }
+
+    public function updateContestSettings(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'default_application_limit' => ['required', 'integer', 'min:1', 'max:50'],
+        ], [
+            'default_application_limit.required' => 'Укажите лимит заявок.',
+            'default_application_limit.integer'  => 'Лимит должен быть целым числом.',
+            'default_application_limit.min'       => 'Минимальное значение: 1.',
+            'default_application_limit.max'       => 'Максимальное значение: 50.',
+        ]);
+
+        SiteSettings::set(SiteSettings::DEFAULT_APPLICATION_LIMIT, (string) $request->input('default_application_limit'));
+        $this->clearSettingsCache();
+
+        return redirect()->route('admin.settings.index', ['tab' => 'app-settings'])
+            ->with('status', 'contest-settings-saved');
+    }
+
     public function privacyPolicy(): BinaryFileResponse
     {
         $path = SiteSettings::get(SiteSettings::PRIVACY_POLICY);

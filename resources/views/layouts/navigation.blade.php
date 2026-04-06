@@ -99,6 +99,12 @@
                             <x-dropdown-link :href="route('admin.applications.index')">
                                 <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.payments.index')">
+                                <i class="fas fa-credit-card mr-2 text-warm-gray w-5 text-center"></i> Платежи
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.payout-registries.index')">
+                                <i class="fas fa-file-invoice-dollar mr-2 text-warm-gray w-5 text-center"></i> Реестр выплат
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.platform-categories.index')">
                                 <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Жанры
                             </x-dropdown-link>
@@ -107,6 +113,9 @@
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.diploma-backgrounds.index')">
                                 <i class="fas fa-image mr-2 text-warm-gray w-5 text-center"></i> Фоны дипломов
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.action-logs.index')">
+                                <i class="fas fa-list-check mr-2 text-warm-gray w-5 text-center"></i> Журнал действий
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.settings.index')">
                                 <i class="fas fa-sliders mr-2 text-warm-gray w-5 text-center"></i> Общие настройки

@@ -6,14 +6,17 @@ namespace App\Http\Controllers;
 
 use App\Enums\ApplicationStatus;
 use App\Enums\FileType;
+use App\Enums\PaymentStatus;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
 use App\Models\Contest;
 use App\Models\Organization;
+use App\Models\Payment;
 use App\Models\SiteSettings;
 use App\Models\User;
 use App\Notifications\ApplicationSubmitted;
 use App\Services\ActionLogService;
+use App\Services\TBankService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -181,6 +184,12 @@ class ApplicationController extends Controller
                 ->with('error', 'Приём заявок на этот конкурс закрыт.');
         }
 
+        // Application limit check (0 = unlimited)
+        if ($contest->isApplicationLimitReached()) {
+            return redirect()->route('contests.show', $contest)
+                ->with('error', 'Достигнут лимит заявок на этот конкурс.');
+        }
+
         $submittedForUserId = $request->filled('submitted_for_user_id')
             ? (int) $request->input('submitted_for_user_id')
             : $request->user()->id;
@@ -195,12 +204,16 @@ class ApplicationController extends Controller
                 ->with('error', 'Заявка от этого участника уже была подана на данный конкурс.');
         }
 
+        $initialStatus = $contest->is_paid
+            ? ApplicationStatus::PaymentPending->value
+            : 'new';
+
         $data = [
             'contest_id'   => $contest->id,
             'category_id'  => $request->input('category_id') ?: null,
             'age_group_id' => $request->input('age_group_id') ?: null,
             'user_id'      => $submittedForUserId,
-            'status'       => 'new',
+            'status'       => $initialStatus,
             'teacher_name' => $request->input('teacher_name'),
         ];
 
@@ -226,7 +239,43 @@ class ApplicationController extends Controller
             'user_id'    => $submittedForUserId,
         ]);
 
-        // Notify the applicant of successful submission
+        // Paid contest — initiate T-Bank payment
+        if ($contest->is_paid) {
+            $tbank = app(TBankService::class);
+
+            // Create payment record with Pending status — updated to Accepted by webhook on confirmation
+            $orderId = $tbank->makeOrderId($application);
+            $payment = Payment::create([
+                'application_id' => $application->id,
+                'contest_id'     => $contest->id,
+                'user_id'        => $submittedForUserId,
+                'tbank_order_id' => $orderId,
+                'amount'         => $contest->entry_fee,
+                'status'         => PaymentStatus::Pending->value,
+            ]);
+
+            try {
+                $application->load('contest'); // ensure relationship loaded for TBankService
+                $result = $tbank->initPayment($application, $orderId);
+
+                $payment->update(['tbank_payment_id' => $result['PaymentId']]);
+
+                return redirect()->away($result['PaymentURL']);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('T-Bank payment init failed', [
+                    'application_id' => $application->id,
+                    'contest_id'     => $contest->id,
+                    'order_id'       => $orderId,
+                    'error'          => $e->getMessage(),
+                    'trace'          => $e->getTraceAsString(),
+                ]);
+
+                return redirect()->route('dashboard.applications')
+                    ->with('warning', 'Заявка создана, но платёж не удалось инициировать: ' . $e->getMessage() . '. Повторите оплату из раздела «Мои заявки».');
+            }
+        }
+
+        // Free contest — notify and redirect
         $application->load('contest');
         $submittedForUser = User::find($submittedForUserId);
         if ($submittedForUser && $submittedForUser->email_notifications) {

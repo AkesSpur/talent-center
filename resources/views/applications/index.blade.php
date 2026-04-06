@@ -58,7 +58,7 @@
                                 <tbody class="divide-y divide-gold/10">
                                     @foreach($applications as $application)
                                         @php
-                                            $isActive  = in_array($application->status->value, ['new', 'participant']);
+                                            $isActive  = in_array($application->status->value, ['new', 'participant', 'payment_pending']);
                                             $isVictory = in_array($application->status->value, ['place_1', 'place_2', 'place_3']);
                                         @endphp
                                         <tr class="hover:bg-cream/50 transition-colors"
@@ -90,7 +90,15 @@
                                                 {{ $application->created_at->format('d.m.Y') }}
                                             </td>
                                             <td class="px-6 py-4 text-sm">
-                                                @if($application->external_link)
+                                                @if($application->status === \App\Enums\ApplicationStatus::PaymentPending)
+                                                    <form method="POST" action="{{ route('payments.initiate', $application) }}">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 gradient-gold text-dark text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap">
+                                                            <i class="fas fa-credit-card"></i>Оплатить
+                                                        </button>
+                                                    </form>
+                                                @elseif($application->external_link)
                                                     <a href="{{ $application->external_link }}" target="_blank" rel="noopener noreferrer"
                                                         class="text-primary hover:underline">
                                                         <i class="fas fa-external-link-alt mr-1"></i>Ссылка

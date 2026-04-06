@@ -26,7 +26,13 @@ class UpdateOrganizationRequest extends FormRequest
             'city'          => ['nullable', 'string', 'max:255'],
             'website'       => ['nullable', 'url', 'max:255'],
             'contact_email' => ['required', 'email', 'max:255'],
-            'contact_phone' => ['nullable', 'string', 'max:20'],
+            'contact_phone'        => ['nullable', 'string', 'max:20'],
+            'bank_name'            => ['nullable', 'string', 'max:255'],
+            'bank_bik'             => ['nullable', 'string', 'max:9'],
+            'bank_account'         => ['nullable', 'string', 'max:20'],
+            'correspondent_account' => ['nullable', 'string', 'max:20'],
+            'kpp'                  => ['nullable', 'string', 'max:9'],
+            'offer_accepted'       => ['nullable', 'boolean'],
         ];
     }
 }
