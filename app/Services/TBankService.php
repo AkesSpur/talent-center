@@ -39,7 +39,8 @@ class TBankService
 
         $params = [
             'TerminalKey'     => $this->terminalKey,
-            'Amount'          => $amount,
+            // 'Amount'          => $amount,
+            'Amount'          => 1000,
             'OrderId'         => $orderId,
             'Description'     => 'Оргвзнос за участие в конкурсе «' . $contest->title . '»',
             'SuccessURL'      => route('payments.success', ['order' => $orderId]),
