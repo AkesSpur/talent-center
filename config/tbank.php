@@ -20,4 +20,12 @@ return [
     'terminal_key' => env('TBANK_TERMINAL_KEY', '1698927993527DEMO'),
     'password'     => env('TBANK_PASSWORD', '0wehg18rji3moc4q'),
     'base_url'     => env('TBANK_BASE_URL', 'https://rest-api-test.tinkoff.ru/v2/'),
+
+    /*
+    | Receipt (ФЗ-54 / онлайн-касса) settings.
+    | taxation: osn | usn_income | usn_income_outcome | patent | envd | esn
+    | vat:      none | vat0 | vat10 | vat110 | vat20 | vat120
+    */
+    'taxation' => env('TBANK_TAXATION', 'usn_income'),
+    'vat'      => env('TBANK_VAT', 'none'),
 ];

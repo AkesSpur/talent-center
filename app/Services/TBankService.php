@@ -37,14 +37,35 @@ class TBankService
         $amount  = $contest->entry_fee * 100; // T-Bank requires kopecks
         $orderId = $orderId ?? $this->makeOrderId($application);
 
+        $itemName = mb_substr(
+            'Оргвзнос за участие в конкурсе «' . $contest->title . '»',
+            0,
+            128
+        );
+
         $params = [
             'TerminalKey'     => $this->terminalKey,
             'Amount'          => $amount,
             'OrderId'         => $orderId,
-            'Description'     => 'Оргвзнос за участие в конкурсе «' . $contest->title . '»',
+            'Description'     => $itemName,
             'SuccessURL'      => route('payments.success', ['order' => $orderId]),
             'FailURL'         => route('payments.fail', ['order' => $orderId]),
             'NotificationURL' => route('payments.callback'),
+            'Receipt'         => [
+                'Email'    => $application->user->email,
+                'Taxation' => (string) config('tbank.taxation'),
+                'Items'    => [
+                    [
+                        'Name'          => $itemName,
+                        'Price'         => $amount,
+                        'Quantity'      => 1.00,
+                        'Amount'        => $amount,
+                        'Tax'           => (string) config('tbank.vat'),
+                        'PaymentMethod' => 'full_payment',
+                        'PaymentObject' => 'service',
+                    ],
+                ],
+            ],
         ];
 
         $params['Token'] = $this->generateToken($params);
