@@ -55,16 +55,9 @@ class TBankService
             'params'   => array_diff_key($params, ['Token' => '']),
         ]);
 
-        // $response = Http::post($this->baseUrl . 'Init', $params);
-        $response = Http::withHeaders([
-    'Accept'       => 'application/json',
-    'Content-Type' => 'application/json',
-    'User-Agent'   => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-])->post($this->baseUrl . 'Init', $params);
+        $response = Http::post($this->baseUrl . 'Init', $params);
         $data     = $response->json() ?? [];
 
-        $myIp = \Illuminate\Support\Facades\Http::get('https://api.ipify.org')->body();
-\Illuminate\Support\Facades\Log::info('My PHP IP is: ' . $myIp);
 
         Log::info('T-Bank Init response', [
             'http_status' => $response->status(),
@@ -101,51 +94,51 @@ class TBankService
      * Algorithm: sort all params alphabetically by key (excluding Token, Receipt, DATA),
      * concatenate their values, append the terminal password, then SHA-256.
      */
-    // public function generateToken(array $params): string
-    // {
-    //     $excluded = ['Token', 'Receipt', 'DATA'];
-
-    //     $filtered = array_filter(
-    //         $params,
-    //         fn ($key) => ! in_array($key, $excluded, true),
-    //         ARRAY_FILTER_USE_KEY
-    //     );
-
-    //     ksort($filtered);
-
-    //     $values = implode('', $filtered);
-    //     $values .= $this->password;
-
-    //     return hash('sha256', $values);
-    // }
-
-    /**
-     * Generate the SHA-256 token required by T-Bank.
-     * Algorithm: Add Password, exclude certain keys, sort alphabetically, concatenate, and hash.
-     */
     public function generateToken(array $params): string
     {
         $excluded = ['Token', 'Receipt', 'DATA'];
 
-        // 1. Filter out excluded keys
         $filtered = array_filter(
             $params,
             fn ($key) => ! in_array($key, $excluded, true),
             ARRAY_FILTER_USE_KEY
         );
 
-        // 2. Add the Password to the array BEFORE sorting
-        $filtered['Password'] = $this->password;
-
-        // 3. Sort alphabetically by key
         ksort($filtered);
 
-        // 4. Concatenate all values
         $values = implode('', $filtered);
+        $values .= $this->password;
 
-        // 5. Return the SHA-256 hash
         return hash('sha256', $values);
     }
+
+    /**
+     * Generate the SHA-256 token required by T-Bank.
+     * Algorithm: Add Password, exclude certain keys, sort alphabetically, concatenate, and hash.
+     */
+    // public function generateToken(array $params): string
+    // {
+    //     $excluded = ['Token', 'Receipt', 'DATA'];
+
+    //     // 1. Filter out excluded keys
+    //     $filtered = array_filter(
+    //         $params,
+    //         fn ($key) => ! in_array($key, $excluded, true),
+    //         ARRAY_FILTER_USE_KEY
+    //     );
+
+    //     // 2. Add the Password to the array BEFORE sorting
+    //     $filtered['Password'] = $this->password;
+
+    //     // 3. Sort alphabetically by key
+    //     ksort($filtered);
+
+    //     // 4. Concatenate all values
+    //     $values = implode('', $filtered);
+
+    //     // 5. Return the SHA-256 hash
+    //     return hash('sha256', $values);
+    // }
 
     /**
      * Generate a unique order ID for a given application.
