@@ -45,7 +45,8 @@ class TBankService
 
         $params = [
             'TerminalKey'     => $this->terminalKey,
-            'Amount'          => $amount,
+            'Amount'          => 1000,
+            // 'Amount'          => $amount,
             'OrderId'         => $orderId,
             'Description'     => $itemName,
             'SuccessURL'      => route('payments.success', ['order' => $orderId]),
