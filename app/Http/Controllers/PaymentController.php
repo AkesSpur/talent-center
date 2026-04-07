@@ -80,7 +80,18 @@ class PaymentController extends Controller
     {
         $data = $request->all();
 
+        // Log every incoming webhook so we can always diagnose failures
+        Log::info('T-Bank webhook received', [
+            'ip'      => $request->ip(),
+            'payload' => $data,
+        ]);
+
         if (! $this->tbank->verifyWebhookToken($data)) {
+            Log::error('T-Bank webhook: invalid token signature', [
+                'payload'          => $data,
+                'expected_token'   => $this->tbank->generateToken($data),
+                'received_token'   => $data['Token'] ?? null,
+            ]);
             return response()->json(['ok' => false, 'error' => 'Invalid token'], 400);
         }
 
@@ -88,14 +99,21 @@ class PaymentController extends Controller
         $status         = (string) ($data['Status'] ?? '');
         $orderId        = (string) ($data['OrderId'] ?? '');
 
+        Log::info('T-Bank webhook: verified', [
+            'OrderId'   => $orderId,
+            'Status'    => $status,
+            'PaymentId' => $tbankPaymentId,
+            'Amount'    => $data['Amount'] ?? null,
+        ]);
+
         $payment = Payment::where('tbank_order_id', $orderId)->first();
 
         if (! $payment) {
-            return response()->json(['ok' => true]); // Unknown order — silently accept
+            Log::warning('T-Bank webhook: no payment found for order', ['OrderId' => $orderId]);
+            return response()->json(['ok' => true]);
         }
 
         if ($status === 'CONFIRMED') {
-            // Payment successful — activate the application
             $payment->update([
                 'tbank_payment_id' => $tbankPaymentId,
                 'status'           => PaymentStatus::Accepted->value,
@@ -104,14 +122,31 @@ class PaymentController extends Controller
 
             $payment->application->update(['status' => ApplicationStatus::New->value]);
 
+            Log::info('T-Bank webhook: payment confirmed, application activated', [
+                'payment_id'     => $payment->id,
+                'application_id' => $payment->application_id,
+                'amount'         => $payment->amount,
+            ]);
+
             ActionLogService::log('payment.confirmed', $payment, [
                 'contest_id'     => $payment->contest_id,
                 'user_id'        => $payment->user_id,
                 'amount'         => $payment->amount,
                 'tbank_order_id' => $orderId,
             ]);
+        } else {
+            // CANCELED, REJECTED, DEADLINE_EXPIRED, etc. — log so we know what happened
+            Log::info('T-Bank webhook: payment not confirmed', [
+                'payment_id' => $payment->id,
+                'status'     => $status,
+                'order_id'   => $orderId,
+            ]);
+
+            $payment->update([
+                'tbank_payment_id' => $tbankPaymentId,
+                'receipt_data'     => $data,
+            ]);
         }
-        // CANCELED / DEADLINE_EXPIRED: application stays payment_pending, user can retry
 
         return response()->json(['ok' => true]);
     }

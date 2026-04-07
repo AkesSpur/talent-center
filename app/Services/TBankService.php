@@ -113,34 +113,6 @@ class TBankService
     }
 
     /**
-     * Generate the SHA-256 token required by T-Bank.
-     * Algorithm: Add Password, exclude certain keys, sort alphabetically, concatenate, and hash.
-     */
-    // public function generateToken(array $params): string
-    // {
-    //     $excluded = ['Token', 'Receipt', 'DATA'];
-
-    //     // 1. Filter out excluded keys
-    //     $filtered = array_filter(
-    //         $params,
-    //         fn ($key) => ! in_array($key, $excluded, true),
-    //         ARRAY_FILTER_USE_KEY
-    //     );
-
-    //     // 2. Add the Password to the array BEFORE sorting
-    //     $filtered['Password'] = $this->password;
-
-    //     // 3. Sort alphabetically by key
-    //     ksort($filtered);
-
-    //     // 4. Concatenate all values
-    //     $values = implode('', $filtered);
-
-    //     // 5. Return the SHA-256 hash
-    //     return hash('sha256', $values);
-    // }
-
-    /**
      * Generate a unique order ID for a given application.
      * Format: app-{application_id}-{random_6_chars}
      */
