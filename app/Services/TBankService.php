@@ -58,9 +58,11 @@ class TBankService
                 'Items'    => [
                     [
                         'Name'          => $itemName,
-                        'Price'         => $amount,
+                        // 'Price'         => $amount,
+                        'Price'         => 1000,
                         'Quantity'      => 1.00,
-                        'Amount'        => $amount,
+                        'Amount'        => 1000,
+                        // 'Amount'        => $amount,
                         'Tax'           => (string) config('tbank.vat'),
                         'PaymentMethod' => 'full_payment',
                         'PaymentObject' => 'service',
