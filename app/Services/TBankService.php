@@ -106,7 +106,16 @@ class TBankService
 
         ksort($filtered);
 
-        $values = implode('', $filtered);
+        $parts = [];
+        foreach ($filtered as $value) {
+            if (is_bool($value)) {
+                $parts[] = $value ? 'true' : 'false';
+            } else {
+                $parts[] = (string) $value;
+            }
+        }
+
+        $values = implode('', $parts);
         $values .= $this->password;
 
         return hash('sha256', $values);
