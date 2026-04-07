@@ -158,13 +158,55 @@ class PaymentController extends Controller
     public function success(Request $request): View|RedirectResponse
     {
         $orderId = $request->query('order');
-        $payment = $orderId ? Payment::where('tbank_order_id', $orderId)->first() : null;
+        $payment = $orderId ? Payment::with('application')->where('tbank_order_id', $orderId)->first() : null;
 
-        if ($payment && $payment->status === PaymentStatus::Accepted) {
+        if (! $payment) {
+            return redirect()->route('dashboard.applications')
+                ->with('status', 'application-submitted');
+        }
+
+        // Already confirmed via webhook — show success page
+        if ($payment->status === PaymentStatus::Accepted) {
             return view('payments.success', compact('payment'));
         }
 
-        // If webhook hasn't fired yet, redirect to applications — it'll appear as new soon
+        // Webhook may not have fired (wrong notification password, timing, etc.)
+        // Poll T-Bank directly to get the authoritative status
+        if ($payment->tbank_payment_id) {
+            try {
+                $state = $this->tbank->getState($payment->tbank_payment_id);
+
+                if (($state['Status'] ?? '') === 'CONFIRMED') {
+                    $payment->update([
+                        'status'       => PaymentStatus::Accepted->value,
+                        'receipt_data' => $state,
+                    ]);
+
+                    $payment->application->update(['status' => ApplicationStatus::New->value]);
+
+                    Log::info('Payment confirmed via GetState fallback', [
+                        'payment_id'     => $payment->id,
+                        'application_id' => $payment->application_id,
+                    ]);
+
+                    ActionLogService::log('payment.confirmed', $payment, [
+                        'contest_id'     => $payment->contest_id,
+                        'user_id'        => $payment->user_id,
+                        'amount'         => $payment->amount,
+                        'tbank_order_id' => $orderId,
+                        'via'            => 'getstate_fallback',
+                    ]);
+
+                    return view('payments.success', compact('payment'));
+                }
+            } catch (\Throwable $e) {
+                Log::warning('GetState fallback failed', [
+                    'payment_id' => $payment->id,
+                    'error'      => $e->getMessage(),
+                ]);
+            }
+        }
+
         return redirect()->route('dashboard.applications')
             ->with('status', 'application-submitted');
     }

@@ -28,4 +28,10 @@ return [
     */
     'taxation' => env('TBANK_TAXATION', 'usn_income'),
     'vat'      => env('TBANK_VAT', 'none'),
+
+    /*
+    | T-Bank can use a separate password for webhook notification signatures.
+    | If not set, falls back to the main terminal password.
+    */
+    'notification_password' => env('TBANK_NOTIFICATION_PASSWORD', env('TBANK_PASSWORD')),
 ];

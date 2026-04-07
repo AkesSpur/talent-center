@@ -13,13 +13,15 @@ class TBankService
 {
     private string $terminalKey;
     private string $password;
+    private string $notificationPassword;
     private string $baseUrl;
 
     public function __construct()
     {
-        $this->terminalKey = (string) config('tbank.terminal_key');
-        $this->password    = (string) config('tbank.password');
-        $this->baseUrl     = rtrim((string) config('tbank.base_url'), '/') . '/';
+        $this->terminalKey          = (string) config('tbank.terminal_key');
+        $this->password             = (string) config('tbank.password');
+        $this->notificationPassword = (string) config('tbank.notification_password');
+        $this->baseUrl              = rtrim((string) config('tbank.base_url'), '/') . '/';
     }
 
     /**
@@ -103,14 +105,40 @@ class TBankService
 
     /**
      * Verify that a webhook notification from T-Bank is authentic.
-     * T-Bank signs notifications the same way we sign requests.
+     * Uses the notification password (may differ from the API password).
      */
     public function verifyWebhookToken(array $data): bool
     {
         $receivedToken = $data['Token'] ?? '';
-        $expected      = $this->generateToken($data);
+        $expected      = $this->generateToken($data, $this->notificationPassword);
 
         return hash_equals($expected, $receivedToken);
+    }
+
+    /**
+     * Query T-Bank for the current status of a payment.
+     * Used as a fallback when the webhook hasn't fired (e.g. wrong password).
+     *
+     * @return array{Status: string, Success: bool, Amount: int, PaymentId: string}
+     */
+    public function getState(string $paymentId): array
+    {
+        $params = [
+            'TerminalKey' => $this->terminalKey,
+            'PaymentId'   => $paymentId,
+        ];
+        $params['Token'] = $this->generateToken($params);
+
+        $response = Http::post($this->baseUrl . 'GetState', $params);
+        $data     = $response->json() ?? [];
+
+        Log::info('T-Bank GetState response', [
+            'PaymentId'   => $paymentId,
+            'http_status' => $response->status(),
+            'body'        => $data,
+        ]);
+
+        return $data;
     }
 
     /**
@@ -118,7 +146,7 @@ class TBankService
      * Algorithm: sort all params alphabetically by key (excluding Token, Receipt, DATA),
      * concatenate their values, append the terminal password, then SHA-256.
      */
-    public function generateToken(array $params): string
+    public function generateToken(array $params, ?string $password = null): string
     {
         $excluded = ['Token', 'Receipt', 'DATA'];
 
@@ -140,7 +168,7 @@ class TBankService
         }
 
         $values = implode('', $parts);
-        $values .= $this->password;
+        $values .= $password ?? $this->password;
 
         return hash('sha256', $values);
     }
