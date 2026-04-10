@@ -18,18 +18,6 @@
         </button>
     </div>
 
-    {{-- Flash messages --}}
-    @if(session('status') === 'payout-registry-created')
-        <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">Запись реестра создана.</div>
-    @elseif(session('status') === 'payout-registry-updated')
-        <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">Данные обновлены.</div>
-    @elseif(session('status') === 'payout-document-uploaded')
-        <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">Документ загружен.</div>
-    @endif
-    @if(session('error'))
-        <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{{ session('error') }}</div>
-    @endif
-
     {{-- Filters --}}
     <form method="GET" class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

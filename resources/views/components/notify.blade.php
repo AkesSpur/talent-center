@@ -34,6 +34,10 @@
         'application-evaluated'  => ['Оценка заявки сохранена', 'success'],
         'contest-finalized'      => ['Оценка завершена. Дипломы сформированы.', 'success'],
         'diplomas-regenerated'   => ['Дипломы успешно пересчитаны', 'success'],
+        // Payout registries
+        'payout-registry-created'  => ['Запись реестра выплат создана', 'success'],
+        'payout-registry-updated'  => ['Данные перечисления обновлены', 'success'],
+        'payout-document-uploaded' => ['Документ перечисления загружен', 'success'],
     ];
 
     if (session('status') && isset($statusMap[session('status')])) {
