@@ -190,7 +190,7 @@ class EvaluationController extends Controller
             abort(403);
         }
 
-        if (! $contest->isEvaluation()) {
+        if (! $contest->isEvaluation() && ! ($contest->isPermanent() && $contest->isAccepting())) {
             return redirect()->back()
                 ->with('error', 'Конкурс не находится в стадии оценки.');
         }

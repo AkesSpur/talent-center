@@ -34,7 +34,7 @@
                         </div>
                     </div>
 
-                    @if($contest->isEvaluation())
+                    @if($contest->isEvaluation() || ($contest->isPermanent() && $contest->isAccepting()))
                         <div class="shrink-0">
                             <button type="button" id="finalize-btn"
                                 @if(!$canFinalize) disabled @endif
@@ -294,7 +294,7 @@
     </script>
 
     {{-- Finalize confirmation modal --}}
-    @if($contest->isEvaluation())
+    @if($contest->isEvaluation() || ($contest->isPermanent() && $contest->isAccepting()))
         <x-confirm-modal
             name="finalize"
             title="Завершить оценку?"
