@@ -62,7 +62,6 @@ class OrganizationController extends Controller
             'correspondent_account' => ['nullable', 'string', 'max:20'],
             'kpp'                   => ['nullable', 'string', 'max:9'],
             'offer_accepted'        => ['nullable', 'boolean'],
-            'can_host_paid'         => ['nullable', 'boolean'],
         ], [
             'inn.unique'             => 'Организация с таким ИНН уже существует.',
             'inn.required'           => 'Укажите ИНН.',
@@ -74,7 +73,6 @@ class OrganizationController extends Controller
         $org = Organization::create([
             ...$validated,
             'offer_accepted' => $request->boolean('offer_accepted'),
-            'can_host_paid'  => $request->boolean('can_host_paid'),
             'created_by'     => $request->user()->id,
             'verified_by'    => $validated['status'] === 'verified' ? $request->user()->id : null,
             'verified_at'    => $validated['status'] === 'verified' ? now() : null,
@@ -121,12 +119,10 @@ class OrganizationController extends Controller
             'correspondent_account' => ['nullable', 'string', 'max:20'],
             'kpp'                   => ['nullable', 'string', 'max:9'],
             'offer_accepted'        => ['nullable', 'boolean'],
-            'can_host_paid'         => ['nullable', 'boolean'],
         ]);
 
         $data = collect($validated)->except(['avatar', 'delete_avatar'])->toArray();
         $data['offer_accepted'] = $request->boolean('offer_accepted');
-        $data['can_host_paid']  = $request->boolean('can_host_paid');
 
         if ($request->boolean('delete_avatar') && $organization->avatar_path) {
             $this->deleteStoredImage($organization->avatar_path);

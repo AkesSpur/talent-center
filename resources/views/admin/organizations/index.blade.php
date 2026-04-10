@@ -194,11 +194,7 @@
                                 class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary/30 w-4 h-4 shrink-0">
                             <span class="text-sm text-dark">Оферта принята</span>
                         </label>
-                        <label class="flex items-center gap-2.5 cursor-pointer">
-                            <input type="checkbox" name="can_host_paid" value="1"
-                                class="rounded border-gray-300 text-primary focus:ring-primary/30 w-4 h-4">
-                            <span class="text-sm text-dark">Разрешить платные конкурсы</span>
-                        </label>
+                        <p x-show="!allFilled" class="text-xs text-warm-gray">Заполните все реквизиты, чтобы отметить принятие оферты.</p>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-2">

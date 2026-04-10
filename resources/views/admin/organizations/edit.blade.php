@@ -113,26 +113,25 @@
                             @error('website') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
-                </div>
 
-                {{-- Bank Details --}}
-                <div
-                    x-data="{
-                        bankName: '{{ old('bank_name', $organization->bank_name) }}',
-                        bankBik: '{{ old('bank_bik', $organization->bank_bik) }}',
-                        bankAccount: '{{ old('bank_account', $organization->bank_account) }}',
-                        correspondentAccount: '{{ old('correspondent_account', $organization->correspondent_account) }}',
-                        kpp: '{{ old('kpp', $organization->kpp) }}',
-                        get allFilled() {
-                            return this.bankName.trim() !== ''
-                                && this.bankBik.trim() !== ''
-                                && this.bankAccount.trim() !== ''
-                                && this.correspondentAccount.trim() !== ''
-                                && this.kpp.trim() !== '';
-                        }
-                    }"
-                    class="mt-6 pt-6 border-t border-primary/10 space-y-4"
-                >
+                    {{-- Bank Details --}}
+                    <div
+                        x-data="{
+                            bankName: '{{ old('bank_name', $organization->bank_name) }}',
+                            bankBik: '{{ old('bank_bik', $organization->bank_bik) }}',
+                            bankAccount: '{{ old('bank_account', $organization->bank_account) }}',
+                            correspondentAccount: '{{ old('correspondent_account', $organization->correspondent_account) }}',
+                            kpp: '{{ old('kpp', $organization->kpp) }}',
+                            get allFilled() {
+                                return this.bankName.trim() !== ''
+                                    && this.bankBik.trim() !== ''
+                                    && this.bankAccount.trim() !== ''
+                                    && this.correspondentAccount.trim() !== ''
+                                    && this.kpp.trim() !== '';
+                            }
+                        }"
+                        class="mt-6 pt-6 border-t border-primary/10 space-y-4"
+                    >
                     <div>
                         <h3 class="font-semibold text-dark text-base">Реквизиты организации</h3>
                         <p class="text-sm text-warm-gray mt-0.5">Необходимы для проведения платных конкурсов.</p>
@@ -186,8 +185,8 @@
                         </div>
                     </div>
 
-                    {{-- Offer accepted + can_host_paid (admin can set both directly) --}}
-                    <div class="space-y-3 pt-1">
+                    {{-- Offer accepted --}}
+                    <div class="pt-1">
                         <label class="flex items-start gap-3 cursor-pointer" :class="{ 'opacity-50 cursor-not-allowed': !allFilled }">
                             <input type="checkbox" name="offer_accepted" value="1"
                                 :disabled="!allFilled"
@@ -197,13 +196,7 @@
                             <span class="text-sm text-dark">Оферта принята</span>
                         </label>
                         <p x-show="!allFilled" class="text-xs text-warm-gray pl-7">Заполните все реквизиты, чтобы отметить принятие оферты.</p>
-
-                        <label class="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" name="can_host_paid" value="1"
-                                {{ old('can_host_paid', $organization->can_host_paid) ? 'checked' : '' }}
-                                class="rounded border-gray-300 text-primary focus:ring-primary/30 w-4 h-4">
-                            <span class="text-sm text-dark">Разрешить проведение платных конкурсов</span>
-                        </label>
+                    </div>
                     </div>
                 </div>
 

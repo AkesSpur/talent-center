@@ -132,7 +132,7 @@
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="font-serif text-xl font-semibold text-dark">Реквизиты</h3>
                             <div class="flex items-center gap-2">
-                                @if($organization->can_host_paid)
+                                @if($organization->canHostPaidContests())
                                     <span class="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium">
                                         <i class="fas fa-check mr-1"></i>Платные конкурсы разрешены
                                     </span>
