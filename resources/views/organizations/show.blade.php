@@ -149,6 +149,25 @@
                         @endif
                     </div>
 
+                    {{-- Payouts --}}
+                    @if(auth()->user()->canInOrg('manage', $organization) || auth()->user()->isAdmin())
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-serif text-xl font-semibold text-dark">Реестр выплат</h3>
+                                <a href="{{ route('organizations.payouts.index', $organization) }}"
+                                    class="text-sm text-primary hover:underline">
+                                    <i class="fas fa-arrow-right mr-1"></i>Перейти
+                                </a>
+                            </div>
+                            @php $payoutCount = $organization->contests()->whereHas('payoutRegistry')->count(); @endphp
+                            @if($payoutCount > 0)
+                                <p class="text-sm text-warm-gray">Записей реестра: <span class="font-semibold text-dark">{{ $payoutCount }}</span></p>
+                            @else
+                                <p class="text-sm text-warm-gray">Записей реестра пока нет.</p>
+                            @endif
+                        </div>
+                    @endif
+
                     {{-- Representatives --}}
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <div class="flex items-center justify-between mb-4">

@@ -54,7 +54,21 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.organizations.store') }}" class="space-y-4">
+                <form method="POST" action="{{ route('admin.organizations.store') }}" class="space-y-4"
+                    x-data="{
+                        bankName: '',
+                        bankBik: '',
+                        bankAccount: '',
+                        correspondentAccount: '',
+                        kpp: '',
+                        get allFilled() {
+                            return this.bankName.trim() !== ''
+                                && this.bankBik.trim() !== ''
+                                && this.bankAccount.trim() !== ''
+                                && this.correspondentAccount.trim() !== ''
+                                && this.kpp.trim() !== '';
+                        }
+                    }">
                     @csrf
 
                     <div>
@@ -129,6 +143,62 @@
                             <option value="pending" {{ old('status', 'pending') === 'pending' ? 'selected' : '' }}>На проверке</option>
                             <option value="verified" {{ old('status') === 'verified' ? 'selected' : '' }}>Верифицирована</option>
                         </select>
+                    </div>
+
+                    {{-- Bank Details --}}
+                    <div class="border-t border-primary/10 pt-4 space-y-3">
+                        <div>
+                            <p class="text-sm font-semibold text-dark">Реквизиты организации</p>
+                            <p class="text-xs text-warm-gray mt-0.5">Необходимы для проведения платных конкурсов.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-dark mb-1.5">Название банка</label>
+                            <input name="bank_name" type="text" value="{{ old('bank_name') }}"
+                                x-model="bankName"
+                                placeholder="ПАО «Сбербанк»"
+                                class="w-full px-4 py-2.5 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-dark mb-1.5">БИК</label>
+                                <input name="bank_bik" type="text" value="{{ old('bank_bik') }}"
+                                    x-model="bankBik"
+                                    placeholder="044525225" maxlength="9"
+                                    class="w-full px-4 py-2.5 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-dark mb-1.5">КПП</label>
+                                <input name="kpp" type="text" value="{{ old('kpp') }}"
+                                    x-model="kpp"
+                                    placeholder="773601001" maxlength="9"
+                                    class="w-full px-4 py-2.5 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-dark mb-1.5">Расчётный счёт</label>
+                                <input name="bank_account" type="text" value="{{ old('bank_account') }}"
+                                    x-model="bankAccount"
+                                    placeholder="40702810000000000000" maxlength="20"
+                                    class="w-full px-4 py-2.5 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-dark mb-1.5">Корр. счёт</label>
+                                <input name="correspondent_account" type="text" value="{{ old('correspondent_account') }}"
+                                    x-model="correspondentAccount"
+                                    placeholder="30101810400000000225" maxlength="20"
+                                    class="w-full px-4 py-2.5 border border-primary/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                            </div>
+                        </div>
+                        <label class="flex items-start gap-2.5 cursor-pointer" :class="{ 'opacity-50 cursor-not-allowed': !allFilled }">
+                            <input type="checkbox" name="offer_accepted" value="1"
+                                :disabled="!allFilled"
+                                class="mt-0.5 rounded border-gray-300 text-primary focus:ring-primary/30 w-4 h-4 shrink-0">
+                            <span class="text-sm text-dark">Оферта принята</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="checkbox" name="can_host_paid" value="1"
+                                class="rounded border-gray-300 text-primary focus:ring-primary/30 w-4 h-4">
+                            <span class="text-sm text-dark">Разрешить платные конкурсы</span>
+                        </label>
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-2">

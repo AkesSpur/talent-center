@@ -127,6 +127,71 @@
                         </div>
                     </div>
 
+                    {{-- Bank Details --}}
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-serif text-xl font-semibold text-dark">Реквизиты</h3>
+                            <div class="flex items-center gap-2">
+                                @if($organization->can_host_paid)
+                                    <span class="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium">
+                                        <i class="fas fa-check mr-1"></i>Платные конкурсы разрешены
+                                    </span>
+                                @else
+                                    <span class="text-xs bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full font-medium">
+                                        Платные конкурсы не разрешены
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        @if($organization->bank_name || $organization->bank_bik || $organization->bank_account)
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                @if($organization->bank_name)
+                                    <div class="md:col-span-2">
+                                        <span class="text-warm-gray text-xs uppercase tracking-wide">Банк</span>
+                                        <p class="text-dark font-medium mt-0.5">{{ $organization->bank_name }}</p>
+                                    </div>
+                                @endif
+                                @if($organization->bank_bik)
+                                    <div>
+                                        <span class="text-warm-gray text-xs uppercase tracking-wide">БИК</span>
+                                        <p class="text-dark font-medium mt-0.5 font-mono">{{ $organization->bank_bik }}</p>
+                                    </div>
+                                @endif
+                                @if($organization->kpp)
+                                    <div>
+                                        <span class="text-warm-gray text-xs uppercase tracking-wide">КПП</span>
+                                        <p class="text-dark font-medium mt-0.5 font-mono">{{ $organization->kpp }}</p>
+                                    </div>
+                                @endif
+                                @if($organization->bank_account)
+                                    <div>
+                                        <span class="text-warm-gray text-xs uppercase tracking-wide">Расчётный счёт</span>
+                                        <p class="text-dark font-medium mt-0.5 font-mono">{{ $organization->bank_account }}</p>
+                                    </div>
+                                @endif
+                                @if($organization->correspondent_account)
+                                    <div>
+                                        <span class="text-warm-gray text-xs uppercase tracking-wide">Корреспондентский счёт</span>
+                                        <p class="text-dark font-medium mt-0.5 font-mono">{{ $organization->correspondent_account }}</p>
+                                    </div>
+                                @endif
+                                <div class="md:col-span-2 pt-2 border-t border-primary/10">
+                                    <span class="text-warm-gray text-xs uppercase tracking-wide">Оферта</span>
+                                    <p class="mt-0.5">
+                                        @if($organization->offer_accepted)
+                                            <span class="text-green-600 font-medium"><i class="fas fa-check-circle mr-1"></i>Принята</span>
+                                        @else
+                                            <span class="text-warm-gray"><i class="fas fa-times-circle mr-1"></i>Не принята</span>
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                        @else
+                            <p class="text-sm text-warm-gray">Реквизиты не заполнены.</p>
+                        @endif
+                    </div>
+
                     {{-- Representatives with management --}}
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <h3 class="font-serif text-xl font-semibold text-dark mb-4">

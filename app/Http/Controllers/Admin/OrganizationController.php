@@ -46,29 +46,38 @@ class OrganizationController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name'          => ['required', 'string', 'max:255'],
-            'description'   => ['nullable', 'string', 'max:2000'],
-            'inn'           => ['required', 'string', 'max:12', 'unique:organizations,inn'],
-            'ogrn'          => ['nullable', 'string', 'max:15'],
-            'legal_address' => ['nullable', 'string', 'max:500'],
-            'city'          => ['nullable', 'string', 'max:255'],
-            'website'       => ['nullable', 'url', 'max:255'],
-            'contact_email' => ['required', 'email', 'max:255'],
-            'contact_phone' => ['nullable', 'string', 'max:20'],
-            'status'        => ['required', 'in:pending,verified'],
+            'name'                  => ['required', 'string', 'max:255'],
+            'description'           => ['nullable', 'string', 'max:2000'],
+            'inn'                   => ['required', 'string', 'max:12', 'unique:organizations,inn'],
+            'ogrn'                  => ['nullable', 'string', 'max:15'],
+            'legal_address'         => ['nullable', 'string', 'max:500'],
+            'city'                  => ['nullable', 'string', 'max:255'],
+            'website'               => ['nullable', 'url', 'max:255'],
+            'contact_email'         => ['required', 'email', 'max:255'],
+            'contact_phone'         => ['nullable', 'string', 'max:20'],
+            'status'                => ['required', 'in:pending,verified'],
+            'bank_name'             => ['nullable', 'string', 'max:255'],
+            'bank_bik'              => ['nullable', 'string', 'max:9'],
+            'bank_account'          => ['nullable', 'string', 'max:20'],
+            'correspondent_account' => ['nullable', 'string', 'max:20'],
+            'kpp'                   => ['nullable', 'string', 'max:9'],
+            'offer_accepted'        => ['nullable', 'boolean'],
+            'can_host_paid'         => ['nullable', 'boolean'],
         ], [
-            'inn.unique'           => 'Организация с таким ИНН уже существует.',
-            'inn.required'         => 'Укажите ИНН.',
-            'name.required'        => 'Укажите название организации.',
+            'inn.unique'             => 'Организация с таким ИНН уже существует.',
+            'inn.required'           => 'Укажите ИНН.',
+            'name.required'          => 'Укажите название организации.',
             'contact_email.required' => 'Укажите контактный email.',
-            'website.url'          => 'Укажите корректный URL сайта.',
+            'website.url'            => 'Укажите корректный URL сайта.',
         ]);
 
         $org = Organization::create([
             ...$validated,
-            'created_by'  => $request->user()->id,
-            'verified_by' => $validated['status'] === 'verified' ? $request->user()->id : null,
-            'verified_at' => $validated['status'] === 'verified' ? now() : null,
+            'offer_accepted' => $request->boolean('offer_accepted'),
+            'can_host_paid'  => $request->boolean('can_host_paid'),
+            'created_by'     => $request->user()->id,
+            'verified_by'    => $validated['status'] === 'verified' ? $request->user()->id : null,
+            'verified_at'    => $validated['status'] === 'verified' ? now() : null,
         ]);
 
         ActionLogService::log('organization.created', $org);
@@ -94,20 +103,30 @@ class OrganizationController extends Controller
     public function update(Request $request, Organization $organization): RedirectResponse
     {
         $validated = $request->validate([
-            'name'          => ['required', 'string', 'max:255'],
-            'avatar'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
-            'delete_avatar' => ['nullable', 'boolean'],
-            'description'   => ['nullable', 'string', 'max:2000'],
-            'inn'           => ['required', 'string', 'max:12'],
-            'ogrn'          => ['nullable', 'string', 'max:15'],
-            'legal_address' => ['nullable', 'string', 'max:500'],
-            'city'          => ['nullable', 'string', 'max:255'],
-            'website'       => ['nullable', 'url', 'max:255'],
-            'contact_email' => ['required', 'email', 'max:255'],
-            'contact_phone' => ['nullable', 'string', 'max:20'],
+            'name'                  => ['required', 'string', 'max:255'],
+            'avatar'                => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'delete_avatar'         => ['nullable', 'boolean'],
+            'description'           => ['nullable', 'string', 'max:2000'],
+            'inn'                   => ['required', 'string', 'max:12'],
+            'ogrn'                  => ['nullable', 'string', 'max:15'],
+            'legal_address'         => ['nullable', 'string', 'max:500'],
+            'city'                  => ['nullable', 'string', 'max:255'],
+            'website'               => ['nullable', 'url', 'max:255'],
+            'contact_email'         => ['required', 'email', 'max:255'],
+            'contact_phone'         => ['nullable', 'string', 'max:20'],
+            // Bank details
+            'bank_name'             => ['nullable', 'string', 'max:255'],
+            'bank_bik'              => ['nullable', 'string', 'max:9'],
+            'bank_account'          => ['nullable', 'string', 'max:20'],
+            'correspondent_account' => ['nullable', 'string', 'max:20'],
+            'kpp'                   => ['nullable', 'string', 'max:9'],
+            'offer_accepted'        => ['nullable', 'boolean'],
+            'can_host_paid'         => ['nullable', 'boolean'],
         ]);
 
         $data = collect($validated)->except(['avatar', 'delete_avatar'])->toArray();
+        $data['offer_accepted'] = $request->boolean('offer_accepted');
+        $data['can_host_paid']  = $request->boolean('can_host_paid');
 
         if ($request->boolean('delete_avatar') && $organization->avatar_path) {
             $this->deleteStoredImage($organization->avatar_path);

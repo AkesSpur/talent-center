@@ -38,6 +38,7 @@
         'payout-registry-created'  => ['Запись реестра выплат создана', 'success'],
         'payout-registry-updated'  => ['Данные перечисления обновлены', 'success'],
         'payout-document-uploaded' => ['Документ перечисления загружен', 'success'],
+        'payout-confirmed'         => ['Получение выплаты подтверждено', 'success'],
     ];
 
     if (session('status') && isset($statusMap[session('status')])) {

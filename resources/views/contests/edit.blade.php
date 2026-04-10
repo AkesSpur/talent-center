@@ -161,6 +161,14 @@
                                         x-model="applicationLimit"
                                         :min="isPaid ? 0 : 1"
                                         :max="isPaid ? 10000 : 50"
+                                        @change="
+                                            if (!isPaid) {
+                                                let v = parseInt($event.target.value);
+                                                if (isNaN(v) || v < 1) applicationLimit = '1';
+                                                else if (v > 50) applicationLimit = '50';
+                                                else applicationLimit = String(v);
+                                            }
+                                        "
                                         class="no-spinner w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white text-sm">
                                     <p class="text-xs text-warm-gray mt-1" x-show="!isPaid">1–50 заявок</p>
                                     <p class="text-xs text-warm-gray mt-1" x-show="isPaid">0 = без ограничений</p>
