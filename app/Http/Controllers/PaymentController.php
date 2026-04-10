@@ -173,37 +173,54 @@ class PaymentController extends Controller
         // Webhook may not have fired (wrong notification password, timing, etc.)
         // Poll T-Bank directly to get the authoritative status
         if ($payment->tbank_payment_id) {
+            $confirmedVia = null;
+
             try {
                 $state = $this->tbank->getState($payment->tbank_payment_id);
 
                 if (($state['Status'] ?? '') === 'CONFIRMED') {
+                    $confirmedVia = 'getstate';
                     $payment->update([
                         'status'       => PaymentStatus::Accepted->value,
                         'receipt_data' => $state,
                     ]);
-
-                    $payment->application->update(['status' => ApplicationStatus::New->value]);
-
-                    Log::info('Payment confirmed via GetState fallback', [
-                        'payment_id'     => $payment->id,
-                        'application_id' => $payment->application_id,
+                } elseif (! empty($state['ErrorCode']) && $state['ErrorCode'] !== '0') {
+                    // GetState itself failed (e.g. wrong password) — fall back to trusting
+                    // the SuccessURL redirect. T-Bank only sends users here after a real payment.
+                    Log::warning('T-Bank GetState failed, confirming via SuccessURL redirect', [
+                        'payment_id' => $payment->id,
+                        'error'      => $state['Message'] ?? $state['ErrorCode'],
                     ]);
-
-                    ActionLogService::log('payment.confirmed', $payment, [
-                        'contest_id'     => $payment->contest_id,
-                        'user_id'        => $payment->user_id,
-                        'amount'         => $payment->amount,
-                        'tbank_order_id' => $orderId,
-                        'via'            => 'getstate_fallback',
-                    ]);
-
-                    return view('payments.success', compact('payment'));
+                    $confirmedVia = 'success_redirect_fallback';
+                    $payment->update(['status' => PaymentStatus::Accepted->value]);
                 }
             } catch (\Throwable $e) {
-                Log::warning('GetState fallback failed', [
+                Log::warning('GetState fallback exception, confirming via SuccessURL redirect', [
                     'payment_id' => $payment->id,
                     'error'      => $e->getMessage(),
                 ]);
+                $confirmedVia = 'success_redirect_fallback';
+                $payment->update(['status' => PaymentStatus::Accepted->value]);
+            }
+
+            if ($confirmedVia) {
+                $payment->application->update(['status' => ApplicationStatus::New->value]);
+
+                Log::info('Payment confirmed via fallback', [
+                    'payment_id'     => $payment->id,
+                    'application_id' => $payment->application_id,
+                    'via'            => $confirmedVia,
+                ]);
+
+                ActionLogService::log('payment.confirmed', $payment, [
+                    'contest_id'     => $payment->contest_id,
+                    'user_id'        => $payment->user_id,
+                    'amount'         => $payment->amount,
+                    'tbank_order_id' => $orderId,
+                    'via'            => $confirmedVia,
+                ]);
+
+                return view('payments.success', compact('payment'));
             }
         }
 
