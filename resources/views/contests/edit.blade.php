@@ -106,13 +106,33 @@
                             <x-input-error class="mt-2" :messages="$errors->get('regulations_url')" />
                         </div>
 
+                        <style>
+                            .input-flash-error {
+                                border-color: #f87171 !important;
+                                box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.20) !important;
+                                transition: border-color 0.15s, box-shadow 0.15s;
+                            }
+                        </style>
+                        <script>
+                            function flashError(el) {
+                                el.classList.add('input-flash-error');
+                                setTimeout(function() { el.classList.remove('input-flash-error'); }, 1000);
+                            }
+                        </script>
+
                         {{-- Paid contest toggle + entry fee + application limit --}}
                         <div
                             x-data="{
                                 isPaid: {{ old('is_paid', $contest->is_paid) ? 'true' : 'false' }},
                                 entryFee: '{{ old('entry_fee', $contest->entry_fee) }}',
                                 applicationLimit: '{{ old('application_limit', $contest->application_limit) }}',
-                                orgCanHostPaid: {{ $contest->organization->canHostPaidContests() ? 'true' : 'false' }}
+                                orgCanHostPaid: {{ $contest->organization->canHostPaidContests() ? 'true' : 'false' }},
+                                init() {
+                                    this.$watch('isPaid', (val) => {
+                                        const el = document.getElementById('application_limit');
+                                        if (el) el.value = val ? '0' : '50';
+                                    });
+                                }
                             }"
                             class="p-4 border border-primary/15 rounded-xl bg-cream/30 space-y-4"
                         >
@@ -142,8 +162,9 @@
                                         Сумма оргвзноса, ₽ <span class="text-red-500">*</span>
                                     </label>
                                     <input id="entry_fee" name="entry_fee" type="number"
-                                        x-model="entryFee"
-                                        min="100" max="100000" step="1"
+                                        :value="entryFee"
+                                        oninput="var s=this.value.replace(/[^0-9]/g,'');this.value=s;var v=parseInt(s);if(!isNaN(v)&&v>100000){this.value=100000;flashError(this);}"
+                                        onblur="var v=parseInt(this.value);if(isNaN(v)||v<100){this.value=isNaN(v)?'100':Math.max(100,v);flashError(this);}else if(v>100000){this.value=100000;flashError(this);}"
                                         class="no-spinner w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white"
                                         placeholder="500">
                                     <p class="text-xs text-warm-gray mt-1">От 100 до 100 000 ₽, без копеек.</p>
@@ -160,8 +181,8 @@
                                     <input id="application_limit" name="application_limit" type="number"
                                         :value="applicationLimit"
                                         :data-paid="isPaid ? '1' : '0'"
-                                        oninput="var s=this.value.replace(/[^0-9]/g,'');this.value=s;var v=parseInt(s),paid=this.dataset.paid==='1',max=paid?10000:50;if(!isNaN(v)&&v>max)this.value=max;"
-                                        onblur="var v=parseInt(this.value),paid=this.dataset.paid==='1',min=paid?0:1,max=paid?10000:50;if(isNaN(v)||v<min)this.value=min;else if(v>max)this.value=max;"
+                                        oninput="var s=this.value.replace(/[^0-9]/g,'');this.value=s;var v=parseInt(s),paid=this.dataset.paid==='1',max=paid?10000:50;if(!isNaN(v)&&v>max){this.value=max;flashError(this);}"
+                                        onblur="var v=parseInt(this.value),paid=this.dataset.paid==='1',min=paid?0:1,max=paid?10000:50;if(isNaN(v)||v<min){this.value=min;flashError(this);}else if(v>max){this.value=max;flashError(this);}"
                                         class="no-spinner w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white text-sm">
                                     <p class="text-xs text-warm-gray mt-1" x-show="!isPaid">1–50 заявок</p>
                                     <p class="text-xs text-warm-gray mt-1" x-show="isPaid">0 = без ограничений</p>

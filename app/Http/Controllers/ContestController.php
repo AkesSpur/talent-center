@@ -219,7 +219,11 @@ class ContestController extends Controller
                 ->exists();
         }
 
-        return view('contests.show', compact('contest', 'hasApplied'));
+        $applicationsCount = $contest->applications()
+            ->whereNotIn('status', ['payment_pending'])
+            ->count();
+
+        return view('contests.show', compact('contest', 'hasApplied', 'applicationsCount'));
     }
 
     /**

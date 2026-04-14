@@ -114,6 +114,17 @@
                                 <a href="{{ route('dashboard.applications') }}" class="block text-center mt-3 px-4 py-2 border border-primary/20 text-primary rounded-lg hover:bg-primary/5 transition-colors text-sm">
                                     Мои заявки
                                 </a>
+                            @elseif($contest->isApplicationLimitReached())
+                                <div class="relative group">
+                                    <button type="button" disabled
+                                        class="block w-full text-center px-4 py-3 bg-warm-gray/15 text-warm-gray/50 font-semibold rounded-lg cursor-not-allowed select-none">
+                                        <i class="fas fa-paper-plane mr-2 opacity-50"></i>Подать заявку
+                                    </button>
+                                    <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-dark text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-10">
+                                        Лимит заявок исчерпан
+                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-dark"></span>
+                                    </span>
+                                </div>
                             @else
                                 <a href="{{ route('applications.create', $contest) }}"
                                     class="block text-center px-4 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
@@ -189,6 +200,22 @@
                                     </div>
                                 </div>
                             @endif
+                        </div>
+                    </div>
+
+                    {{-- Statistics card --}}
+                    <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
+                        <h3 class="font-semibold text-dark mb-3">Статистика</h3>
+                        <div class="flex items-center gap-3 text-sm">
+                            <i class="fas fa-users text-primary w-4 text-center shrink-0"></i>
+                            <div>
+                                <span class="text-warm-gray">Подано заявок:</span>
+                                <span class="font-semibold text-dark ml-1">{{ $applicationsCount }}</span>
+                                @if($contest->hasApplicationLimit())
+                                    <span class="text-warm-gray"> из </span>
+                                    <span class="font-semibold text-dark">{{ $contest->application_limit }}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
