@@ -301,7 +301,7 @@
 </section>
 
 {{-- ===== ACTIVE CONTESTS ===== --}}
-<section class="py-20 bg-cream" x-data="{ modal: null }" @keydown.escape.window="modal = null">
+<section class="py-20 bg-cream">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-end justify-between mb-12">
             <div>
@@ -317,24 +317,8 @@
         @if($activeContests->count())
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($activeContests as $contest)
-                    @php
-                        $contestData = [
-                            'title'              => $contest->title,
-                            'description'        => $contest->description,
-                            'cover_image'        => $contest->cover_image ? asset('storage/' . $contest->cover_image) : null,
-                            'category'           => $contest->platformCategory?->name,
-                            'org_name'           => $contest->organization->name,
-                            'applications_start' => $contest->applications_start_at->isoFormat('D MMM YYYY'),
-                            'applications_end'   => $contest->applications_end_at ? $contest->applications_end_at->isoFormat('D MMM YYYY') : 'бессрочно',
-                            'evaluation_end'     => $contest->evaluation_end_at ? $contest->evaluation_end_at->isoFormat('D MMM YYYY') : null,
-                            'apply_url'          => route('applications.create', $contest),
-                            'show_url'           => route('contests.show', $contest),
-                            'categories'         => $contest->categories->map(fn ($c) => $c->name)->values()->toArray(),
-                            'regulations_url'    => $contest->regulations_url,
-                        ];
-                    @endphp
-                    <div @click="modal = {{ \Illuminate\Support\Js::from($contestData) }}"
-                        class="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gold/10 hover-lift flex flex-col cursor-pointer">
+                    <a href="{{ route('contests.show', $contest) }}"
+                        class="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gold/10 hover-lift flex flex-col">
 
                         {{-- Cover or placeholder --}}
                         <div class="relative" style="padding-top: 56.25%;">
@@ -391,7 +375,7 @@
                                 </span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
 
@@ -409,147 +393,6 @@
                 <div class="gold-line mx-auto mt-4"></div>
             </div>
         @endif
-    </div>
-
-    {{-- ===== CONTEST MODAL ===== --}}
-    <div
-        x-show="modal"
-        x-cloak
-        @click.self="modal = null"
-        x-transition:enter="transition ease-out duration-200"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-150"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        class="fixed inset-0 bg-dark/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-    >
-        <div
-            @click.stop
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 translate-y-4 scale-95"
-            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-            x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-            class="bg-white rounded-2xl max-w-lg w-full shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden"
-        >
-            {{-- Cover / header --}}
-            <div class="relative h-40 shrink-0 overflow-hidden">
-                <img
-                    x-show="modal && modal.cover_image"
-                    :src="modal ? (modal.cover_image || '') : ''"
-                    class="w-full h-full object-cover"
-                    style="display: none;"
-                    alt=""
-                >
-                <div
-                    x-show="!modal || !modal.cover_image"
-                    class="w-full h-full gradient-gold flex items-center justify-center"
-                >
-                    <i class="fas fa-award text-white/25 text-6xl"></i>
-                </div>
-
-                <button
-                    @click="modal = null"
-                    class="absolute top-3 right-3 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center text-dark shadow-sm transition-colors"
-                >
-                    <i class="fas fa-times text-sm"></i>
-                </button>
-
-                <template x-if="modal && modal.category">
-                    <span
-                        class="absolute bottom-3 left-3 bg-white text-dark text-xs font-medium px-3 py-1 rounded-full shadow-sm border border-gold/10"
-                        x-text="modal.category"
-                    ></span>
-                </template>
-            </div>
-
-            {{-- Scrollable content --}}
-            <div class="overflow-y-auto flex-1 p-6">
-
-                <h2
-                    class="font-serif text-2xl font-bold text-dark mb-1 leading-tight"
-                    x-text="modal ? modal.title : ''"
-                ></h2>
-
-                <p
-                    class="text-sm text-warm-gray mb-4"
-                    x-text="modal ? modal.org_name : ''"
-                ></p>
-
-                <template x-if="modal && modal.description">
-                    <div
-                        class="rich-content text-dark text-sm leading-relaxed mb-5"
-                        x-html="modal.description"
-                    ></div>
-                </template>
-
-                <div class="bg-cream rounded-xl p-4 space-y-2 mb-4 text-sm">
-                    <template x-if="modal && modal.regulations_url">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-file-alt text-primary w-4 text-center shrink-0"></i>
-                            <a :href="modal.regulations_url" target="_blank" rel="noopener noreferrer"
-                                class="font-medium text-primary hover:underline">Положение о конкурсе</a>
-                        </div>
-                    </template>
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-calendar-alt text-primary w-4 text-center shrink-0"></i>
-                        <span class="text-warm-gray shrink-0">Приём заявок:</span>
-                        <span
-                            class="font-medium text-dark"
-                            x-text="modal ? (modal.applications_start + ' — ' + modal.applications_end) : ''"
-                        ></span>
-                    </div>
-                    <template x-if="modal && modal.evaluation_end">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-flag-checkered text-primary w-4 text-center shrink-0"></i>
-                            <span class="text-warm-gray shrink-0">Результаты:</span>
-                            <span class="font-medium text-dark" x-text="modal.evaluation_end"></span>
-                        </div>
-                    </template>
-                </div>
-
-                <template x-if="modal && modal.categories && modal.categories.length">
-                    <div class="mb-5">
-                        <p class="text-xs font-semibold text-warm-gray uppercase tracking-wider mb-2">Номинации</p>
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="cat in modal.categories" :key="cat">
-                                <span
-                                    class="text-xs px-3 py-1 bg-gold/10 text-dark rounded-full border border-gold/20"
-                                    x-text="cat"
-                                ></span>
-                            </template>
-                        </div>
-                    </div>
-                </template>
-
-                <div class="flex gap-3 pt-2">
-                    @auth
-                        <a
-                            :href="modal ? modal.apply_url : '#'"
-                            class="flex-1 text-center px-4 py-3 gradient-gold text-dark font-semibold rounded-xl hover:opacity-90 transition-opacity"
-                        >
-                            <i class="fas fa-paper-plane mr-2"></i>Участвовать
-                        </a>
-                    @else
-                        <a
-                            href="{{ route('login') }}"
-                            class="flex-1 text-center px-4 py-3 gradient-gold text-dark font-semibold rounded-xl hover:opacity-90 transition-opacity"
-                        >
-                            <i class="fas fa-paper-plane mr-2"></i>Участвовать
-                        </a>
-                    @endauth
-                    <a
-                        :href="modal ? modal.show_url : '#'"
-                        class="flex-1 text-center px-4 py-3 border border-primary/20 text-primary rounded-xl hover:bg-primary/5 transition-colors"
-                    >
-                        Подробнее
-                    </a>
-                </div>
-
-            </div>
-        </div>
     </div>
 
 </section>
