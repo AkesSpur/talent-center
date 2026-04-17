@@ -1,42 +1,50 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-2 mb-1">
-                    <a href="{{ route('contests.index') }}" class="text-warm-gray hover:text-primary transition-colors text-sm">
-                        <i class="fas fa-arrow-left mr-1"></i>Конкурсы
-                    </a>
-                </div>
-                <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark">{{ $contest->title }}</h2>
-                <div class="flex items-center gap-2 mt-2">
-                    <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full {{ $contest->status->color() }}">
-                        {{ $contest->status->label() }}
-                    </span>
-                    <span class="text-warm-gray text-sm">· {{ $contest->organization->name }}</span>
-                    @if($contest->platformCategory)
-                        <span class="text-warm-gray text-sm">· {{ $contest->platformCategory->name }}</span>
-                    @endif
-                </div>
-            </div>
+@extends('layouts.public')
 
-            {{-- Management buttons --}}
-            <div class="flex items-center gap-2 shrink-0" x-data>
-                @can('update', $contest)
-                    <a href="{{ route('contests.edit', $contest) }}"
-                        class="inline-flex items-center px-4 py-2 border border-primary/30 text-primary text-sm font-medium rounded-lg hover:bg-primary/5 transition-colors">
-                        <i class="fas fa-pen mr-1.5"></i>Редактировать
-                    </a>
-                @endcan
-                @can('cancel', $contest)
-                    <button type="button"
-                        @click="$dispatch('confirm-cancel', { action: '{{ route('contests.cancel', $contest) }}' })"
-                        class="inline-flex items-center px-4 py-2 border border-red-300 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors">
-                        <i class="fas fa-ban mr-1.5"></i>Отменить
-                    </button>
-                @endcan
+@section('title', $contest->title . ' — Талант-центр')
+
+@section('content')
+
+    {{-- Page header --}}
+    <div class="pattern-bg py-6 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4" x-data>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <a href="{{ route('contests.index') }}" class="text-warm-gray hover:text-primary transition-colors text-sm">
+                            <i class="fas fa-arrow-left mr-1"></i>Конкурсы
+                        </a>
+                    </div>
+                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark">{{ $contest->title }}</h2>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full {{ $contest->status->color() }}">
+                            {{ $contest->status->label() }}
+                        </span>
+                        <span class="text-warm-gray text-sm">· {{ $contest->organization->name }}</span>
+                        @if($contest->platformCategory)
+                            <span class="text-warm-gray text-sm">· {{ $contest->platformCategory->name }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Management buttons --}}
+                <div class="flex items-center gap-2 shrink-0">
+                    @can('update', $contest)
+                        <a href="{{ route('contests.edit', $contest) }}"
+                            class="inline-flex items-center px-4 py-2 border border-primary/30 text-primary text-sm font-medium rounded-lg hover:bg-primary/5 transition-colors">
+                            <i class="fas fa-pen mr-1.5"></i>Редактировать
+                        </a>
+                    @endcan
+                    @can('cancel', $contest)
+                        <button type="button"
+                            @click="$dispatch('confirm-cancel', { action: '{{ route('contests.cancel', $contest) }}' })"
+                            class="inline-flex items-center px-4 py-2 border border-red-300 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors">
+                            <i class="fas fa-ban mr-1.5"></i>Отменить
+                        </button>
+                    @endcan
+                </div>
             </div>
         </div>
-    </x-slot>
+    </div>
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -274,4 +282,4 @@
         />
     @endcan
 
-</x-app-layout>
+@endsection

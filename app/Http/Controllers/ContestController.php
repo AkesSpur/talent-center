@@ -130,7 +130,8 @@ class ContestController extends Controller
             }
         }
 
-        $isPaid = $request->boolean('is_paid');
+        $isPaid      = $request->boolean('is_paid');
+        $isPermanent = $isPaid && $request->boolean('is_permanent');
 
         $data = array_merge(
             $request->safe()->except(['diploma_background', 'cover_image', 'categories', 'juries', 'organization_id', 'contest_age_groups', 'selected_diploma_background_path', 'selected_cover_path', 'is_permanent', 'is_paid', 'entry_fee', 'application_limit']),
@@ -138,12 +139,14 @@ class ContestController extends Controller
                 'organization_id'   => $organization->id,
                 'created_by'        => $request->user()->id,
                 'status'            => ContestStatus::Draft->value,
-                'is_permanent'      => $request->boolean('is_permanent'),
+                'is_permanent'      => $isPermanent,
                 'is_paid'           => $isPaid,
                 'entry_fee'         => $isPaid ? (int) $request->input('entry_fee') : null,
-                'application_limit' => $isPaid
-                    ? max(0, (int) $request->input('application_limit', 0))
-                    : min(50, max(1, (int) $request->input('application_limit', \App\Models\SiteSettings::get(\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT, '50')))),
+                'application_limit' => $isPermanent
+                    ? 0
+                    : ($isPaid
+                        ? max(0, (int) $request->input('application_limit', 0))
+                        : min(50, max(1, (int) $request->input('application_limit', \App\Models\SiteSettings::get(\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT, '50'))))),
             ]
         );
 
@@ -284,7 +287,14 @@ class ContestController extends Controller
             'selected_diploma_background_path', 'selected_cover_path', 'is_permanent',
         ]);
 
-        $data['is_permanent']          = $request->boolean('is_permanent');
+        $isPaidUpdate      = $request->boolean('is_paid');
+        $isPermanentUpdate = $isPaidUpdate && $request->boolean('is_permanent');
+        $data['is_permanent'] = $isPermanentUpdate;
+        if ($isPermanentUpdate) {
+            $data['application_limit'] = 0;
+        } elseif (! $isPaidUpdate) {
+            $data['application_limit'] = min(50, max(1, (int) ($data['application_limit'] ?? 1)));
+        }
         $data['applications_start_at'] = Carbon::parse($data['applications_start_at'])->startOfDay();
         $data['applications_end_at']   = isset($data['applications_end_at'])
             ? Carbon::parse($data['applications_end_at'])->endOfDay()

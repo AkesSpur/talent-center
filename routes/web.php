@@ -67,7 +67,7 @@ Route::get('/contests', [ContestController::class, 'index'])->name('contests.ind
 Route::get('/contests/create', [ContestController::class, 'create'])
     ->middleware(['auth', 'verified'])
     ->name('contests.create');
-Route::get('/contests/{contest}', [ContestController::class, 'show'])->middleware(['auth', 'verified'])->name('contests.show');
+Route::get('/contests/{contest}', [ContestController::class, 'show'])->name('contests.show');
 
 // ── Authenticated (any role) ────────────────────────────
 
@@ -202,6 +202,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/payout-registries', [AdminPayoutRegistryController::class, 'store'])->name('payout-registries.store');
     Route::put('/payout-registries/{payoutRegistry}', [AdminPayoutRegistryController::class, 'update'])->name('payout-registries.update');
     Route::post('/payout-registries/{payoutRegistry}/document', [AdminPayoutRegistryController::class, 'uploadDocument'])->name('payout-registries.upload-document');
+    Route::get('/payout-registries/{payoutRegistry}/requisites', [AdminPayoutRegistryController::class, 'requisites'])->name('payout-registries.requisites');
 
     // Site settings
     Route::get('/settings', [AdminSiteSettingsController::class, 'index'])->name('settings.index');

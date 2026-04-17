@@ -30,10 +30,17 @@ class PayoutRegistryController extends Controller
             $query->where('organization_id', $request->input('organization_id'));
         }
 
+        // "Только неоплаченные": default ON unless form was submitted with checkbox unchecked
+        $filterSubmitted = $request->has('filter_submitted');
+        $unpaidOnly      = ! $filterSubmitted || $request->boolean('unpaid_only');
+        if ($unpaidOnly) {
+            $query->whereRaw('payout_amount > COALESCE(transfer_amount, 0)');
+        }
+
         $registries    = $query->paginate(20)->withQueryString();
         $organizations = Organization::orderBy('name')->get(['id', 'name']);
 
-        return view('admin.payout-registries.index', compact('registries', 'organizations'));
+        return view('admin.payout-registries.index', compact('registries', 'organizations', 'unpaidOnly'));
     }
 
     /**
@@ -92,6 +99,41 @@ class PayoutRegistryController extends Controller
 
         return redirect()->route('admin.payout-registries.index')
             ->with('status', 'payout-registry-updated');
+    }
+
+    /**
+     * GET /admin/payout-registries/{payoutRegistry}/requisites
+     * Download a .txt file with org bank details + contest info for the accountant.
+     */
+    public function requisites(PayoutRegistry $payoutRegistry): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $payoutRegistry->load(['organization', 'contest']);
+        $org = $payoutRegistry->organization;
+
+        $lines = [
+            'РЕКВИЗИТЫ ОРГАНИЗАЦИИ',
+            str_repeat('-', 40),
+            'Наименование:      ' . ($org->name ?? '—'),
+            'ИНН:               ' . ($org->inn ?? '—'),
+            'КПП:               ' . ($org->kpp ?? '—'),
+            'БИК:               ' . ($org->bank_bik ?? '—'),
+            'Расчётный счёт:    ' . ($org->bank_account ?? '—'),
+            'Корр. счёт:        ' . ($org->correspondent_account ?? '—'),
+            'Банк:              ' . ($org->bank_name ?? '—'),
+            '',
+            str_repeat('-', 40),
+            'НАЗНАЧЕНИЕ ВЫПЛАТЫ',
+            str_repeat('-', 40),
+            'Конкурс:           ' . ($payoutRegistry->contest->title ?? '—'),
+            'Сумма к выплате:   ' . number_format($payoutRegistry->payout_amount, 0, '.', ' ') . ' руб.',
+        ];
+
+        $content  = implode("\r\n", $lines);
+        $filename = 'requisites-' . $payoutRegistry->id . '.txt';
+
+        return response()->streamDownload(function () use ($content) {
+            echo $content;
+        }, $filename, ['Content-Type' => 'text/plain; charset=UTF-8']);
     }
 
     /**

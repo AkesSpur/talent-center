@@ -36,7 +36,7 @@
                 @endphp
                 <form id="contest-edit-form" method="POST" action="{{ route('contests.update', $contest) }}"
                       enctype="multipart/form-data"
-                      x-data="contestForm({{ \Illuminate\Support\Js::from($initialCategories) }}, {{ \Illuminate\Support\Js::from($orgsData) }}, {{ $contest->organization_id }}, {{ \Illuminate\Support\Js::from($restoredJuryIds) }}, {{ \Illuminate\Support\Js::from($initialContestAgeGroups) }}, {{ \Illuminate\Support\Js::from($diplomaBackgrounds) }}, {{ \Illuminate\Support\Js::from($restoredGenreId) }}, {{ \Illuminate\Support\Js::from($restoredDiplomaBg) }}, {{ \Illuminate\Support\Js::from($contestCovers) }}, {{ \Illuminate\Support\Js::from($restoredCoverPath) }})"
+                      x-data="contestForm({{ \Illuminate\Support\Js::from($initialCategories) }}, {{ \Illuminate\Support\Js::from($orgsData) }}, {{ $contest->organization_id }}, {{ \Illuminate\Support\Js::from($restoredJuryIds) }}, {{ \Illuminate\Support\Js::from($initialContestAgeGroups) }}, {{ \Illuminate\Support\Js::from($diplomaBackgrounds) }}, {{ \Illuminate\Support\Js::from($restoredGenreId) }}, {{ \Illuminate\Support\Js::from($restoredDiplomaBg) }}, {{ \Illuminate\Support\Js::from($contestCovers) }}, {{ \Illuminate\Support\Js::from($restoredCoverPath) }}, {{ old('is_paid', $contest->is_paid) ? 'true' : 'false' }}, {{ old('is_permanent', $contest->is_permanent) ? 'true' : 'false' }})"
                       class="space-y-8">
                     @csrf
                     @method('PUT')
@@ -123,16 +123,8 @@
                         {{-- Paid contest toggle + entry fee + application limit --}}
                         <div
                             x-data="{
-                                isPaid: {{ old('is_paid', $contest->is_paid) ? 'true' : 'false' }},
                                 entryFee: '{{ old('entry_fee', $contest->entry_fee) }}',
-                                applicationLimit: '{{ old('application_limit', $contest->application_limit) }}',
-                                orgCanHostPaid: {{ $contest->organization->canHostPaidContests() ? 'true' : 'false' }},
-                                init() {
-                                    this.$watch('isPaid', (val) => {
-                                        const el = document.getElementById('application_limit');
-                                        if (el) el.value = val ? '0' : '50';
-                                    });
-                                }
+                                applicationLimit: '{{ old('application_limit', $contest->application_limit) }}'
                             }"
                             class="p-4 border border-primary/15 rounded-xl bg-cream/30 space-y-4"
                         >
@@ -176,35 +168,50 @@
                                 <div x-show="!isPaid"></div>
 
                                 {{-- Application limit --}}
-                                <div>
+                                <div class="relative group">
                                     <label for="application_limit" class="block text-sm font-medium text-dark mb-2">Лимит заявок</label>
                                     <input id="application_limit" name="application_limit" type="number"
                                         :value="applicationLimit"
                                         :data-paid="isPaid ? '1' : '0'"
-                                        oninput="var s=this.value.replace(/[^0-9]/g,'');this.value=s;var v=parseInt(s),paid=this.dataset.paid==='1',max=paid?10000:50;if(!isNaN(v)&&v>max){this.value=max;flashError(this);}"
-                                        onblur="var v=parseInt(this.value),paid=this.dataset.paid==='1',min=paid?0:1,max=paid?10000:50;if(isNaN(v)||v<min){this.value=min;flashError(this);}else if(v>max){this.value=max;flashError(this);}"
-                                        class="no-spinner w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white text-sm">
+                                        :disabled="isPaid && isPermanent"
+                                        :class="(isPaid && isPermanent) ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'bg-white'"
+                                        oninput="if(!this.disabled){var s=this.value.replace(/[^0-9]/g,'');this.value=s;var v=parseInt(s),paid=this.dataset.paid==='1',max=paid?10000:50;if(!isNaN(v)&&v>max){this.value=max;flashError(this);}}"
+                                        onblur="if(!this.disabled){var v=parseInt(this.value),paid=this.dataset.paid==='1',min=paid?0:1,max=paid?10000:50;if(isNaN(v)||v<min){this.value=min;flashError(this);}else if(v>max){this.value=max;flashError(this);}}"
+                                        class="no-spinner w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
                                     <p class="text-xs text-warm-gray mt-1" x-show="!isPaid">1–50 заявок</p>
-                                    <p class="text-xs text-warm-gray mt-1" x-show="isPaid">0 = без ограничений</p>
+                                    <p class="text-xs text-warm-gray mt-1" x-show="isPaid && !isPermanent">0 = без ограничений</p>
                                     <x-input-error class="mt-1" :messages="$errors->get('application_limit')" />
+                                    <span x-show="isPaid && isPermanent"
+                                        class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-dark text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-10">
+                                        Для бессрочного конкурса нельзя установить лимит заявок
+                                        <span class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-dark"></span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {{-- Section 2: Dates --}}
-                    <div class="space-y-5" x-data="{ isPermanent: {{ old('is_permanent', $contest->is_permanent) ? 'true' : 'false' }} }">
+                    <div class="space-y-5">
                         <h3 class="font-serif text-lg font-semibold text-dark border-b border-gold/20 pb-2">Даты</h3>
 
                         {{-- Permanent toggle --}}
-                        <label class="flex items-center gap-3 cursor-pointer select-none w-fit">
-                            <input type="checkbox" name="is_permanent" value="1"
-                                x-model="isPermanent"
-                                {{ old('is_permanent', $contest->is_permanent) ? 'checked' : '' }}
-                                class="rounded border-primary/30 text-primary focus:ring-primary/30">
-                            <span class="text-sm font-medium text-dark">Бессрочный конкурс</span>
-                            <span class="text-xs text-warm-gray">(без даты окончания приёма заявок)</span>
-                        </label>
+                        <div class="relative group w-fit">
+                            <label class="flex items-center gap-3 select-none"
+                                :class="!isPaid ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'">
+                                <input type="checkbox" name="is_permanent" value="1"
+                                    x-model="isPermanent"
+                                    :disabled="!isPaid"
+                                    class="rounded border-primary/30 text-primary focus:ring-primary/30">
+                                <span class="text-sm font-medium text-dark">Бессрочный конкурс</span>
+                                <span class="text-xs text-warm-gray">(без даты окончания приёма заявок)</span>
+                            </label>
+                            <span x-show="!isPaid"
+                                class="pointer-events-none absolute bottom-full left-0 mb-2 px-3 py-1.5 bg-dark text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-10">
+                                Опция доступна только для платных конкурсов
+                                <span class="absolute top-full left-4 border-4 border-transparent border-t-dark"></span>
+                            </span>
+                        </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                             <div>
@@ -638,8 +645,29 @@
 </x-app-layout>
 
 <script>
-function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds, initialContestAgeGroups, diplomaBgData, initialGenreId, initialDiplomaBg, contestCoverData, initialCoverPath) {
+function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds, initialContestAgeGroups, diplomaBgData, initialGenreId, initialDiplomaBg, contestCoverData, initialCoverPath, initialIsPaid, initialIsPermanent) {
     return {
+        isPaid: !!initialIsPaid,
+        isPermanent: !!initialIsPermanent,
+        get orgCanHostPaid() {
+            const id = parseInt(this.selectedOrgId);
+            if (!id) return false;
+            const org = this.orgs.find(o => o.id === id);
+            return org ? !!org.can_host_paid : false;
+        },
+        init() {
+            this.$watch('isPaid', (val) => {
+                const el = document.getElementById('application_limit');
+                if (el) el.value = val ? '0' : '50';
+                if (!val) this.isPermanent = false;
+            });
+            this.$watch('isPermanent', (val) => {
+                if (val) {
+                    const el = document.getElementById('application_limit');
+                    if (el) el.value = '0';
+                }
+            });
+        },
         categories: (initialCategories && (Array.isArray(initialCategories) ? initialCategories.length > 0 : Object.keys(initialCategories).length > 0)
             ? Object.values(initialCategories)
             : []).map(c => ({ ...c, age_groups: c.age_groups ? Object.values(c.age_groups) : [] })),

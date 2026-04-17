@@ -20,6 +20,7 @@
 
     {{-- Filters --}}
     <form method="GET" class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <input type="hidden" name="filter_submitted" value="1">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-dark mb-1">Организация</label>
@@ -29,6 +30,13 @@
                         <option value="{{ $org->id }}" @selected(request('organization_id') == $org->id)>{{ $org->name }}</option>
                     @endforeach
                 </select>
+            </div>
+            <div class="flex items-end">
+                <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" name="unpaid_only" value="1" @checked($unpaidOnly)
+                        class="rounded border-gray-300 text-primary focus:ring-primary">
+                    <span class="text-sm font-medium text-dark">Только неоплаченные</span>
+                </label>
             </div>
         </div>
         <div class="mt-3 flex gap-2">
@@ -91,6 +99,11 @@
 
                     {{-- Actions --}}
                     <div class="flex flex-col gap-2 min-w-[200px]" x-data="{ uploadOpen: false, editOpen: false }">
+                        {{-- Requisites download --}}
+                        <a href="{{ route('admin.payout-registries.requisites', $registry) }}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-dark hover:bg-gray-50 transition text-left inline-flex items-center">
+                            <i class="fa-solid fa-file-lines mr-2"></i>Реквизиты
+                        </a>
                         {{-- Edit transfer details --}}
                         <button @click="editOpen = !editOpen"
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-dark hover:bg-gray-50 transition text-left">
