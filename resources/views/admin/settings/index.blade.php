@@ -643,12 +643,12 @@
                             </label>
                             <input type="number" id="default_application_limit" name="default_application_limit"
                                 value="{{ old('default_application_limit', $settings[\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT] ?? '50') }}"
-                                min="1" max="50"
+                                min="1"
                                 class="no-spinner w-full px-4 py-2.5 border border-primary/20 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-cream/30 text-dark">
                             @error('default_application_limit')
                                 <p class="mt-1.5 text-xs text-red-600"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
                             @enderror
-                            <p class="mt-1.5 text-xs text-warm-gray">Значение от 1 до 50. Это значение будет подставляться по умолчанию при создании нового бесплатного конкурса.</p>
+                            <p class="mt-1.5 text-xs text-warm-gray">Целое положительное число. Это значение будет подставляться по умолчанию при создании нового бесплатного конкурса и станет максимальным лимитом для него.</p>
                         </div>
 
                         <div class="flex items-center justify-end gap-3 pt-6 border-t border-gold/10 mt-6">

@@ -46,10 +46,23 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="mt-6">
-            <x-primary-button class="w-full justify-center">
-                Зарегистрироваться
-            </x-primary-button>
+        <div class="mt-5" x-data="{ agreed: false }">
+            <label class="flex items-start gap-3 cursor-pointer select-none">
+                <input type="checkbox" x-model="agreed"
+                    class="mt-0.5 rounded border-primary/30 text-primary focus:ring-primary/30 w-4 h-4 shrink-0">
+                <span class="text-sm text-warm-gray leading-snug">
+                    Даю согласие на обработку персональных данных в соответствии с
+                    <a href="{{ route('privacy-policy') }}" target="_blank" rel="noopener noreferrer"
+                       class="text-primary underline hover:opacity-80">политикой конфиденциальности</a>
+                </span>
+            </label>
+
+            <div class="mt-4">
+                <x-primary-button class="w-full justify-center" x-bind:disabled="!agreed"
+                    x-bind:class="!agreed ? 'opacity-50 cursor-not-allowed' : ''">
+                    Зарегистрироваться
+                </x-primary-button>
+            </div>
         </div>
 
         <div class="mt-4 text-center">

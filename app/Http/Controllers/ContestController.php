@@ -118,7 +118,9 @@ class ContestController extends Controller
             'category_ids' => $c->platformCategories->pluck('id')->toArray(),
         ])->values();
 
-        return view('contests.create', compact('orgsData', 'platformCategories', 'preselectedOrgId', 'diplomaBackgrounds', 'contestCovers'));
+        $defaultApplicationLimit = (int) \App\Models\SiteSettings::get(\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT, '50');
+
+        return view('contests.create', compact('orgsData', 'platformCategories', 'preselectedOrgId', 'diplomaBackgrounds', 'contestCovers', 'defaultApplicationLimit'));
     }
 
     /**
@@ -154,7 +156,10 @@ class ContestController extends Controller
                     ? 0
                     : ($isPaid
                         ? max(0, (int) $request->input('application_limit', 0))
-                        : min(50, max(1, (int) $request->input('application_limit', \App\Models\SiteSettings::get(\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT, '50'))))),
+                        : min(
+                            (int) \App\Models\SiteSettings::get(\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT, '50'),
+                            max(1, (int) $request->input('application_limit', \App\Models\SiteSettings::get(\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT, '50')))
+                        )),
             ]
         );
 
@@ -278,7 +283,9 @@ class ContestController extends Controller
             'category_ids' => $c->platformCategories->pluck('id')->toArray(),
         ])->values();
 
-        return view('contests.edit', compact('contest', 'orgsData', 'platformCategories', 'selectedJuryIds', 'diplomaBackgrounds', 'contestCovers'));
+        $defaultApplicationLimit = (int) \App\Models\SiteSettings::get(\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT, '50');
+
+        return view('contests.edit', compact('contest', 'orgsData', 'platformCategories', 'selectedJuryIds', 'diplomaBackgrounds', 'contestCovers', 'defaultApplicationLimit'));
     }
 
     /**
@@ -301,7 +308,8 @@ class ContestController extends Controller
         if ($isPermanentUpdate) {
             $data['application_limit'] = 0;
         } elseif (! $isPaidUpdate) {
-            $data['application_limit'] = min(50, max(1, (int) ($data['application_limit'] ?? 1)));
+            $defaultLimit = (int) \App\Models\SiteSettings::get(\App\Models\SiteSettings::DEFAULT_APPLICATION_LIMIT, '50');
+            $data['application_limit'] = min($defaultLimit, max(1, (int) ($data['application_limit'] ?? 1)));
         }
         $data['applications_start_at'] = Carbon::parse($data['applications_start_at'])->startOfDay();
         $data['applications_end_at']   = isset($data['applications_end_at'])

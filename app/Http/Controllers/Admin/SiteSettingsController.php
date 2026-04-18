@@ -220,12 +220,11 @@ class SiteSettingsController extends Controller
     public function updateContestSettings(Request $request): RedirectResponse
     {
         $request->validate([
-            'default_application_limit' => ['required', 'integer', 'min:1', 'max:50'],
+            'default_application_limit' => ['required', 'integer', 'min:1'],
         ], [
             'default_application_limit.required' => 'Укажите лимит заявок.',
             'default_application_limit.integer'  => 'Лимит должен быть целым числом.',
             'default_application_limit.min'       => 'Минимальное значение: 1.',
-            'default_application_limit.max'       => 'Максимальное значение: 50.',
         ]);
 
         SiteSettings::set(SiteSettings::DEFAULT_APPLICATION_LIMIT, (string) $request->input('default_application_limit'));
