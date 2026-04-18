@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Конкурсы — Талант-центр')
+@section('description', 'Найдите конкурс по своим интересам и участвуйте в творческих состязаниях. Подайте заявку онлайн.')
 
 @section('head')
 <style>
@@ -65,6 +66,15 @@
                         @endforeach
                     </select>
                 @endif
+
+                {{-- Sort --}}
+                <select
+                    onchange="window.location.href='{{ route('contests.index') }}?sort=' + this.value"
+                    class="px-3 py-2.5 border border-primary/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm bg-cream/50 text-dark"
+                >
+                    <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>По новизне</option>
+                    <option value="deadline" {{ $sort === 'deadline' ? 'selected' : '' }}>По дедлайну</option>
+                </select>
             </div>
 
             {{-- Contest grid --}}

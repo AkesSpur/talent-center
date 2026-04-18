@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', $contest->title . ' — Талант-центр')
+@section('description', Str::limit(strip_tags($contest->description ?? ''), 160))
 
 @section('content')
 
@@ -9,12 +10,11 @@
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4" x-data>
                 <div class="min-w-0 flex-1">
-                    <div class="flex items-center gap-2 mb-1">
-                        <a href="{{ route('contests.index') }}" class="text-warm-gray hover:text-primary transition-colors text-sm">
-                            <i class="fas fa-arrow-left mr-1"></i>Конкурсы
-                        </a>
-                    </div>
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark">{{ $contest->title }}</h2>
+                    <x-breadcrumbs :items="[
+                        ['label' => 'Конкурсы', 'url' => route('contests.index')],
+                        ['label' => $contest->title, 'url' => '#'],
+                    ]" />
+                    <h1 class="font-serif text-xl sm:text-2xl font-bold text-dark">{{ $contest->title }}</h1>
                     <div class="flex items-center gap-2 mt-2">
                         <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full {{ $contest->status->color() }}">
                             {{ $contest->status->label() }}
@@ -65,14 +65,14 @@
                     {{-- Description --}}
                     <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
                         <h3 class="font-serif text-xl font-semibold text-dark mb-4">О конкурсе</h3>
-                        <div class="text-dark leading-relaxed rich-content">{!! $contest->description !!}</div>
+                        <div class="text-dark leading-relaxed rich-content">{!! nl2br(e($contest->description)) !!}</div>
                     </div>
 
                     {{-- Rules --}}
                     @if($contest->rules)
                         <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
                             <h3 class="font-serif text-xl font-semibold text-dark mb-4">Правила участия</h3>
-                            <div class="text-dark leading-relaxed rich-content">{!! $contest->rules !!}</div>
+                            <div class="text-dark leading-relaxed rich-content">{!! nl2br(e($contest->rules)) !!}</div>
                         </div>
                     @endif
 

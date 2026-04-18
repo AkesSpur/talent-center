@@ -1,12 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <a href="{{ url()->previous() }}"
-                    class="inline-flex items-center gap-1.5 text-sm text-warm-gray hover:text-primary transition-colors">
-                    <i class="fas fa-arrow-left text-xs"></i>Назад
-                </a>
-            </div>
+            <x-breadcrumbs :items="[
+                ['label' => 'Конкурсы', 'url' => route('contests.index')],
+                ['label' => $contest->title, 'url' => route('contests.show', $contest)],
+                ['label' => 'Подать заявку', 'url' => '#'],
+            ]" />
             <h2 class="font-serif text-xl sm:text-2xl font-bold text-dark">Подача заявки</h2>
             <p class="text-warm-gray mt-1">Заполните форму для участия в конкурсе</p>
         </div>

@@ -32,16 +32,24 @@ class ContestController extends Controller
      * GET /contests
      * Public listing — no auth required.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $contests = Contest::with(['organization', 'categories', 'platformCategory'])
-            ->where('status', ContestStatus::Accepting->value)
-            ->latest()
-            ->paginate(24);
+        $sort = $request->input('sort', 'newest');
+
+        $query = Contest::with(['organization', 'categories', 'platformCategory'])
+            ->where('status', ContestStatus::Accepting->value);
+
+        if ($sort === 'deadline') {
+            $query->orderByRaw('applications_end_at IS NULL, applications_end_at ASC');
+        } else {
+            $query->latest();
+        }
+
+        $contests = $query->paginate(24)->withQueryString();
 
         $platformCategories = PlatformCategory::active()->get();
 
-        return view('contests.index', compact('contests', 'platformCategories'));
+        return view('contests.index', compact('contests', 'platformCategories', 'sort'));
     }
 
     /**

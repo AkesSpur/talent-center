@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Талант-центр — Всероссийская платформа конкурсов</title>
+    <meta name="description" content="Всероссийская платформа для участия в творческих онлайн-конкурсах. Подайте заявку, получите диплом.">
 
     <!-- Favicon -->
     @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_FAVICON]))
