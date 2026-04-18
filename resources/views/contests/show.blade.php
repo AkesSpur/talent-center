@@ -65,14 +65,14 @@
                     {{-- Description --}}
                     <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
                         <h3 class="font-serif text-xl font-semibold text-dark mb-4">О конкурсе</h3>
-                        <div class="text-dark leading-relaxed rich-content">{!! nl2br(e($contest->description)) !!}</div>
+                        <div class="text-dark leading-relaxed rich-content">{!! clean($contest->description) !!}</div>
                     </div>
 
                     {{-- Rules --}}
                     @if($contest->rules)
                         <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
                             <h3 class="font-serif text-xl font-semibold text-dark mb-4">Правила участия</h3>
-                            <div class="text-dark leading-relaxed rich-content">{!! nl2br(e($contest->rules)) !!}</div>
+                            <div class="text-dark leading-relaxed rich-content">{!! clean($contest->rules) !!}</div>
                         </div>
                     @endif
 
