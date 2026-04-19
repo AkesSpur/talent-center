@@ -54,6 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_notifications',
         'is_blocked',
         'avatar_path',
+        'parental_consent_path',
     ];
 
     /**
