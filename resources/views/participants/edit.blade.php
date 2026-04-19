@@ -17,7 +17,27 @@
     <div class="py-8">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-                <form method="POST" action="{{ route('participants.update', $participant) }}" class="space-y-5">
+                @php
+                    $initMinor = $participant->birth_date
+                        ? now() < $participant->birth_date->copy()->addYears(18)->addDay()
+                        : false;
+                    $hasConsent = (bool) $participant->parental_consent_path;
+                    $consentTemplateExists = \App\Models\SiteSettings::get(\App\Models\SiteSettings::PARENTAL_CONSENT_DOCUMENT);
+                @endphp
+                <form method="POST" action="{{ route('participants.update', $participant) }}"
+                      enctype="multipart/form-data"
+                      class="space-y-5"
+                      x-data="{
+                          minor: {{ $initMinor ? 'true' : 'false' }},
+                          hasConsent: {{ $hasConsent ? 'true' : 'false' }},
+                          consentFile: '',
+                          isMinorCheck(v) {
+                              if (!v) return false;
+                              const d = new Date(v), t = new Date(d);
+                              t.setFullYear(t.getFullYear() + 18); t.setDate(t.getDate() + 1);
+                              return new Date() < t;
+                          }
+                      }">
                     @csrf
                     @method('PUT')
 
@@ -44,8 +64,9 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
                             <label for="birth_date" class="block text-sm font-medium text-dark mb-2">Дата рождения</label>
-                            <input id="birth_date" name="birth_date" type="date"
+                            <input id="birth_date" name="birth_date" type="date" required
                                 value="{{ old('birth_date', $participant->birth_date?->format('Y-m-d')) }}"
+                                @change="minor = isMinorCheck($event.target.value)"
                                 class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                             <x-input-error class="mt-1" :messages="$errors->get('birth_date')" />
                         </div>
@@ -72,9 +93,43 @@
                         </div>
                     </div>
 
+                    {{-- Parental consent block (shown for minors) --}}
+                    <div x-show="minor" x-cloak class="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-3">
+                        <p class="font-semibold text-dark text-sm">
+                            <i class="fas fa-child mr-2 text-amber-600"></i>Согласие от родителей / законных представителей
+                        </p>
+                        <p class="text-sm text-warm-gray leading-relaxed">
+                            Для несовершеннолетнего участника требуется вручную заполнить и прикрепить
+                            @if($consentTemplateExists)
+                                <a href="{{ route('parental-consent-template') }}" target="_blank" rel="noopener noreferrer"
+                                   class="text-primary underline hover:opacity-80">Согласие родителей или законных представителей на участие в конкурсах</a>
+                            @else
+                                <span class="font-medium text-dark">Согласие родителей или законных представителей на участие в конкурсах</span>
+                            @endif
+                        </p>
+                        @if($hasConsent)
+                            <div class="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                                <i class="fas fa-check-circle shrink-0"></i>
+                                <span>Документ уже загружен. Загрузите новый, чтобы заменить.</span>
+                            </div>
+                        @endif
+                        <div>
+                            <input type="file" name="parental_consent"
+                                accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*"
+                                @change="consentFile = $event.target.files[0]?.name || ''"
+                                class="text-sm text-dark w-full">
+                            <p class="text-xs text-warm-gray mt-1">PDF или фото документа · до 10 МБ</p>
+                        </div>
+                        @error('parental_consent')
+                            <p class="text-xs text-red-600"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div class="flex gap-4 pt-2">
                         <button type="submit"
-                            class="px-6 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                            :disabled="minor && !hasConsent && !consentFile"
+                            :class="(minor && !hasConsent && !consentFile) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'"
+                            class="px-6 py-3 gradient-gold text-dark font-semibold rounded-lg transition-opacity">
                             <i class="fas fa-save mr-2"></i>Сохранить изменения
                         </button>
                         <a href="{{ route('participants.index') }}"

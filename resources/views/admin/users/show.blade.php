@@ -136,6 +136,34 @@
                         </div>
                     @endif
 
+                    {{-- Parental consent (shown for child participants) --}}
+                    @if($user->parent_id)
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="font-serif text-xl font-semibold text-dark mb-4">Согласие родителей</h3>
+                            @if($user->parental_consent_path)
+                                <div class="flex items-center justify-between gap-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
+                                            <i class="fas fa-file-alt text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-dark">Документ загружен</p>
+                                            <p class="text-xs text-warm-gray">Согласие родителей или законных представителей</p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('admin.users.parental-consent.download', $user) }}" target="_blank"
+                                        class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/5 border border-primary/30 rounded-lg transition-colors">
+                                        <i class="fas fa-download"></i> Скачать
+                                    </a>
+                                </div>
+                            @else
+                                <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>Согласие родителей не загружено.
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
                     {{-- Children --}}
                     @if($user->children->count())
                         <div class="bg-white rounded-xl shadow-lg p-6">

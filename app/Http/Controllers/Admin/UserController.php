@@ -12,8 +12,10 @@ use App\Traits\HandlesImages;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class UserController extends Controller
 {
@@ -87,6 +89,25 @@ class UserController extends Controller
     public function edit(User $user): View
     {
         return view('admin.users.edit', compact('user'));
+    }
+
+    public function downloadParentalConsent(User $user): BinaryFileResponse
+    {
+        $path = $user->parental_consent_path;
+
+        if (!$path || !Storage::disk('public')->exists($path)) {
+            abort(404, 'Документ согласия не найден.');
+        }
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $mime = \in_array($extension, ['jpg', 'jpeg', 'png', 'webp'])
+            ? 'image/' . ($extension === 'jpg' ? 'jpeg' : $extension)
+            : 'application/pdf';
+
+        return response()->file(Storage::disk('public')->path($path), [
+            'Content-Type'        => $mime,
+            'Content-Disposition' => 'inline; filename="parental-consent-' . $user->id . '.' . $extension . '"',
+        ]);
     }
 
     public function update(Request $request, User $user): RedirectResponse

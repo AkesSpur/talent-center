@@ -658,7 +658,7 @@ function contestForm(initialCategories, orgsData, contestOrgId, selectedJuryIds,
         init() {
             this.$watch('isPaid', (val) => {
                 const el = document.getElementById('application_limit');
-                if (el) el.value = val ? '0' : '50';
+                if (el) el.value = val ? '0' : '{{ $defaultApplicationLimit }}';
                 if (!val) this.isPermanent = false;
             });
             this.$watch('isPermanent', (val) => {

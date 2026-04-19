@@ -217,6 +217,63 @@ class SiteSettingsController extends Controller
             ->with('status', 'offer-document-deleted');
     }
 
+    public function updateParentalConsentDocument(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'parental_consent_document' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:10240'],
+        ], [
+            'parental_consent_document.required' => 'Выберите файл.',
+            'parental_consent_document.mimes'    => 'Допустимые форматы: PDF, JPG, PNG, WebP.',
+            'parental_consent_document.max'      => 'Файл не должен превышать 10 МБ.',
+        ]);
+
+        $existing = SiteSettings::get(SiteSettings::PARENTAL_CONSENT_DOCUMENT);
+        if ($existing && Storage::disk('public')->exists($existing)) {
+            Storage::disk('public')->delete($existing);
+        }
+
+        $path = $request->file('parental_consent_document')->store('site', 'public');
+
+        SiteSettings::set(SiteSettings::PARENTAL_CONSENT_DOCUMENT, $path);
+        $this->clearSettingsCache();
+
+        return redirect()->route('admin.settings.index', ['tab' => 'privacy'])
+            ->with('status', 'parental-consent-document-saved');
+    }
+
+    public function deleteParentalConsentDocument(): RedirectResponse
+    {
+        $existing = SiteSettings::get(SiteSettings::PARENTAL_CONSENT_DOCUMENT);
+        if ($existing && Storage::disk('public')->exists($existing)) {
+            Storage::disk('public')->delete($existing);
+        }
+
+        SiteSettings::set(SiteSettings::PARENTAL_CONSENT_DOCUMENT, null);
+        $this->clearSettingsCache();
+
+        return redirect()->route('admin.settings.index', ['tab' => 'privacy'])
+            ->with('status', 'parental-consent-document-deleted');
+    }
+
+    public function downloadParentalConsentDocument(): BinaryFileResponse
+    {
+        $path = SiteSettings::get(SiteSettings::PARENTAL_CONSENT_DOCUMENT);
+
+        if (!$path || !Storage::disk('public')->exists($path)) {
+            abort(404, 'Документ не загружен.');
+        }
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $mime = \in_array($extension, ['jpg', 'jpeg', 'png', 'webp'])
+            ? 'image/' . ($extension === 'jpg' ? 'jpeg' : $extension)
+            : 'application/pdf';
+
+        return response()->file(Storage::disk('public')->path($path), [
+            'Content-Type'        => $mime,
+            'Content-Disposition' => 'inline; filename="parental-consent-template.' . $extension . '"',
+        ]);
+    }
+
     public function updateContestSettings(Request $request): RedirectResponse
     {
         $request->validate([

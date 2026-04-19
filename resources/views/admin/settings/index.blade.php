@@ -338,6 +338,89 @@
                 </div>
             </div>
 
+            {{-- ── Parental consent document block (still in "Документы" tab) ── --}}
+            <div x-show="tab === 'privacy'" x-cloak>
+                <x-confirm-modal
+                    name="delete-parental-consent"
+                    title="Удалить документ согласия"
+                    message="Вы уверены, что хотите удалить шаблон согласия родителей?"
+                    icon="fa-trash-alt"
+                    iconColor="text-red-600"
+                    iconBg="bg-red-100"
+                    confirmText="Удалить"
+                    confirmClass="bg-red-600 text-white"
+                    method="DELETE"
+                />
+                <div class="bg-white rounded-xl shadow-sm border border-gold/10 overflow-hidden">
+                    <div class="flex items-center gap-3 px-6 py-4 border-b border-gold/10 bg-cream/30">
+                        <div class="w-9 h-9 rounded-lg bg-teal-100 flex items-center justify-center shrink-0">
+                            <i class="fas fa-child text-teal-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-dark text-sm">Согласие родителей или законных представителей на участие в конкурсах</p>
+                            <p class="text-xs text-warm-gray">PDF-документ или фото, на который ссылается текст на странице редактирования участника</p>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        @php $parentalDoc = $settings[\App\Models\SiteSettings::PARENTAL_CONSENT_DOCUMENT] ?? ''; @endphp
+                        @if(!empty($parentalDoc))
+                            <div class="flex items-center justify-between gap-4 p-4 mb-5 bg-green-50 border border-green-200 rounded-xl">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
+                                        <i class="fas fa-file-alt text-green-600"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-dark">Шаблон загружен</p>
+                                        <a href="{{ route('parental-consent-template') }}" target="_blank"
+                                            class="text-xs text-primary hover:underline truncate block">
+                                            Открыть документ <i class="fas fa-external-link-alt ml-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <button type="button"
+                                    @click="$dispatch('confirm-delete-parental-consent', { action: '{{ route('admin.settings.parental-consent-document.delete') }}' })"
+                                    class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-colors">
+                                    <i class="fas fa-trash-alt"></i> Удалить
+                                </button>
+                            </div>
+                        @endif
+
+                        <form method="POST" action="{{ route('admin.settings.parental-consent-document') }}" enctype="multipart/form-data">
+                            @csrf
+                            <div class="mb-5">
+                                <label class="block text-xs font-semibold text-warm-gray uppercase tracking-wider mb-2">
+                                    Шаблон согласия (PDF или фото)
+                                </label>
+                                <label for="parental_consent_document"
+                                    class="flex flex-col items-center justify-center w-full border-2 border-dashed rounded-xl cursor-pointer transition-colors
+                                           {{ $errors->has('parental_consent_document') ? 'border-red-300 bg-red-50/30' : 'border-primary/20 hover:border-gold/50 bg-cream/30 hover:bg-cream/60' }}"
+                                    style="min-height: 130px;"
+                                    x-data="{ name: '' }">
+                                    <input type="file" id="parental_consent_document" name="parental_consent_document"
+                                        accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*" class="hidden"
+                                        @change="name = $event.target.files[0]?.name || ''">
+                                    <div class="flex flex-col items-center py-6 px-4 text-center pointer-events-none">
+                                        <i class="fas fa-cloud-arrow-up text-3xl text-warm-gray mb-2"></i>
+                                        <p class="text-sm font-medium text-dark" x-text="name || 'Нажмите или перетащите файл'"></p>
+                                        <p class="text-xs text-warm-gray mt-1">PDF, JPG, PNG, WebP · до 10 МБ</p>
+                                    </div>
+                                </label>
+                                @error('parental_consent_document')
+                                    <p class="mt-1.5 text-xs text-red-600"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div class="flex items-center justify-end gap-3 pt-4 border-t border-gold/10">
+                                <button type="submit"
+                                    class="flex items-center gap-2 px-5 py-2 gradient-gold text-dark font-semibold text-sm rounded-lg hover:opacity-90 transition-opacity">
+                                    <i class="fas fa-floppy-disk text-xs"></i> Сохранить
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             {{-- ── TAB: Branding ── --}}
             <div x-show="tab === 'branding'" x-cloak>
 

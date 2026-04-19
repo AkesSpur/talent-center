@@ -40,6 +40,7 @@ Route::get('/', HomeController::class)->name('home');
 
 // ── Privacy policy (public) ──────────────────────────
 Route::get('/privacy-policy', [AdminSiteSettingsController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/parental-consent-template', [AdminSiteSettingsController::class, 'downloadParentalConsentDocument'])->name('parental-consent-template');
 
 // ── T-Bank payment callback (public, CSRF-excluded via bootstrap/app.php) ──
 Route::post('/payments/callback', [PaymentController::class, 'callback'])->name('payments.callback');
@@ -217,6 +218,11 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/settings/offer-document', [AdminSiteSettingsController::class, 'updateOfferDocument'])->name('settings.offer-document');
     Route::delete('/settings/offer-document', [AdminSiteSettingsController::class, 'deleteOfferDocument'])->name('settings.offer-document.delete');
     Route::post('/settings/contest-settings', [AdminSiteSettingsController::class, 'updateContestSettings'])->name('settings.contest-settings');
+    Route::post('/settings/parental-consent-document', [AdminSiteSettingsController::class, 'updateParentalConsentDocument'])->name('settings.parental-consent-document');
+    Route::delete('/settings/parental-consent-document', [AdminSiteSettingsController::class, 'deleteParentalConsentDocument'])->name('settings.parental-consent-document.delete');
+
+    // Download participant's signed consent (admin only)
+    Route::get('/users/{user}/parental-consent', [AdminUserController::class, 'downloadParentalConsent'])->name('users.parental-consent.download');
 });
 
 // ── Support ─────────────────────────────────────────────

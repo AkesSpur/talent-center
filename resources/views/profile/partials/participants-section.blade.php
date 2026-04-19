@@ -41,6 +41,7 @@
                                     'organization' => $participant->organization ?? '',
                                     'city' => $participant->city ?? '',
                                     'group' => $participant->group ?? '',
+                                    'has_consent' => (bool) $participant->parental_consent_path,
                                 ]) }})"
                                 class="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
                                 title="Редактировать">
@@ -99,7 +100,9 @@
                 </div>
 
                 {{-- Modal Form --}}
-                <form :action="editingId ? '{{ url('participants') }}/' + editingId : '{{ route('participants.store') }}'" method="POST" class="p-6 space-y-5">
+                <form :action="editingId ? '{{ url('participants') }}/' + editingId : '{{ route('participants.store') }}'" method="POST"
+                      enctype="multipart/form-data"
+                      class="p-6 space-y-5">
                     @csrf
                     <template x-if="editingId">
                         <input type="hidden" name="_method" value="PUT">
@@ -126,8 +129,9 @@
 
                     {{-- Birth Date --}}
                     <div>
-                        <label class="block text-sm font-medium text-dark mb-1.5">Дата рождения</label>
-                        <input name="birth_date" type="date" x-model="form.birth_date"
+                        <label class="block text-sm font-medium text-dark mb-1.5">Дата рождения <span class="text-red-500">*</span></label>
+                        <input name="birth_date" type="date" required x-model="form.birth_date"
+                            @change="form.birth_date = $event.target.value; minor = isMinorCheck($event.target.value)"
                             class="w-full px-3 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                     </div>
 
@@ -152,6 +156,34 @@
                         </div>
                     </div>
 
+                    {{-- Parental consent block --}}
+                    @php $consentTemplateExists = \App\Models\SiteSettings::get(\App\Models\SiteSettings::PARENTAL_CONSENT_DOCUMENT); @endphp
+                    <div x-show="minor" x-cloak class="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-3">
+                        <p class="font-semibold text-dark text-sm">
+                            <i class="fas fa-child mr-2 text-amber-600"></i>Согласие от родителей / законных представителей
+                        </p>
+                        <p class="text-sm text-warm-gray leading-relaxed">
+                            Для несовершеннолетнего участника требуется вручную заполнить и прикрепить
+                            @if($consentTemplateExists)
+                                <a href="{{ route('parental-consent-template') }}" target="_blank" rel="noopener noreferrer"
+                                   class="text-primary underline hover:opacity-80">Согласие родителей или законных представителей на участие в конкурсах</a>
+                            @else
+                                <span class="font-medium text-dark">Согласие родителей или законных представителей на участие в конкурсах</span>
+                            @endif
+                        </p>
+                        <div x-show="hasConsent" class="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                            <i class="fas fa-check-circle shrink-0"></i>
+                            <span>Документ уже загружен. Загрузите новый, чтобы заменить.</span>
+                        </div>
+                        <div>
+                            <input type="file" name="parental_consent"
+                                accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*"
+                                @change="consentFile = $event.target.files[0]?.name || ''"
+                                class="text-sm text-dark w-full">
+                            <p class="text-xs text-warm-gray mt-1">PDF или фото документа · до 10 МБ</p>
+                        </div>
+                    </div>
+
                     {{-- Buttons --}}
                     <div class="flex gap-3 pt-2">
                         <button type="button" @click="closeModal()"
@@ -159,7 +191,9 @@
                             Отмена
                         </button>
                         <button type="submit"
-                            class="flex-1 py-2.5 gradient-gold text-dark font-medium rounded-lg hover:opacity-90 transition-opacity">
+                            :disabled="minor && !hasConsent && !consentFile"
+                            :class="(minor && !hasConsent && !consentFile) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'"
+                            class="flex-1 py-2.5 gradient-gold text-dark font-medium rounded-lg transition-opacity">
                             Сохранить
                         </button>
                     </div>
@@ -174,6 +208,9 @@ function participantsManager() {
     return {
         showModal: false,
         editingId: null,
+        minor: false,
+        hasConsent: false,
+        consentFile: '',
         form: {
             last_name: '',
             first_name: '',
@@ -183,13 +220,24 @@ function participantsManager() {
             city: '',
             group: '',
         },
+        isMinorCheck(v) {
+            if (!v) return false;
+            const d = new Date(v), t = new Date(d);
+            t.setFullYear(t.getFullYear() + 18); t.setDate(t.getDate() + 1);
+            return new Date() < t;
+        },
         openAddModal() {
             this.editingId = null;
+            this.minor = false;
+            this.hasConsent = false;
+            this.consentFile = '';
             this.form = { last_name: '', first_name: '', patronymic: '', birth_date: '', organization: '', city: '', group: '' };
             this.showModal = true;
         },
         openEditModal(data) {
             this.editingId = data.id;
+            this.hasConsent = data.has_consent ?? false;
+            this.consentFile = '';
             this.form = {
                 last_name: data.last_name,
                 first_name: data.first_name,
@@ -199,6 +247,7 @@ function participantsManager() {
                 city: data.city,
                 group: data.group,
             };
+            this.minor = this.isMinorCheck(data.birth_date);
             this.showModal = true;
         },
         closeModal() {

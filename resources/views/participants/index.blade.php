@@ -116,7 +116,18 @@
                             <i class="fas fa-user-plus text-primary mr-2"></i>Добавить участника
                         </h3>
 
-                        <form method="POST" action="{{ route('participants.store') }}" class="space-y-4">
+                        @php $consentTemplateExists = \App\Models\SiteSettings::get(\App\Models\SiteSettings::PARENTAL_CONSENT_DOCUMENT); @endphp
+                        <form method="POST" action="{{ route('participants.store') }}" enctype="multipart/form-data"
+                              class="space-y-4"
+                              x-data="{
+                                  minor: false, consentFile: '',
+                                  isMinorCheck(v) {
+                                      if (!v) return false;
+                                      const d = new Date(v), t = new Date(d);
+                                      t.setFullYear(t.getFullYear() + 18); t.setDate(t.getDate() + 1);
+                                      return new Date() < t;
+                                  }
+                              }">
                             @csrf
 
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -144,8 +155,9 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="birth_date" class="block text-sm font-medium text-dark mb-2">Дата рождения</label>
-                                    <input id="birth_date" name="birth_date" type="date" value="{{ old('birth_date') }}"
+                                    <label for="birth_date" class="block text-sm font-medium text-dark mb-2">Дата рождения <span class="text-red-500">*</span></label>
+                                    <input id="birth_date" name="birth_date" type="date" value="{{ old('birth_date') }}" required
+                                        @change="minor = isMinorCheck($event.target.value)"
                                         class="w-full px-4 py-3 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                                     <x-input-error class="mt-1" :messages="$errors->get('birth_date')" />
                                 </div>
@@ -172,9 +184,37 @@
                                 </div>
                             </div>
 
+                            {{-- Parental consent block --}}
+                            <div x-show="minor" x-cloak class="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-3">
+                                <p class="font-semibold text-dark text-sm">
+                                    <i class="fas fa-child mr-2 text-amber-600"></i>Согласие от родителей / законных представителей
+                                </p>
+                                <p class="text-sm text-warm-gray leading-relaxed">
+                                    Для несовершеннолетнего участника требуется вручную заполнить и прикрепить
+                                    @if($consentTemplateExists)
+                                        <a href="{{ route('parental-consent-template') }}" target="_blank" rel="noopener noreferrer"
+                                           class="text-primary underline hover:opacity-80">Согласие родителей или законных представителей на участие в конкурсах</a>
+                                    @else
+                                        <span class="font-medium text-dark">Согласие родителей или законных представителей на участие в конкурсах</span>
+                                    @endif
+                                </p>
+                                <div>
+                                    <input type="file" name="parental_consent"
+                                        accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*"
+                                        @change="consentFile = $event.target.files[0]?.name || ''"
+                                        class="text-sm text-dark w-full">
+                                    <p class="text-xs text-warm-gray mt-1">PDF или фото документа · до 10 МБ</p>
+                                </div>
+                                @error('parental_consent')
+                                    <p class="text-xs text-red-600"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
+                                @enderror
+                            </div>
+
                             <div class="pt-2">
                                 <button type="submit"
-                                    class="px-6 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                                    :disabled="minor && !consentFile"
+                                    :class="(minor && !consentFile) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'"
+                                    class="px-6 py-3 gradient-gold text-dark font-semibold rounded-lg transition-opacity">
                                     <i class="fas fa-plus mr-2"></i>Добавить участника
                                 </button>
                             </div>
@@ -203,7 +243,19 @@
                 </div>
 
                 {{-- Modal Form --}}
-                <form method="POST" action="{{ route('participants.store') }}" class="p-6 space-y-4">
+                <form method="POST" action="{{ route('participants.store') }}"
+                      enctype="multipart/form-data"
+                      class="p-6 space-y-4"
+                      x-data="{
+                          minor: false,
+                          consentFile: '',
+                          isMinorCheck(v) {
+                              if (!v) return false;
+                              const d = new Date(v), t = new Date(d);
+                              t.setFullYear(t.getFullYear() + 18); t.setDate(t.getDate() + 1);
+                              return new Date() < t;
+                          }
+                      }">
                     @csrf
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -229,8 +281,9 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-dark mb-1.5">Дата рождения</label>
-                            <input name="birth_date" type="date" value="{{ old('birth_date') }}"
+                            <label class="block text-sm font-medium text-dark mb-1.5">Дата рождения <span class="text-red-500">*</span></label>
+                            <input name="birth_date" type="date" value="{{ old('birth_date') }}" required
+                                @change="minor = isMinorCheck($event.target.value)"
                                 class="w-full px-3 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
                         </div>
                         <div>
@@ -256,13 +309,41 @@
                         </div>
                     </div>
 
+                    {{-- Parental consent block --}}
+                    <div x-show="minor" x-cloak class="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-3">
+                        <p class="font-semibold text-dark text-sm">
+                            <i class="fas fa-child mr-2 text-amber-600"></i>Согласие от родителей / законных представителей
+                        </p>
+                        <p class="text-sm text-warm-gray leading-relaxed">
+                            Для несовершеннолетнего участника требуется вручную заполнить и прикрепить
+                            @if($consentTemplateExists)
+                                <a href="{{ route('parental-consent-template') }}" target="_blank" rel="noopener noreferrer"
+                                   class="text-primary underline hover:opacity-80">Согласие родителей или законных представителей на участие в конкурсах</a>
+                            @else
+                                <span class="font-medium text-dark">Согласие родителей или законных представителей на участие в конкурсах</span>
+                            @endif
+                        </p>
+                        <div>
+                            <input type="file" name="parental_consent"
+                                accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*"
+                                @change="consentFile = $event.target.files[0]?.name || ''"
+                                class="text-sm text-dark w-full">
+                            <p class="text-xs text-warm-gray mt-1">PDF или фото документа · до 10 МБ</p>
+                        </div>
+                        @error('parental_consent')
+                            <p class="text-xs text-red-600"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div class="flex gap-3 pt-2">
                         <button type="button" onclick="document.getElementById('add-participant-modal').close()"
                             class="flex-1 py-2.5 border border-primary text-primary font-medium rounded-lg hover:bg-primary/5 transition-colors">
                             Отмена
                         </button>
                         <button type="submit"
-                            class="flex-1 py-2.5 gradient-gold text-dark font-medium rounded-lg hover:opacity-90 transition-opacity">
+                            :disabled="minor && !consentFile"
+                            :class="(minor && !consentFile) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'"
+                            class="flex-1 py-2.5 gradient-gold text-dark font-medium rounded-lg transition-opacity">
                             <i class="fas fa-plus mr-2"></i>Добавить
                         </button>
                     </div>
