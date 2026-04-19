@@ -33,6 +33,7 @@
         method="DELETE"
     />
 
+    @php $consentTemplateExists = \App\Models\SiteSettings::get(\App\Models\SiteSettings::PARENTAL_CONSENT_DOCUMENT); @endphp
     <div x-data class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
@@ -116,7 +117,6 @@
                             <i class="fas fa-user-plus text-primary mr-2"></i>Добавить участника
                         </h3>
 
-                        @php $consentTemplateExists = \App\Models\SiteSettings::get(\App\Models\SiteSettings::PARENTAL_CONSENT_DOCUMENT); @endphp
                         <form method="POST" action="{{ route('participants.store') }}" enctype="multipart/form-data"
                               class="space-y-4"
                               x-data="{
@@ -199,11 +199,28 @@
                                     @endif
                                 </p>
                                 <div>
-                                    <input type="file" name="parental_consent"
+                                    <input type="file" name="parental_consent" id="parental-consent-inline"
                                         accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*"
-                                        @change="consentFile = $event.target.files[0]?.name || ''"
-                                        class="text-sm text-dark w-full">
-                                    <p class="text-xs text-warm-gray mt-1">PDF или фото документа · до 10 МБ</p>
+                                        class="hidden"
+                                        @change="consentFile = $event.target.files[0]?.name || ''">
+                                    <label for="parental-consent-inline"
+                                        :class="consentFile ? 'border-green-400 bg-green-50' : 'border-primary/20 hover:border-primary/40'"
+                                        class="border-2 border-dashed rounded-lg p-5 text-center transition-colors cursor-pointer block">
+                                        <template x-if="!consentFile">
+                                            <div>
+                                                <i class="fas fa-cloud-upload-alt text-2xl text-primary/40 mb-2 block"></i>
+                                                <p class="text-sm font-medium text-dark mb-0.5">Нажмите для выбора файла</p>
+                                                <p class="text-xs text-warm-gray">PDF или фото документа · до 10 МБ</p>
+                                            </div>
+                                        </template>
+                                        <template x-if="consentFile">
+                                            <div>
+                                                <i class="fas fa-check-circle text-2xl text-green-500 mb-2 block"></i>
+                                                <p class="text-sm font-semibold text-green-700 mb-0.5 truncate" x-text="consentFile"></p>
+                                                <p class="text-xs text-warm-gray">Нажмите, чтобы изменить файл</p>
+                                            </div>
+                                        </template>
+                                    </label>
                                 </div>
                                 @error('parental_consent')
                                     <p class="text-xs text-red-600"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
@@ -324,11 +341,28 @@
                             @endif
                         </p>
                         <div>
-                            <input type="file" name="parental_consent"
+                            <input type="file" name="parental_consent" id="parental-consent-modal"
                                 accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/*"
-                                @change="consentFile = $event.target.files[0]?.name || ''"
-                                class="text-sm text-dark w-full">
-                            <p class="text-xs text-warm-gray mt-1">PDF или фото документа · до 10 МБ</p>
+                                class="hidden"
+                                @change="consentFile = $event.target.files[0]?.name || ''">
+                            <label for="parental-consent-modal"
+                                :class="consentFile ? 'border-green-400 bg-green-50' : 'border-primary/20 hover:border-primary/40'"
+                                class="border-2 border-dashed rounded-lg p-5 text-center transition-colors cursor-pointer block">
+                                <template x-if="!consentFile">
+                                    <div>
+                                        <i class="fas fa-cloud-upload-alt text-2xl text-primary/40 mb-2 block"></i>
+                                        <p class="text-sm font-medium text-dark mb-0.5">Нажмите для выбора файла</p>
+                                        <p class="text-xs text-warm-gray">PDF или фото документа · до 10 МБ</p>
+                                    </div>
+                                </template>
+                                <template x-if="consentFile">
+                                    <div>
+                                        <i class="fas fa-check-circle text-2xl text-green-500 mb-2 block"></i>
+                                        <p class="text-sm font-semibold text-green-700 mb-0.5 truncate" x-text="consentFile"></p>
+                                        <p class="text-xs text-warm-gray">Нажмите, чтобы изменить файл</p>
+                                    </div>
+                                </template>
+                            </label>
                         </div>
                         @error('parental_consent')
                             <p class="text-xs text-red-600"><i class="fas fa-circle-exclamation mr-1"></i>{{ $message }}</p>
