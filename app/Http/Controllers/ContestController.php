@@ -319,14 +319,20 @@ class ContestController extends Controller
             ? Carbon::parse($data['evaluation_end_at'])->endOfDay()
             : null;
 
+        // Only delete a stored image if it is a contest-specific custom upload,
+        // never if it points to a shared library asset (diploma-backgrounds/, etc.).
+        $deleteIfOwned = function (?string $path): void {
+            if ($path && str_starts_with($path, 'contests/')) {
+                $this->deleteStoredImage($path);
+            }
+        };
+
         // Diploma background
         if ($request->boolean('delete_diploma_background') && $contest->diploma_background) {
-            $this->deleteStoredImage($contest->diploma_background);
+            $deleteIfOwned($contest->diploma_background);
             $data['diploma_background'] = null;
         } elseif ($request->hasFile('diploma_background')) {
-            if ($contest->diploma_background) {
-                $this->deleteStoredImage($contest->diploma_background);
-            }
+            $deleteIfOwned($contest->diploma_background);
             $data['diploma_background'] = $this->storeImageAsWebp(
                 $request->file('diploma_background'),
                 'contests/backgrounds',
@@ -334,20 +340,16 @@ class ContestController extends Controller
                 90
             );
         } elseif ($request->filled('selected_diploma_background_path')) {
-            if ($contest->diploma_background) {
-                $this->deleteStoredImage($contest->diploma_background);
-            }
+            $deleteIfOwned($contest->diploma_background);
             $data['diploma_background'] = $request->input('selected_diploma_background_path');
         }
 
         // Cover image
         if ($request->boolean('delete_cover_image') && $contest->cover_image) {
-            $this->deleteStoredImage($contest->cover_image);
+            $deleteIfOwned($contest->cover_image);
             $data['cover_image'] = null;
         } elseif ($request->hasFile('cover_image')) {
-            if ($contest->cover_image) {
-                $this->deleteStoredImage($contest->cover_image);
-            }
+            $deleteIfOwned($contest->cover_image);
             $data['cover_image'] = $this->storeImageAsWebp(
                 $request->file('cover_image'),
                 'contests/covers',
