@@ -351,9 +351,14 @@
             <div class="participant-last-name">{{ $participantLastName }}</div>
             <div class="participant-first-patronymic">{{ $participantFirstPatronymic }}</div>
 
-            <!-- Institution / Group (right-aligned, right after name) -->
-            @if($participantInstitution || $participantGroup)
+            <!-- Institution / Group / City (right-aligned, right after name) -->
+            @if($participantInstitution || $participantGroup || ($participantCity ?? null))
                 <div class="details-block" style="margin-bottom: 2mm;">
+                    @if($participantCity ?? null)
+                        <div class="group-line">
+                            <span class="group-label">город: </span>{{ $participantCity }}
+                        </div>
+                    @endif
                     @if($participantInstitution)
                         <div class="institution-line">
                             <span class="institution-label">учреждение: </span>{{ $participantInstitution }}

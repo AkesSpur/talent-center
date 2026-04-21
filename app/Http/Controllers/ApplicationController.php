@@ -76,6 +76,7 @@ class ApplicationController extends Controller
                     'firstPat'    => trim(($u->first_name ?? '') . ' ' . ($u->patronymic ?? '')),
                     'institution' => $u->organization ?? '',
                     'group'       => $u->group ?? '',
+                    'city'        => $u->city ?? '',
                 ],
             ])
             ->all();
@@ -95,12 +96,16 @@ class ApplicationController extends Controller
 
         $contactEmail = SiteSettings::get(SiteSettings::CONTACT_EMAIL, 'info@talant-centr.ru');
 
+        $offerDocUrl = ($path = SiteSettings::get(SiteSettings::OFFER_DOCUMENT))
+            ? asset('storage/' . $path)
+            : null;
+
         $months      = [1 => 'январь', 2 => 'февраль', 3 => 'март', 4 => 'апрель', 5 => 'май', 6 => 'июнь', 7 => 'июль', 8 => 'август', 9 => 'сентябрь', 10 => 'октябрь', 11 => 'ноябрь', 12 => 'декабрь'];
         $previewDate = $months[(int) now()->format('n')] . ' ' . now()->format('Y');
 
         return view('applications.create', compact(
             'contest', 'children', 'alreadyAppliedIds', 'ageGroupsData',
-            'usersPreviewData', 'diplomaBgUrl', 'juryMembers', 'contactEmail', 'previewDate'
+            'usersPreviewData', 'diplomaBgUrl', 'juryMembers', 'contactEmail', 'previewDate', 'offerDocUrl'
         ));
     }
 
@@ -167,6 +172,7 @@ class ApplicationController extends Controller
             'contactEmail'              => SiteSettings::get(SiteSettings::CONTACT_EMAIL, 'info@talant-centr.ru'),
             'participantInstitution'    => $user->organization,
             'participantGroup'          => $user->group,
+            'participantCity'           => $user->city,
             'isPreview'                 => true,
         ]);
     }

@@ -68,6 +68,7 @@ class DiplomaService
             'teacherName'           => $application->teacher_name,
             'participantInstitution' => $application->user->organization,
             'participantGroup'       => $application->user->group,
+            'participantCity'        => $application->user->city,
             'awardedDate'     => $this->russianMonthYear(
                 $application->evaluated_at ?? now()
             ),

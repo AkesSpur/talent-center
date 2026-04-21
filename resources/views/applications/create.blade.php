@@ -106,6 +106,9 @@
                             get previewGroup() {
                                 return (this.usersData[String(this.submittedForUserId)] || {}).group || '';
                             },
+                            get previewCity() {
+                                return (this.usersData[String(this.submittedForUserId)] || {}).city || '';
+                            },
                             get categoryName() {
                                 if (!this.selectedCategoryId) return '';
                                 return this.categoriesData[String(this.selectedCategoryId)] || '';
@@ -327,7 +330,10 @@
                                             <div style="text-align:right;font-size:12pt;color:#000;line-height:1.7;"><span style="color:#aa8345;">Преподаватель: </span><span x-text="teacherName"></span></div>
                                         </template>
 
-                                        {{-- Institution / group --}}
+                                        {{-- City / Institution / group --}}
+                                        <template x-if="previewCity">
+                                            <div style="text-align:right;font-size:12pt;color:#000;line-height:1.7;margin-top:8px;"><span style="color:#aa8345;">город: </span><span x-text="previewCity"></span></div>
+                                        </template>
                                         <template x-if="previewInstitution">
                                             <div style="text-align:right;font-size:12pt;color:#000;line-height:1.7;margin-top:8px;"><span style="color:#aa8345;">учреждение: </span><span x-text="previewInstitution"></span></div>
                                         </template>
@@ -369,7 +375,13 @@
                                 class="w-4 h-4 mt-0.5 shrink-0 rounded border-primary/30 text-primary focus:ring-primary/20 cursor-pointer">
                             <div>
                                 <p class="text-sm font-semibold text-dark leading-snug">Заполнено верно, мною проверено</p>
-                                <p class="text-xs text-warm-gray mt-0.5 leading-relaxed">Я подтверждаю, что все данные заполнены верно и соответствуют действительности</p>
+                                <p class="text-xs text-warm-gray mt-0.5 leading-relaxed">Я подтверждаю, что все данные заполнены верно и соответствуют действительности, все необходимые согласия имеются, с
+                                    @if($offerDocUrl)
+                                        <a href="{{ $offerDocUrl }}" target="_blank" rel="noopener noreferrer" class="underline hover:opacity-80">договором-оферты</a>
+                                    @else
+                                        договором-оферты
+                                    @endif
+                                    ознакомлен, условия принимаю.</p>
                             </div>
                         </label>
 

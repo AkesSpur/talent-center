@@ -113,7 +113,7 @@
                     </div>
 
                     {{-- Apply card --}}
-                    <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6" x-data="{ showAuthModal: false }">
                         @if($contest->isAccepting())
                             @if($hasApplied)
                                 <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-700">
@@ -134,10 +134,18 @@
                                     </span>
                                 </div>
                             @else
-                                <a href="{{ route('applications.create', $contest) }}"
-                                    class="block text-center px-4 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
-                                    <i class="fas fa-paper-plane mr-2"></i>Подать заявку
-                                </a>
+                                @auth
+                                    <a href="{{ route('applications.create', $contest) }}"
+                                        class="block text-center px-4 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                                        <i class="fas fa-paper-plane mr-2"></i>Подать заявку
+                                    </a>
+                                @endauth
+                                @guest
+                                    <button type="button" @click="showAuthModal = true"
+                                        class="block w-full text-center px-4 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                                        <i class="fas fa-paper-plane mr-2"></i>Подать заявку
+                                    </button>
+                                @endguest
                             @endif
                             @if($contest->isPermanent() && auth()->check() && (auth()->user()->isAdmin() || auth()->user()->canInOrg('evaluate', $contest->organization)))
                                 <a href="{{ route('evaluation.show', [$contest->organization, $contest]) }}"
@@ -168,6 +176,41 @@
                                 <i class="fas fa-ban mr-2"></i>Конкурс отменён.
                             </div>
                         @endif
+
+                        {{-- Guest auth modal --}}
+                        <div x-show="showAuthModal" x-cloak
+                            class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+                            x-transition:enter="ease-out duration-200"
+                            x-transition:enter-start="opacity-0"
+                            x-transition:enter-end="opacity-100"
+                            x-transition:leave="ease-in duration-150"
+                            x-transition:leave-start="opacity-100"
+                            x-transition:leave-end="opacity-0">
+                            <div @click.outside="showAuthModal = false"
+                                class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 space-y-4">
+                                <div class="text-center">
+                                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <i class="fas fa-user-lock text-primary text-xl"></i>
+                                    </div>
+                                    <h3 class="font-serif text-lg font-semibold text-dark">Требуется вход</h3>
+                                    <p class="text-sm text-warm-gray mt-2">Для участия в конкурсе необходимо войти либо зарегистрироваться.</p>
+                                </div>
+                                <div class="flex flex-col gap-2 pt-2">
+                                    <a href="{{ route('login') }}"
+                                        class="block text-center px-4 py-3 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                                        <i class="fas fa-sign-in-alt mr-2"></i>Войти
+                                    </a>
+                                    <a href="{{ route('register') }}"
+                                        class="block text-center px-4 py-3 border border-primary text-primary font-semibold rounded-lg hover:bg-primary/5 transition-colors">
+                                        <i class="fas fa-user-plus mr-2"></i>Зарегистрироваться
+                                    </a>
+                                    <button @click="showAuthModal = false"
+                                        class="block w-full text-center px-4 py-2 text-warm-gray hover:text-dark transition-colors text-sm">
+                                        Вернуться к конкурсу
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- Dates card --}}
