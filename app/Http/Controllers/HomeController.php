@@ -18,7 +18,7 @@ class HomeController extends Controller
 {
     public function __invoke(): View
     {
-        $activeContests = Contest::with(['organization', 'platformCategory', 'categories'])
+        $activeContests = Contest::with(['organization', 'platformCategory'])
             ->where('status', ContestStatus::Accepting)
             ->latest('applications_start_at')
             ->take(6)

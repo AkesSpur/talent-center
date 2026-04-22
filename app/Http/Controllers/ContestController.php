@@ -36,7 +36,7 @@ class ContestController extends Controller
     {
         $sort = $request->input('sort', 'newest');
 
-        $query = Contest::with(['organization', 'categories', 'platformCategory'])
+        $query = Contest::with(['organization', 'platformCategory'])
             ->where('status', ContestStatus::Accepting->value);
 
         if ($sort === 'deadline') {
