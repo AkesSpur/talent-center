@@ -1,3 +1,11 @@
+# Helpdesk attachments (10 MB per file, 20 MB per message) when PHP runs as an
+# Apache module. PHP-FPM / FastCGI read public/.user.ini instead.
+<IfModule mod_php.c>
+    php_value upload_max_filesize 12M
+    php_value post_max_size 25M
+    php_value max_input_time 300
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

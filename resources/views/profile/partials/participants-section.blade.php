@@ -1,4 +1,18 @@
 <div x-data="participantsManager()" class="space-y-6">
+    <template x-teleport="body">
+        <x-confirm-modal
+            name="delete-participant"
+            title="Удалить участника"
+            message="Вы уверены, что хотите удалить этого участника?"
+            icon="fa-user-minus"
+            iconColor="text-red-600"
+            iconBg="bg-red-100"
+            confirmText="Удалить"
+            confirmClass="bg-red-600 text-white hover:bg-red-700"
+            method="DELETE"
+        />
+    </template>
+
     {{-- Header --}}
     <div class="bg-white rounded-xl shadow-lg p-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
@@ -47,14 +61,11 @@
                                 title="Редактировать">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <form method="POST" action="{{ route('participants.destroy', $participant) }}"
-                                onsubmit="return confirm('Удалить участника {{ addslashes($participant->first_name) }} {{ addslashes($participant->last_name) }}?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Удалить">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                            <button type="button"
+                                @click="$dispatch('confirm-delete-participant', { action: '{{ route('participants.destroy', $participant) }}', message: @js('Вы уверены, что хотите удалить участника «' . trim($participant->last_name . ' ' . $participant->first_name . ' ' . $participant->patronymic) . '»?') })"
+                                class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Удалить">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
                     </div>
                 @endforeach

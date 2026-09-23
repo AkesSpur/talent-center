@@ -1,5 +1,6 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
+import plugin from 'tailwindcss/plugin';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -41,5 +42,10 @@ export default {
         'bg-gray-200', 'text-gray-600',
     ],
 
-    plugins: [forms],
+    plugins: [
+        forms,
+        // `xl:sidebar-compact:…` styles the docked sidebar once the user narrows it to icons.
+        // The class sits on <html>; layouts/app.blade.php sets it before the first paint.
+        plugin(({ addVariant }) => addVariant('sidebar-compact', '.sidebar-compact &')),
+    ],
 };

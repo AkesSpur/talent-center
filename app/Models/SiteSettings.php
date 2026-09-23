@@ -25,6 +25,10 @@ class SiteSettings extends Model
     const DEFAULT_APPLICATION_LIMIT      = 'default_application_limit';
     const PARENTAL_CONSENT_DOCUMENT      = 'parental_consent_document_path';
 
+    // Support / helpdesk
+    const SUPPORT_EMAIL                  = 'support_email';
+    const SUPPORT_SLA_HOURS              = 'support_sla_hours';
+
     public static function get(string $key, ?string $default = null): ?string
     {
         return static::where('key', $key)->value('value') ?? $default;

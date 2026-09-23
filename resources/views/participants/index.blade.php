@@ -62,7 +62,7 @@
                                                 <i class="fas fa-pen text-xs"></i>
                                             </a>
                                             <button type="button"
-                                                @click="$dispatch('confirm-delete-participant', { action: '{{ route('participants.destroy', $child) }}' })"
+                                                @click="$dispatch('confirm-delete-participant', { action: '{{ route('participants.destroy', $child) }}', message: @js('Вы уверены, что хотите удалить участника «' . trim($child->last_name . ' ' . $child->first_name . ' ' . $child->patronymic) . '»?') })"
                                                 class="w-8 h-8 flex items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
                                                 title="Удалить">
                                                 <i class="fas fa-trash text-xs"></i>

@@ -38,6 +38,13 @@ return [
             'report' => false,
         ],
 
+        // Support attachments: private, served only through a gated route.
+        'support' => [
+            'driver' => 'local',
+            'root' => storage_path('app/support'),
+            'throw' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

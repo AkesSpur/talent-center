@@ -10,7 +10,8 @@
     <div class="error-title">Доступ запрещён</div>
     <div class="divider"></div>
     <p class="error-message">
-        {{ $exception->getMessage() ?: 'У вас недостаточно прав для просмотра этой страницы. Если вы считаете, что это ошибка, обратитесь к администратору.' }}
+        {{-- __() turns Laravel's own English messages ("This action is unauthorized.") into Russian via lang/ru.json --}}
+        {{ $exception->getMessage() ? __($exception->getMessage()) : 'У вас недостаточно прав для просмотра этой страницы. Если вы считаете, что это ошибка, обратитесь к администратору.' }}
     </p>
     <div class="actions">
         <a href="javascript:history.back()" class="error-btn">

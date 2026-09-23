@@ -12,11 +12,17 @@
     $sizeClass = $sizes[$size] ?? $sizes['md'];
 @endphp
 
-@if($user->avatar_url)
+@if($user?->avatar_url)
     <img src="{{ $user->avatar_url }}" alt="{{ $user->initials }}"
         {{ $attributes->merge(['class' => "{$sizeClass} rounded-full object-cover flex-shrink-0"]) }} />
-@else
+@elseif($user)
     <div {{ $attributes->merge(['class' => "{$sizeClass} gradient-gold rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0"]) }}>
         {{ $user->initials }}
+    </div>
+@else
+    {{-- Deleted account: tickets and comments outlive their user (nullOnDelete) --}}
+    <div {{ $attributes->merge(['class' => "{$sizeClass} bg-warm-gray/20 rounded-full flex items-center justify-center text-warm-gray flex-shrink-0"]) }}
+        title="Аккаунт удалён">
+        <i class="fas fa-user-slash"></i>
     </div>
 @endif

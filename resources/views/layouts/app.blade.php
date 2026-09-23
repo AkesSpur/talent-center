@@ -21,31 +21,59 @@
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 
+        {{-- Sidebar narrowed on this device: applied before the first paint so the page doesn't jump (resources/js/app-shell.js) --}}
+        <script>
+            try { if (localStorage.getItem('tc.sidebar.compact') === '1') document.documentElement.classList.add('sidebar-compact'); } catch (e) {}
+        </script>
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @stack('styles')
     </head>
     <body class="font-sans antialiased bg-cream">
+        {{-- Keyboard users can jump past the sidebar straight to the page --}}
+        <a href="#main-content"
+            class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary focus:shadow-lg focus:ring-2 focus:ring-primary/40">
+            Перейти к содержимому
+        </a>
+
         <x-notify />
-        <div class="min-h-screen">
-            @include('layouts.navigation')
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class=''>
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+        <div x-data="appShell" @keydown.escape.window="closeSidebar()">
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>            
+            {{-- Dims the page behind the drawer on small screens --}}
+            <div x-show="sidebarOpen" x-cloak
+                x-transition:enter="transition-opacity ease-out duration-300"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="transition-opacity ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                @click="closeSidebar()"
+                class="fixed inset-0 z-40 bg-dark/40 backdrop-blur-sm xl:hidden"
+                aria-hidden="true"></div>
+
+            <x-app-sidebar />
+
+            <div class="flex min-h-screen flex-col transition-[padding] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none xl:pl-64 xl:sidebar-compact:pl-20" :inert="sidebarOpen">
+                @include('layouts.navigation')
+
+                <!-- Page Heading -->
+                @isset($header)
+                    <header>
+                        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                            {{ $header }}
+                        </div>
+                    </header>
+                @endisset
+
+                <!-- Page Content -->
+                <main id="main-content" tabindex="-1" class="flex-1 focus:outline-none">
+                    {{ $slot }}
+                </main>
+
+                @include('layouts.footer')
+            </div>
         </div>
-        
-        @include('layouts.footer')
+
         @stack('scripts')
     </body>
 </html>

@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminSeeder::class,
+            SupportCategorySeeder::class,
             TestDataSeeder::class,
             ContestSeeder::class,
             Stage4TestSeeder::class,

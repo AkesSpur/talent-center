@@ -90,55 +90,13 @@
 
             <div class="flex items-center gap-3">
                 @auth
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open"
-                            class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary transition">
-                            <x-user-avatar :user="Auth::user()" size="sm" />
-                            <span class="hidden sm:inline">{{ Auth::user()->last_name }} {{ mb_substr(Auth::user()->first_name, 0, 1) }}.</span>
-                            <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
-                        </button>
-                        <div x-show="open" @click.outside="open = false"
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             x-transition:leave="transition ease-in duration-75"
-                             x-transition:leave-start="opacity-100 scale-100"
-                             x-transition:leave-end="opacity-0 scale-95"
-                             class="absolute right-0 z-50 mt-2 w-64 rounded-xl shadow-lg bg-white ring-1 ring-gold/20 py-1"
-                             style="display:none;">
-                            <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-2 text-sm text-dark hover:bg-cream transition">
-                                <i class="fas fa-th-large mr-2 text-warm-gray w-4"></i> Личный кабинет
-                            </a>
-                            <a href="{{ route('dashboard.applications') }}" class="flex items-center px-4 py-2 text-sm text-dark hover:bg-cream transition">
-                                <i class="fas fa-file-alt mr-2 text-warm-gray w-4"></i> Мои заявки
-                            </a>
-                            <a href="{{ route('contests.index') }}" class="flex items-center px-4 py-2 text-sm text-dark hover:bg-cream transition">
-                                <i class="fas fa-trophy mr-2 text-warm-gray w-4"></i> Конкурсы
-                            </a>
-                            @if(auth()->user()->isAdmin())
-                                <div class="border-t border-gold/10 mt-1 pt-1">
-                                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 text-sm text-dark hover:bg-cream transition">
-                                        <i class="fas fa-cog mr-2 text-warm-gray w-4"></i> Админ-панель
-                                    </a>
-                                </div>
-                            @endif
-                            @if(auth()->user()->isSupport())
-                                <div class="border-t border-gold/10 mt-1 pt-1">
-                                    <a href="{{ route('support.dashboard') }}" class="flex items-center px-4 py-2 text-sm text-dark hover:bg-cream transition">
-                                        <i class="fas fa-headset mr-2 text-warm-gray w-4"></i> Панель поддержки
-                                    </a>
-                                </div>
-                            @endif
-                            <div class="border-t border-gold/10 mt-1 pt-1">
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
-                                        <i class="fas fa-sign-out-alt mr-2 w-4"></i> Выйти
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                    {{-- The full menu lives in the cabinet sidebar; this is the way in. --}}
+                    <a href="{{ route('dashboard') }}"
+                        class="inline-flex items-center gap-2 rounded-full border border-primary/20 py-1 pl-1 pr-1 text-sm font-medium text-dark transition hover:bg-primary/5 active:scale-[0.98] sm:pr-4"
+                        title="Личный кабинет">
+                        <x-user-avatar :user="Auth::user()" size="sm" />
+                        <span class="hidden sm:inline">Личный кабинет</span>
+                    </a>
                 @else
                     <a href="{{ route('login') }}" class="text-sm font-medium text-warm-gray hover:text-primary transition">Войти</a>
                     <a href="{{ route('register') }}" class="hidden sm:inline-block px-5 py-2 gradient-gold text-dark font-semibold rounded-lg text-sm hover:opacity-90 transition">

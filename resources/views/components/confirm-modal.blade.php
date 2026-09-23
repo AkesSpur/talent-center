@@ -11,8 +11,9 @@
     'method' => 'POST',
 ])
 
-<div x-data="{ open: false, action: '', loading: false }"
-     @confirm-{{ $name }}.window="action = $event.detail.action; open = true"
+{{-- Dispatch detail: { action, message? } — message overrides the default prop text --}}
+<div x-data="{ open: false, action: '', loading: false, message: @js($message) }"
+     @confirm-{{ $name }}.window="action = $event.detail.action; message = $event.detail.message ?? @js($message); open = true"
      x-show="open"
      x-transition:enter="transition ease-out duration-200"
      x-transition:enter-start="opacity-0"
@@ -62,7 +63,7 @@
             <h3 class="font-serif text-lg font-bold text-dark mb-2">{{ $title }}</h3>
 
             {{-- Message --}}
-            <p class="text-warm-gray text-sm mb-6">{{ $message }}</p>
+            <p class="text-warm-gray text-sm mb-6" x-text="message">{{ $message }}</p>
 
             {{-- Actions --}}
             <form :action="action" method="POST" class="flex items-center justify-center gap-3"

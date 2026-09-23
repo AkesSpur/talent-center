@@ -45,3 +45,20 @@
     .no-spinner::-webkit-outer-spin-button,
     .no-spinner::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 }
+
+/* Respect the OS "reduce motion" setting: keep feedback, drop movement. */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .hover-lift:hover { transform: none; }
+    .active\:scale-\[0\.98\]:active { transform: none; }
+}
+
+/* Top bar glass: solid when the OS asks for less transparency. */
+@media (prefers-reduced-transparency: reduce) {
+    .app-topbar { background-color: #FAF8F5; backdrop-filter: none; }
+}

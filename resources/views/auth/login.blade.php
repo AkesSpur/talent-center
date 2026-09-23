@@ -48,4 +48,13 @@
             <a href="{{ route('register') }}" class="text-primary hover:text-primary-dark font-medium">Зарегистрироваться</a>
         </p>
     </div>
+
+    {{-- Can't get in? Support is reachable by email, since a ticket needs a login --}}
+            @if(!empty($siteSettings[\App\Models\SiteSettings::SUPPORT_EMAIL]))
+                <p class="mt-6 text-center text-xs text-warm-gray">
+                    Не получается войти? Напишите нам:
+                    <a href="mailto:{{ $siteSettings[\App\Models\SiteSettings::SUPPORT_EMAIL] }}"
+                        class="text-primary hover:underline">{{ $siteSettings[\App\Models\SiteSettings::SUPPORT_EMAIL] }}</a>
+                </p>
+            @endif
 </x-guest-layout>

@@ -26,3 +26,6 @@ Thumbs.db
 /docs
 CLAUDE.md
 /prototype_materials
+/.playwright-mcp
+.devdbrc
+/.claude

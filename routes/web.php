@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\SiteSettingsController as AdminSiteSettingsContro
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PayoutRegistryController as AdminPayoutRegistryController;
+use App\Http\Controllers\Admin\Support\SupportCategoryController;
+use App\Http\Controllers\Admin\Support\SupportTicketController as AdminSupportTicketController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\DashboardController;
@@ -28,6 +30,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PayoutRegistryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RepresentativeController;
+use App\Http\Controllers\SupportAttachmentController;
+use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\Support\ContestController as SupportContestController;
 use App\Http\Controllers\Support\DashboardController as SupportDashboardController;
 use App\Http\Controllers\Support\OrganizationController as SupportOrganizationController;
@@ -135,6 +139,56 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ── Org payout registry ───────────────────────────────
     Route::get('/organizations/{organization}/payouts', [PayoutRegistryController::class, 'orgIndex'])->name('organizations.payouts.index');
     Route::post('/organizations/{organization}/payouts/{payoutRegistry}/confirm', [PayoutRegistryController::class, 'confirm'])->name('organizations.payouts.confirm');
+
+    // ── Support tickets (user's personal account) ─────────
+    // Paths stay under /support/tickets so they never collide with the
+    // support-role panel routes registered at /support/* further below.
+    Route::prefix('support/tickets')->name('tickets.')->group(function () {
+        Route::get('/', [SupportTicketController::class, 'index'])->name('index');
+        Route::get('/create', [SupportTicketController::class, 'create'])->name('create');
+        Route::post('/', [SupportTicketController::class, 'store'])
+            ->middleware('throttle:10,60')->name('store');
+        Route::get('/{ticket}', [SupportTicketController::class, 'show'])->name('show');
+        Route::post('/{ticket}/comments', [SupportTicketController::class, 'comment'])
+            ->middleware('throttle:30,60')->name('comment');
+        Route::post('/{ticket}/confirm', [SupportTicketController::class, 'confirm'])->name('confirm');
+        Route::post('/{ticket}/rate', [SupportTicketController::class, 'rate'])->name('rate');
+    });
+
+    // Private attachments (token-gated, see SupportAttachmentPolicy)
+    Route::get('/support/attachments/{token}', [SupportAttachmentController::class, 'download'])
+        ->name('support-attachments.download');
+    Route::get('/support/attachments/{token}/preview', [SupportAttachmentController::class, 'preview'])
+        ->name('support-attachments.preview');
+    Route::get('/support/attachments/{token}/thumb', [SupportAttachmentController::class, 'thumbnail'])
+        ->name('support-attachments.thumb');
+});
+
+// ── Helpdesk operators (admin + support roles) ──────────
+
+Route::middleware(['auth', 'verified', 'role:admin,support'])
+    ->prefix('admin/support')->name('admin.support.')->group(function () {
+
+    Route::get('/tickets', [AdminSupportTicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [AdminSupportTicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets', [AdminSupportTicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/search-users', [AdminSupportTicketController::class, 'searchUsers'])->name('tickets.search-users');
+    Route::get('/tickets/{ticket}', [AdminSupportTicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [AdminSupportTicketController::class, 'reply'])->name('tickets.reply');
+    Route::patch('/tickets/{ticket}/status', [AdminSupportTicketController::class, 'updateStatus'])->name('tickets.status');
+    Route::patch('/tickets/{ticket}/category', [AdminSupportTicketController::class, 'updateCategory'])->name('tickets.category');
+    Route::post('/tickets/{ticket}/assign', [AdminSupportTicketController::class, 'assign'])->name('tickets.assign');
+});
+
+// «Настройки поддержки» — admin only: the TZ (4.2) places it under «Администрирование».
+Route::middleware(['auth', 'verified', 'role:admin'])
+    ->prefix('admin/support')->name('admin.support.')->group(function () {
+    Route::get('/categories', [SupportCategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [SupportCategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{category}', [SupportCategoryController::class, 'update'])->name('categories.update');
+    Route::post('/categories/{category}/archive', [SupportCategoryController::class, 'toggleArchive'])->name('categories.archive');
+    Route::delete('/categories/{category}', [SupportCategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::post('/settings', [SupportCategoryController::class, 'updateSettings'])->name('settings.update');
 });
 
 // ── Admin ───────────────────────────────────────────────

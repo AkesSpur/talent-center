@@ -12,6 +12,17 @@
         </div>
     </x-slot>
 
+    <x-confirm-modal
+        name="confirm-payout"
+        title="Подтвердить получение"
+        message="Подтвердить получение выплаты? Отменить это действие будет нельзя."
+        icon="fa-check"
+        iconColor="text-green-600"
+        iconBg="bg-green-100"
+        confirmText="Подтвердить"
+        confirmClass="bg-green-600 text-white hover:bg-green-700"
+    />
+
     <div class="py-8">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -87,14 +98,11 @@
 
                         {{-- Confirm button --}}
                         @if(!$registry->payment_received && $registry->transfer_document_path)
-                            <form action="{{ route('organizations.payouts.confirm', [$organization, $registry]) }}" method="POST"
-                                onsubmit="return confirm('Подтвердить получение выплаты?')">
-                                @csrf
-                                <button type="submit"
-                                    class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition">
-                                    <i class="fas fa-check mr-2"></i>Подтвердить получение
-                                </button>
-                            </form>
+                            <button type="button"
+                                @click="$dispatch('confirm-confirm-payout', { action: '{{ route('organizations.payouts.confirm', [$organization, $registry]) }}' })"
+                                class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition">
+                                <i class="fas fa-check mr-2"></i>Подтвердить получение
+                            </button>
                         @elseif(!$registry->payment_received)
                             <div class="text-xs text-warm-gray italic">Ожидание документа перечисления</div>
                         @endif

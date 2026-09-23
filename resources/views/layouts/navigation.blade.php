@@ -1,161 +1,53 @@
-<nav x-data="{ open: false }" class="bg-cream shadow-sm sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-20 gap-4">
+{{--
+    Top bar of the cabinet. Section navigation moved to the sidebar
+    (components/app-sidebar); this bar keeps the menu button (opens the drawer on
+    small screens, narrows the docked sidebar on wide ones), the links back to the
+    public site and the account shortcut.
+--}}
+<header class="app-topbar sticky top-0 z-30 h-16 border-b border-gold/10 bg-cream/80 backdrop-blur-md">
+    <div class="flex h-full items-center gap-3 px-4 sm:px-6 lg:px-8">
 
-            <!-- Logo -->
-            <a href="/" class="flex items-center space-x-3">
-                @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_LOGO]))
-                    <img src="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_LOGO]) }}"
-                        alt="Талант-центр" class="h-11 w-auto max-w-[44px] object-contain shrink-0">
-                @else
-                    <div class="w-11 h-11 gradient-gold rounded-full flex items-center justify-center shadow-sm shrink-0">
-                        <i class="fas fa-award text-white text-lg"></i>
-                    </div>
-                @endif
-                <div>
-                    <h1 class="font-serif text-lg font-bold leading-tight"
-                        style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME_COLOR] ?? '#8B4513' }}">
-                        {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}</h1>
-                    <p class="text-xs leading-tight"
-                        style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE_COLOR] ?? '#9A8B7A' }}">
-                        {{ $siteSettings[\App\Models\SiteSettings::SITE_SUBTITLE] ?? 'Всероссийский центр талантов' }}
-                    </p>
+        <button type="button" x-ref="menuButton" @click="openSidebar()"
+            class="-ml-2 inline-flex h-10 w-10 items-center justify-center rounded-lg text-dark transition hover:bg-cream-dark active:scale-95 xl:hidden"
+            aria-controls="app-sidebar" :aria-expanded="sidebarOpen.toString()" aria-label="Открыть меню">
+            <i class="fas fa-bars text-lg" aria-hidden="true"></i>
+        </button>
+
+        <button type="button" @click="toggleCompact()"
+            class="-ml-2 hidden h-10 w-10 items-center justify-center rounded-lg text-dark transition hover:bg-cream-dark active:scale-95 xl:inline-flex"
+            aria-controls="app-sidebar" aria-label="Свернуть меню" title="Свернуть меню"
+            :aria-label="compact ? 'Развернуть меню' : 'Свернуть меню'" :title="compact ? 'Развернуть меню' : 'Свернуть меню'">
+            <i class="fas fa-bars text-lg" aria-hidden="true"></i>
+        </button>
+
+        {{-- Brand: the docked sidebar shows it on desktop --}}
+        <a href="/" class="flex min-w-0 items-center gap-2 xl:hidden">
+            @if(!empty($siteSettings[\App\Models\SiteSettings::SITE_LOGO]))
+                <img src="{{ asset('storage/' . $siteSettings[\App\Models\SiteSettings::SITE_LOGO]) }}"
+                    alt="" class="h-8 w-auto max-w-[32px] shrink-0 object-contain">
+            @else
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full gradient-gold">
+                    <i class="fas fa-award text-xs text-white"></i>
                 </div>
-            </a>
+            @endif
+            <span class="hidden truncate font-serif text-base font-bold sm:inline"
+                style="color: {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME_COLOR] ?? '#8B4513' }}">
+                {{ $siteSettings[\App\Models\SiteSettings::SITE_NAME] ?? 'Талант-центр' }}
+            </span>
+        </a>
 
-            <!-- Center Nav (large screens only) -->
-            <div class="hidden lg:flex items-center justify-center gap-8">
-                <a href="/" class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
-                    Главная
-                </a>
-                <a href="{{ route('contests.index') }}"
-                    class="text-sm font-medium text-warm-gray hover:text-primary transition-colors">
-                    Конкурсы
-                </a>
-                {{-- <a href="{{ route('diplomvtrifi.search') }}"
-                    class="text-sm font-medium {{ request()->routeIs('diplomvtrifi.*') ? 'text-primary border-b-2 border-primary pb-0.5' : 'text-warm-gray hover:text-primary transition-colors' }}">
-                    Проверить диплом
-                </a> --}}
-            </div>
+        <nav class="ml-4 hidden items-center gap-6 md:flex xl:ml-2" aria-label="Сайт">
+            <a href="/" class="text-sm font-medium text-warm-gray transition-colors hover:text-primary">Главная</a>
+            <a href="{{ route('contests.index') }}" class="text-sm font-medium text-warm-gray transition-colors hover:text-primary">Конкурсы</a>
+        </nav>
 
-            <!-- Right Side: User Dropdown (all screens) -->
-            <x-dropdown align="right" width="72">
-                <x-slot name="trigger">
-                    <button
-                        class="inline-flex items-center space-x-2 px-3 py-2 text-sm font-medium text-dark hover:text-primary focus:outline-none transition duration-150">
-                        <x-user-avatar :user="Auth::user()" size="sm" />
-                        <span class="hidden sm:inline">{{ Auth::user()->last_name }}
-                            {{ mb_substr(Auth::user()->first_name, 0, 1) }}.{{ Auth::user()->patronymic ? mb_substr(Auth::user()->patronymic, 0, 1) . '.' : '' }}</span>
-                        <i class="fas fa-chevron-down text-xs text-warm-gray"></i>
-                    </button>
-                </x-slot>
-
-                <x-slot name="content">
-                    <!-- Participant section -->
-                    <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Участник
-                        конкурсов</div>
-                    <x-dropdown-link :href="route('profile.edit')">
-                        <i class="fas fa-user-circle mr-2 text-warm-gray w-5 text-center"></i> Профиль представителя
-                    </x-dropdown-link>
-                    <x-dropdown-link :href="route('dashboard.applications')">
-                        <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
-                    </x-dropdown-link>
-                    <x-dropdown-link :href="route('dashboard.diplomas')">
-                        <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Награды
-                    </x-dropdown-link>
-                    <x-dropdown-link :href="route('participants.index')">
-                        <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Участники
-                    </x-dropdown-link>
-
-                    <!-- Organizer section -->
-                    <div class="border-t border-gold/10 mt-1 pt-1">
-                        <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Организатор
-                            конкурсов</div>
-                        <x-dropdown-link :href="route('dashboard.contests')">
-                            <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
-                        </x-dropdown-link>
-                        <x-dropdown-link :href="route('organizations.index')">
-                            <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Управление организацией
-                        </x-dropdown-link>
-                    </div>
-
-                    <!-- Admin section -->
-                    @if(auth()->user()->isAdmin())
-                        <div class="border-t border-gold/10 mt-1 pt-1">
-                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">
-                                Администрирование</div>
-                            <x-dropdown-link :href="route('admin.dashboard')">
-                                <i class="fas fa-cog mr-2 text-warm-gray w-5 text-center"></i> Админ-панель
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.users.index')">
-                                <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Пользователи
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.organizations.index')">
-                                <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Организации
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.contests.index')">
-                                <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.applications.index')">
-                                <i class="fas fa-file-alt mr-2 text-warm-gray w-5 text-center"></i> Заявки
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.payments.index')">
-                                <i class="fas fa-credit-card mr-2 text-warm-gray w-5 text-center"></i> Платежи
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.payout-registries.index')">
-                                <i class="fas fa-file-invoice-dollar mr-2 text-warm-gray w-5 text-center"></i> Реестр выплат
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.platform-categories.index')">
-                                <i class="fas fa-tags mr-2 text-warm-gray w-5 text-center"></i> Жанры
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.contest-covers.index')">
-                                <i class="fas fa-images mr-2 text-warm-gray w-5 text-center"></i> Обложки конкурсов
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.diploma-backgrounds.index')">
-                                <i class="fas fa-image mr-2 text-warm-gray w-5 text-center"></i> Фоны дипломов
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.action-logs.index')">
-                                <i class="fas fa-list-check mr-2 text-warm-gray w-5 text-center"></i> Журнал действий
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('admin.settings.index')">
-                                <i class="fas fa-sliders mr-2 text-warm-gray w-5 text-center"></i> Общие настройки
-                            </x-dropdown-link>
-                        </div>
-                    @endif
-
-                    <!-- Support section -->
-                    @if(auth()->user()->isSupport())
-                        <div class="border-t border-gold/10 mt-1 pt-1">
-                            <div class="px-4 py-2 text-xs font-semibold text-warm-gray uppercase tracking-wider">Поддержка
-                            </div>
-                            <x-dropdown-link :href="route('support.dashboard')">
-                                <i class="fas fa-headset mr-2 text-warm-gray w-5 text-center"></i> Панель поддержки
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('support.users.index')">
-                                <i class="fas fa-users mr-2 text-warm-gray w-5 text-center"></i> Пользователи
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('support.organizations.index')">
-                                <i class="fas fa-sitemap mr-2 text-warm-gray w-5 text-center"></i> Организации
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('support.contests.index')">
-                                <i class="fas fa-trophy mr-2 text-warm-gray w-5 text-center"></i> Конкурсы
-                            </x-dropdown-link>
-                        </div>
-                    @endif
-
-                    <!-- Logout -->
-                    <div class="border-t border-gold/10 mt-1 pt-1">
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault(); this.closest('form').submit();"
-                                class="text-red-600 hover:bg-red-50">
-                                <i class="fas fa-sign-out-alt mr-2 w-5 text-center"></i> Выйти
-                            </x-dropdown-link>
-                        </form>
-                    </div>
-                </x-slot>
-            </x-dropdown>
-        </div>
+        <a href="{{ route('profile.edit') }}"
+            class="ml-auto flex items-center gap-2 rounded-full py-1 pl-1 pr-1 transition-colors hover:bg-cream-dark sm:pr-3"
+            title="Профиль">
+            <x-user-avatar :user="Auth::user()" size="sm" />
+            <span class="hidden text-sm font-medium text-dark sm:inline">
+                {{ Auth::user()->last_name }} {{ mb_substr(Auth::user()->first_name, 0, 1) }}.{{ Auth::user()->patronymic ? mb_substr(Auth::user()->patronymic, 0, 1) . '.' : '' }}
+            </span>
+        </a>
     </div>
-</nav>
+</header>
