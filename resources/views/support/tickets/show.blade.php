@@ -12,7 +12,7 @@
                     Заявка {{ $ticket->number }} от {{ $ticket->created_at->timezone('Europe/Moscow')->format('d.m.Y, H:i') }} (МСК)
                 </p>
             </div>
-            <span class="inline-flex shrink-0 items-center text-xs font-medium px-3 py-1.5 rounded-full {{ $ticket->status->color() }}">
+            <span class="self-start inline-flex shrink-0 items-center text-xs font-medium px-3 py-1.5 rounded-full {{ $ticket->status->color() }}">
                 {{ $ticket->status->label() }}
             </span>
         </div>
