@@ -6,7 +6,7 @@
                 <p class="text-warm-gray mt-1">Ваши обращения в службу поддержки</p>
             </div>
             <a href="{{ route('tickets.create') }}"
-                class="inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98] text-sm">
+                class="self-start inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98] text-sm">
                 <i class="fas fa-plus mr-2"></i>Создать заявку
             </a>
         </div>
@@ -32,7 +32,44 @@
             @endif
 
             @if($tickets->count())
-                <div class="bg-white rounded-xl shadow-sm border border-gold/10 overflow-hidden">
+                {{-- Phones: cards. The table below has too many columns for this width. --}}
+                <div class="space-y-3 sm:hidden">
+                    @foreach($tickets as $ticket)
+                        @php $unread = $ticket->hasUnreadForOwner(); @endphp
+                        <a href="{{ route('tickets.show', $ticket) }}"
+                            class="block bg-white rounded-xl shadow-sm border border-gold/10 p-4 active:bg-cream/40 transition-colors">
+                            <div class="flex items-start justify-between gap-3">
+                                <span class="font-medium text-primary whitespace-nowrap">
+                                    @if($unread)
+                                        <span class="mr-1.5 inline-block h-2 w-2 rounded-full bg-primary align-middle" aria-hidden="true"></span>
+                                        <span class="sr-only">Новое сообщение.</span>
+                                    @endif
+                                    {{ $ticket->number }}
+                                </span>
+                                <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap {{ $ticket->status->color() }}">
+                                    {{ $ticket->status->label() }}
+                                </span>
+                            </div>
+                            <p class="mt-2 text-dark {{ $unread ? 'font-semibold' : 'font-medium' }}">
+                                {{ Str::limit($ticket->subject, 80) }}
+                            </p>
+                            @if($unread)
+                                <p class="text-xs font-medium text-primary mt-1">
+                                    <i class="fas fa-envelope mr-1" aria-hidden="true"></i>Новое сообщение от поддержки
+                                </p>
+                            @elseif($ticket->status === \App\Enums\SupportTicketStatus::NeedsClarification)
+                                <p class="text-xs text-orange-600 mt-1">
+                                    <i class="fas fa-circle-exclamation mr-1" aria-hidden="true"></i>Нужен ваш ответ
+                                </p>
+                            @endif
+                            <p class="mt-2 text-xs text-warm-gray">
+                                {{ $ticket->category?->name ?? 'Без категории' }} · {{ $ticket->created_at->timezone('Europe/Moscow')->format('d.m.Y') }}
+                            </p>
+                        </a>
+                    @endforeach
+                </div>
+
+                <div class="hidden sm:block bg-white rounded-xl shadow-sm border border-gold/10 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>

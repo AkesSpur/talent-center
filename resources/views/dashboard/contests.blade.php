@@ -6,7 +6,7 @@
                 <p class="text-warm-gray mt-1">Конкурсы, созданные вами</p>
             </div>
             <a href="{{ route('contests.create') }}"
-                class="inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm">
+                class="self-start inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm">
                 <i class="fas fa-plus mr-2"></i>Создать конкурс
             </a>
         </div>

@@ -6,7 +6,7 @@
                 <p class="text-warm-gray mt-1">Управление фоновыми изображениями для дипломов</p>
             </div>
             <button type="button" onclick="document.getElementById('modal-create').classList.remove('hidden')"
-                class="inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm">
+                class="self-start inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity text-sm">
                 <i class="fas fa-plus mr-2"></i>Загрузить фон
             </button>
         </div>

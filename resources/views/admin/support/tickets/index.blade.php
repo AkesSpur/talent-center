@@ -122,7 +122,50 @@
                         : 'fa-sort';
                 @endphp
 
-                <div class="bg-white rounded-xl shadow-sm border border-gold/10 overflow-hidden">
+                {{-- Phones and small tablets: cards. Seven columns do not fit this width. --}}
+                <div class="space-y-3 md:hidden">
+                    @foreach($tickets as $ticket)
+                        @php $unread = $ticket->hasUnreadForStaff(); @endphp
+                        <a href="{{ route('admin.support.tickets.show', $ticket) }}"
+                            class="block bg-white rounded-xl shadow-sm border border-gold/10 p-4 active:bg-cream/40 transition-colors">
+                            <div class="flex items-start justify-between gap-3">
+                                <span class="font-medium text-primary whitespace-nowrap">
+                                    @if($unread)
+                                        <span class="mr-1.5 inline-block h-2 w-2 rounded-full bg-primary align-middle" aria-hidden="true"></span>
+                                        <span class="sr-only">Новое сообщение.</span>
+                                    @endif
+                                    {{ $ticket->number }}
+                                </span>
+                                <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap {{ $ticket->status->color() }}">
+                                    {{ $ticket->status->label() }}
+                                </span>
+                            </div>
+                            <p class="mt-2 text-dark {{ $unread ? 'font-semibold' : 'font-medium' }}">
+                                {{ Str::limit($ticket->subject, 80) }}
+                                @if($ticket->comments_count)
+                                    <span class="ml-1 text-xs font-normal text-warm-gray whitespace-nowrap">
+                                        <i class="fas fa-comment-dots" aria-hidden="true"></i> {{ $ticket->comments_count }}
+                                    </span>
+                                @endif
+                            </p>
+                            <p class="mt-2 text-xs text-warm-gray">
+                                {{ $ticket->user?->full_name ?? $ticket->guest_email ?? 'Гость' }} · {{ $ticket->category?->name ?? 'Без категории' }}
+                            </p>
+                            <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-warm-gray">
+                                @if($ticket->isOverdueNow())
+                                    <span class="inline-flex items-center gap-1 font-medium px-2 py-1 rounded-full bg-red-100 text-red-700">
+                                        <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>Просрочена
+                                    </span>
+                                @elseif($ticket->sla_deadline)
+                                    <span>Срок: {{ $ticket->sla_deadline->timezone('Europe/Moscow')->format('d.m H:i') }}</span>
+                                @endif
+                                <span>{{ $ticket->assignee?->full_name ?? 'Не назначен' }}</span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+
+                <div class="hidden md:block bg-white rounded-xl shadow-sm border border-gold/10 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>

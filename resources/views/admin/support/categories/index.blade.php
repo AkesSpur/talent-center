@@ -10,7 +10,7 @@
                 <p class="text-warm-gray mt-1">Категории обращений и параметры службы поддержки</p>
             </div>
             <button type="button" @click="$dispatch('open-category-modal', { parent: null })"
-                class="inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98] text-sm">
+                class="self-start inline-flex items-center px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98] text-sm">
                 <i class="fas fa-plus mr-2"></i>Добавить категорию
             </button>
         </div>
