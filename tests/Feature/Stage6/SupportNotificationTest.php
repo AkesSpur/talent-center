@@ -330,6 +330,34 @@ class SupportNotificationTest extends TestCase
         $this->assertStringNotContainsString('48 часов', $body);
     }
 
+    public function test_every_notification_survives_the_queue(): void
+    {
+        // Production runs the database queue, so every letter is serialised and
+        // rebuilt by a worker. Anything that breaks here dies silently in prod.
+        $owner = User::factory()->create(['role' => 'participant']);
+        $ticket = $this->ticketFor($owner);
+
+        foreach ($this->everyTemplate($ticket) as $notification) {
+            $restored = unserialize(serialize($notification));
+
+            $this->assertInstanceOf($notification::class, $restored);
+            $this->assertSame($ticket->id, $restored->ticket->id, $notification::class . ' lost its ticket');
+            $this->assertSame($notification->template(), $restored->template());
+        }
+    }
+
+    public function test_the_ticket_property_is_not_readonly(): void
+    {
+        // SerializesModels restores it by reflection from the subclass's scope.
+        // PHP before 8.4 refuses that for a readonly property declared in the
+        // parent, and every queued letter fails. The server runs 8.3, so the
+        // round-trip test above passes on 8.4 while production burns — this
+        // assertion is the one that catches it on any version.
+        $property = new \ReflectionProperty(SupportNotification::class, 'ticket');
+
+        $this->assertFalse($property->isReadOnly(), 'SupportNotification::$ticket must not be readonly.');
+    }
+
     public function test_every_template_renders(): void
     {
         $owner = User::factory()->create(['role' => 'participant', 'first_name' => 'Сергей']);

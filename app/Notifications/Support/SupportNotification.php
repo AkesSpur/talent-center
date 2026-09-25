@@ -31,7 +31,14 @@ abstract class SupportNotification extends Notification implements ShouldQueueAf
     /** The scheduled queue:work runs with --tries=1, so support mail asks for its own retries. */
     public int $tries = 3;
 
-    public function __construct(public readonly SupportTicket $ticket)
+    /**
+     * Not readonly on purpose. SerializesModels restores this with reflection from
+     * the subclass's scope, and PHP before 8.4 refuses to initialize a readonly
+     * property declared in a parent class from a child scope — every queued letter
+     * dies with «Cannot initialize readonly property … from scope …». The server
+     * runs 8.3, so this must stay a plain property.
+     */
+    public function __construct(public SupportTicket $ticket)
     {
     }
 
