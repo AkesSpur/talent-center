@@ -12,16 +12,18 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Every ticket state change goes through here, so status rules, timestamps
- * and action logging stay in one place and remain testable without HTTP.
+ * Every ticket state change goes through here, so status rules, timestamps,
+ * action logging and email stay in one place and remain testable without HTTP.
  *
- * Email notifications are deliberately not dispatched yet — that is stage 2.
+ * Notifications are dispatched from here rather than from the controllers, so
+ * no request path can forget one. SupportNotifier decides who receives them.
  */
 class SupportTicketService
 {
     public function __construct(
         private readonly SlaService $sla,
         private readonly SupportAttachmentService $attachments,
+        private readonly SupportNotifier $notifier,
     ) {
     }
 
@@ -56,6 +58,9 @@ class SupportTicketService
                 'created_by'  => $createdBy?->id,
             ]);
 
+            // Queued after commit, so a rolled-back create sends nothing.
+            $this->notifier->created($ticket);
+
             return $ticket;
         });
     }
@@ -74,6 +79,10 @@ class SupportTicketService
         bool $isInternal = false,
     ): SupportTicketComment {
         return DB::transaction(function () use ($ticket, $author, $content, $files, $fromOperator, $isInternal) {
+            // A first operator reply moves «Новая» → «В работе»; the letter we send
+            // depends on whether the status actually moved.
+            $statusBefore = $ticket->status;
+
             $comment = $ticket->comments()->create([
                 'author_id'   => $author->id,
                 'author_type' => $fromOperator ? SupportTicketComment::AUTHOR_ADMIN : SupportTicketComment::AUTHOR_USER,
@@ -96,6 +105,15 @@ class SupportTicketService
                 'author_type' => $comment->author_type,
                 'is_internal' => $comment->is_internal,
             ]);
+
+            if ($fromOperator) {
+                // An internal note is invisible to the user, so it is no news for them.
+                if (! $isInternal) {
+                    $this->notifier->operatorReplied($ticket, $statusBefore, $comment);
+                }
+            } else {
+                $this->notifier->userReplied($ticket, $comment);
+            }
 
             return $comment;
         });
@@ -192,6 +210,8 @@ class SupportTicketService
             'new' => $next->value,
         ]);
 
+        $this->notifier->statusChanged($ticket, $current);
+
         return $ticket;
     }
 
@@ -211,6 +231,33 @@ class SupportTicketService
         ActionLogService::log('support.ticket.closed', $ticket, [
             'reason' => TicketCloseReason::UserConfirmed->value,
         ]);
+
+        $this->notifier->closed($ticket);
+
+        return $ticket;
+    }
+
+    /**
+     * The 3-day inactivity close run by support:auto-close (ТЗ 5.2).
+     *
+     * A sibling of confirmResolution() rather than an argument on changeStatus():
+     * the console has no operator to attribute the change to, and the two existing
+     * close paths already assert their own reasons.
+     */
+    public function autoClose(SupportTicket $ticket): SupportTicket
+    {
+        $ticket->update([
+            'status'        => SupportTicketStatus::Closed,
+            'closed_at'     => now(),
+            'closed_reason' => TicketCloseReason::AutoInactivity,
+        ]);
+
+        ActionLogService::log('support.ticket.closed', $ticket, [
+            'reason' => TicketCloseReason::AutoInactivity->value,
+            'auto'   => true,
+        ]);
+
+        $this->notifier->closed($ticket);
 
         return $ticket;
     }

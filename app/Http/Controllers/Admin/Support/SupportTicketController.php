@@ -137,6 +137,12 @@ class SupportTicketController extends Controller
             'categories'  => SupportCategory::roots()->ordered()->with('children')->get(),
             'operators'   => $this->operators(),
             'transitions' => $ticket->status->allowedTransitions(),
+            // id breaks the tie: one event writes several rows in the same second.
+            'notificationLogs' => $ticket->notificationLogs()
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->limit(200)
+                ->get(),
         ]);
     }
 

@@ -13,3 +13,13 @@ Schedule::command('contests:transition')
     ->everyMinute()
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/contests-transition.log'));
+
+Schedule::command('support:flag-overdue')
+    ->everyTenMinutes()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/support-sla.log'));
+
+Schedule::command('support:auto-close')
+    ->hourly()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/support-sla.log'));

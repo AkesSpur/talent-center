@@ -42,89 +42,150 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
 
                 {{-- Conversation --}}
-                <div class="lg:col-span-2 space-y-6">
+                <div class="lg:col-span-2 space-y-6" x-data="{ tab: '{{ request('tab', 'conversation') }}' }">
                     <div class="bg-white rounded-xl shadow-sm border border-gold/10 overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gold/10">
-                            <h3 class="font-serif text-lg font-semibold text-dark">Переписка</h3>
-                        </div>
-                        <div class="divide-y divide-gold/10">
-                            <article class="p-6">
-                                <div class="flex items-center gap-3 mb-3">
-                                    <x-user-avatar :user="$ticket->user" size="sm" />
-                                    <div>
-                                        <p class="text-sm font-medium text-dark">{{ $ticket->user?->full_name ?? 'Гость' }}</p>
-                                        <p class="text-xs text-warm-gray">{{ $ticket->created_at->timezone('Europe/Moscow')->format('d.m.Y, H:i') }}</p>
-                                    </div>
-                                </div>
-                                <div class="text-sm text-dark whitespace-pre-line leading-relaxed">{{ $ticket->description }}</div>
-                                @include('support.tickets.partials.attachments', ['attachments' => $ticket->attachments])
-                            </article>
-
-                            @foreach($ticket->comments as $comment)
-                                <article id="comment-{{ $comment->id }}" class="p-6 scroll-mt-24 {{ $comment->is_internal ? 'bg-yellow-50' : ($comment->isFromUser() ? '' : 'bg-cream/40') }}">
-                                    <div class="flex items-center gap-3 mb-3">
-                                        <x-user-avatar :user="$comment->author" size="sm" />
-                                        <div class="min-w-0">
-                                            <p class="text-sm font-medium text-dark">
-                                                {{ $comment->author?->full_name ?? 'Система' }}
-                                                @if($comment->is_internal)
-                                                    <span class="ml-2 inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">
-                                                        <i class="fas fa-lock mr-1"></i>Внутренняя заметка
-                                                    </span>
-                                                @elseif(! $comment->isFromUser())
-                                                    <span class="ml-2 text-xs text-warm-gray">поддержка</span>
-                                                @endif
-                                            </p>
-                                            <p class="text-xs text-warm-gray">{{ $comment->created_at->timezone('Europe/Moscow')->format('d.m.Y, H:i') }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-sm text-dark whitespace-pre-line leading-relaxed">{{ $comment->content }}</div>
-                                    @include('support.tickets.partials.attachments', ['attachments' => $comment->attachments])
-                                </article>
-                            @endforeach
+                        <div class="flex overflow-x-auto border-b border-gold/10">
+                            <button type="button" @click="tab = 'conversation'"
+                                :class="tab === 'conversation' ? 'border-b-2 border-gold text-primary font-semibold' : 'text-warm-gray hover:text-dark'"
+                                class="flex items-center gap-2 px-5 py-3.5 text-sm whitespace-nowrap transition-colors shrink-0">
+                                <i class="fas fa-comments text-xs" aria-hidden="true"></i>Переписка
+                            </button>
+                            <button type="button" @click="tab = 'notifications'"
+                                :class="tab === 'notifications' ? 'border-b-2 border-gold text-primary font-semibold' : 'text-warm-gray hover:text-dark'"
+                                class="flex items-center gap-2 px-5 py-3.5 text-sm whitespace-nowrap transition-colors shrink-0">
+                                <i class="fas fa-envelope text-xs" aria-hidden="true"></i>История уведомлений
+                                @if($notificationLogs->isNotEmpty())
+                                    <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">{{ $notificationLogs->count() }}</span>
+                                @endif
+                            </button>
                         </div>
                     </div>
 
-                    {{-- Reply --}}
-                    @if($ticket->status !== SupportTicketStatus::Closed)
-                        <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6"
-                            x-data="{ internal: @js((bool) old('is_internal')) }">
-                            <h3 class="font-serif text-lg font-semibold text-dark mb-4"
-                                x-text="internal ? 'Внутренняя заметка' : 'Ответ пользователю'">Ответ пользователю</h3>
-                            <x-support.upload-form :action="route('admin.support.tickets.reply', $ticket)" class="space-y-4">
-                                <div>
-                                    <label for="reply-content" class="sr-only">Текст ответа</label>
-                                    <textarea id="reply-content" name="content" rows="5" required maxlength="20000"
-                                        :placeholder="internal ? 'Заметка видна только сотрудникам поддержки...' : 'Ответ пользователю...'"
-                                        @paste="pasted($event)"
-                                        class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 text-sm resize-y transition-colors"
-                                        :class="internal ? 'border-yellow-300 bg-yellow-50/50 focus:ring-yellow-300/40' : 'border-primary/20 focus:ring-primary/30'">{{ old('content') }}</textarea>
-                                    <x-support.field-error field="content" class="mt-2" />
-                                </div>
+                    <div x-show="tab === 'conversation'" x-cloak class="space-y-6">
+                        {{-- The tab above already names this card. --}}
+                        <div class="bg-white rounded-xl shadow-sm border border-gold/10 overflow-hidden">
+                            <div class="divide-y divide-gold/10">
+                                <article class="p-6">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <x-user-avatar :user="$ticket->user" size="sm" />
+                                        <div>
+                                            <p class="text-sm font-medium text-dark">{{ $ticket->user?->full_name ?? 'Гость' }}</p>
+                                            <p class="text-xs text-warm-gray">{{ $ticket->created_at->timezone('Europe/Moscow')->format('d.m.Y, H:i') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-dark whitespace-pre-line leading-relaxed">{{ $ticket->description }}</div>
+                                    @include('support.tickets.partials.attachments', ['attachments' => $ticket->attachments])
+                                </article>
 
-                                <x-support.file-picker id="admin-files" compact />
-
-                                <div>
-                                    <label class="inline-flex items-center gap-2 text-sm text-dark cursor-pointer">
-                                        <input type="checkbox" name="is_internal" value="1" x-model="internal"
-                                            class="rounded border-primary/30 text-primary">
-                                        Внутренняя заметка
-                                    </label>
-                                    <p class="text-xs text-warm-gray mt-1" x-show="internal" x-cloak>
-                                        Заметка не видна пользователю и не меняет статус заявки.
-                                    </p>
-                                </div>
-
-                                <x-support.upload-status />
-
-                                <button type="submit" :disabled="sending"
-                                    class="px-6 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98] text-sm disabled:opacity-60 disabled:cursor-wait">
-                                    <span x-show="!sending"><i class="fas fa-paper-plane mr-2" aria-hidden="true"></i>Отправить</span>
-                                    <span x-show="sending" x-cloak><i class="fas fa-circle-notch fa-spin mr-2" aria-hidden="true"></i>Отправка…</span>
-                                </button>
-                            </x-support.upload-form>
+                                @foreach($ticket->comments as $comment)
+                                    <article id="comment-{{ $comment->id }}" class="p-6 scroll-mt-24 {{ $comment->is_internal ? 'bg-yellow-50' : ($comment->isFromUser() ? '' : 'bg-cream/40') }}">
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <x-user-avatar :user="$comment->author" size="sm" />
+                                            <div class="min-w-0">
+                                                <p class="text-sm font-medium text-dark">
+                                                    {{ $comment->author?->full_name ?? 'Система' }}
+                                                    @if($comment->is_internal)
+                                                        <span class="ml-2 inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">
+                                                            <i class="fas fa-lock mr-1"></i>Внутренняя заметка
+                                                        </span>
+                                                    @elseif(! $comment->isFromUser())
+                                                        <span class="ml-2 text-xs text-warm-gray">поддержка</span>
+                                                    @endif
+                                                </p>
+                                                <p class="text-xs text-warm-gray">{{ $comment->created_at->timezone('Europe/Moscow')->format('d.m.Y, H:i') }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-sm text-dark whitespace-pre-line leading-relaxed">{{ $comment->content }}</div>
+                                        @include('support.tickets.partials.attachments', ['attachments' => $comment->attachments])
+                                    </article>
+                                @endforeach
+                            </div>
                         </div>
-                    @endif
+
+                        {{-- Reply --}}
+                        @if($ticket->status !== SupportTicketStatus::Closed)
+                            <div class="bg-white rounded-xl shadow-sm border border-gold/10 p-6"
+                                x-data="{ internal: @js((bool) old('is_internal')) }">
+                                <h3 class="font-serif text-lg font-semibold text-dark mb-4"
+                                    x-text="internal ? 'Внутренняя заметка' : 'Ответ пользователю'">Ответ пользователю</h3>
+                                <x-support.upload-form :action="route('admin.support.tickets.reply', $ticket)" class="space-y-4">
+                                    <div>
+                                        <label for="reply-content" class="sr-only">Текст ответа</label>
+                                        <textarea id="reply-content" name="content" rows="5" required maxlength="20000"
+                                            :placeholder="internal ? 'Заметка видна только сотрудникам поддержки...' : 'Ответ пользователю...'"
+                                            @paste="pasted($event)"
+                                            class="w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 text-sm resize-y transition-colors"
+                                            :class="internal ? 'border-yellow-300 bg-yellow-50/50 focus:ring-yellow-300/40' : 'border-primary/20 focus:ring-primary/30'">{{ old('content') }}</textarea>
+                                        <x-support.field-error field="content" class="mt-2" />
+                                    </div>
+
+                                    <x-support.file-picker id="admin-files" compact />
+
+                                    <div>
+                                        <label class="inline-flex items-center gap-2 text-sm text-dark cursor-pointer">
+                                            <input type="checkbox" name="is_internal" value="1" x-model="internal"
+                                                class="rounded border-primary/30 text-primary">
+                                            Внутренняя заметка
+                                        </label>
+                                        <p class="text-xs text-warm-gray mt-1" x-show="internal" x-cloak>
+                                            Заметка не видна пользователю и не меняет статус заявки.
+                                        </p>
+                                    </div>
+
+                                    <x-support.upload-status />
+
+                                    <button type="submit" :disabled="sending"
+                                        class="px-6 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98] text-sm disabled:opacity-60 disabled:cursor-wait">
+                                        <span x-show="!sending"><i class="fas fa-paper-plane mr-2" aria-hidden="true"></i>Отправить</span>
+                                        <span x-show="sending" x-cloak><i class="fas fa-circle-notch fa-spin mr-2" aria-hidden="true"></i>Отправка…</span>
+                                    </button>
+                                </x-support.upload-form>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Notification history (ТЗ 11.2) --}}
+                    <div x-show="tab === 'notifications'" x-cloak>
+                        <div class="bg-white rounded-xl shadow-sm border border-gold/10 overflow-hidden">
+                            @if($notificationLogs->isEmpty())
+                                <p class="p-6 text-sm text-warm-gray">Писем по этой заявке ещё не отправлялось.</p>
+                            @else
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm">
+                                        <thead>
+                                            <tr class="border-b border-gold/10 text-warm-gray text-xs uppercase tracking-wider">
+                                                <th class="text-left px-6 py-3 font-semibold">Кому</th>
+                                                <th class="text-left px-6 py-3 font-semibold">Письмо</th>
+                                                <th class="text-left px-6 py-3 font-semibold w-40">Когда</th>
+                                                <th class="text-left px-6 py-3 font-semibold w-36">Статус</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gold/10">
+                                            @foreach($notificationLogs as $log)
+                                                <tr>
+                                                    <td class="px-6 py-3 text-dark break-all">{{ $log->recipient_email }}</td>
+                                                    <td class="px-6 py-3 text-dark">{{ $log->template_label }}</td>
+                                                    <td class="px-6 py-3 text-warm-gray whitespace-nowrap">
+                                                        {{ $log->created_at?->timezone('Europe/Moscow')->format('d.m.Y, H:i') }} МСК
+                                                    </td>
+                                                    <td class="px-6 py-3">
+                                                        @if($log->wasSent())
+                                                            <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-700">Отправлено</span>
+                                                        @else
+                                                            <span class="inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full bg-red-100 text-red-700">Ошибка</span>
+                                                            @if($log->error)
+                                                                <p class="text-xs text-warm-gray mt-1 break-all">{{ $log->error }}</p>
+                                                            @endif
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Sidebar --}}

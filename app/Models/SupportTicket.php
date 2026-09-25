@@ -83,6 +83,13 @@ class SupportTicket extends Model
         ]);
     }
 
+    /**
+     * Past the SLA deadline and still open, computed fresh from sla_deadline.
+     *
+     * It deliberately ignores is_overdue: FlagOverdueTickets composes this with
+     * `where('is_overdue', false)` to find the newly breached ones. Filtering the
+     * flag here would make that command a no-op.
+     */
     public function scopeOverdue(Builder $query): Builder
     {
         return $query->open()->where('sla_deadline', '<', now());
@@ -130,6 +137,12 @@ class SupportTicket extends Model
     public function lastOperator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'last_operator_id');
+    }
+
+    /** Every support email we tried to send about this ticket (ТЗ 11.2). */
+    public function notificationLogs(): HasMany
+    {
+        return $this->hasMany(SupportNotificationLog::class, 'ticket_id');
     }
 
     public function comments(): HasMany
