@@ -50,50 +50,8 @@ class AppSidebar extends Component
             ],
         ];
 
-        $sections[] = [
-            'key'   => 'participant',
-            'label' => 'Участник конкурсов',
-            'items' => [
-                $this->item('Обзор', 'fa-gauge-high', 'dashboard', ['dashboard']),
-                $this->item('Профиль', 'fa-user-circle', 'profile.edit', ['profile.*']),
-                $this->item('Заявки', 'fa-file-alt', 'dashboard.applications', ['dashboard.applications', 'applications.*']),
-                $this->item('Награды', 'fa-trophy', 'dashboard.diplomas', ['dashboard.diplomas']),
-                $this->item('Участники', 'fa-users', 'participants.index', ['participants.*']),
-                $this->item('Поддержка', 'fa-headset', 'tickets.index', ['tickets.*'], $this->unreadForUser($user), 'attention'),
-            ],
-        ];
-
-        $sections[] = [
-            'key'   => 'organizer',
-            'label' => 'Организатор конкурсов',
-            'items' => [
-                $this->item('Конкурсы', 'fa-award', 'dashboard.contests', ['dashboard.contests', 'contests.create', 'contests.edit']),
-                $this->item('Управление организацией', 'fa-sitemap', 'organizations.index', ['organizations.*', 'evaluation.*']),
-            ],
-        ];
-
-        if ($user->isAdmin()) {
-            $sections[] = [
-                'key'   => 'admin',
-                'label' => 'Администрирование',
-                'items' => [
-                    $this->item('Админ-панель', 'fa-chart-pie', 'admin.dashboard', ['admin.dashboard']),
-                    $this->item('Пользователи', 'fa-users', 'admin.users.index', ['admin.users.*']),
-                    $this->item('Организации', 'fa-sitemap', 'admin.organizations.index', ['admin.organizations.*']),
-                    $this->item('Конкурсы', 'fa-trophy', 'admin.contests.index', ['admin.contests.*', 'admin.evaluation.*']),
-                    $this->item('Заявки', 'fa-file-alt', 'admin.applications.index', ['admin.applications.*']),
-                    $this->item('Платежи', 'fa-credit-card', 'admin.payments.index', ['admin.payments.*']),
-                    $this->item('Реестр выплат', 'fa-file-invoice-dollar', 'admin.payout-registries.index', ['admin.payout-registries.*']),
-                    $this->item('Жанры', 'fa-tags', 'admin.platform-categories.index', ['admin.platform-categories.*']),
-                    $this->item('Обложки конкурсов', 'fa-images', 'admin.contest-covers.index', ['admin.contest-covers.*']),
-                    $this->item('Фоны дипломов', 'fa-image', 'admin.diploma-backgrounds.index', ['admin.diploma-backgrounds.*']),
-                    $this->item('Заявки поддержки', 'fa-inbox', 'admin.support.tickets.index', ['admin.support.tickets.*'], $this->unreadForStaff(), 'queue'),
-                    $this->item('Настройки поддержки', 'fa-sliders', 'admin.support.categories.index', ['admin.support.categories.*']),
-                    $this->item('Журнал действий', 'fa-list-check', 'admin.action-logs.index', ['admin.action-logs.*']),
-                    $this->item('Общие настройки', 'fa-gear', 'admin.settings.index', ['admin.settings.*']),
-                ],
-            ];
-        }
+        // Order is the client's (26.09): the helpdesk first, then the rest of the
+        // admin area, then the two personal sections — most important at the top.
 
         if ($user->isSupport()) {
             $sections[] = [
@@ -108,6 +66,61 @@ class AppSidebar extends Component
                 ],
             ];
         }
+
+        if ($user->isAdmin()) {
+            // The helpdesk gets its own section rather than sitting among the
+            // fourteen «Администрирование» links.
+            $sections[] = [
+                'key'   => 'support',
+                'label' => 'Поддержка',
+                'items' => [
+                    $this->item('Заявки поддержки', 'fa-inbox', 'admin.support.tickets.index', ['admin.support.tickets.*'], $this->unreadForStaff(), 'queue'),
+                    $this->item('Настройки поддержки', 'fa-sliders', 'admin.support.categories.index', ['admin.support.categories.*']),
+                ],
+            ];
+
+            $sections[] = [
+                'key'   => 'admin',
+                'label' => 'Администрирование',
+                'items' => [
+                    $this->item('Админ-панель', 'fa-chart-pie', 'admin.dashboard', ['admin.dashboard']),
+                    $this->item('Пользователи', 'fa-users', 'admin.users.index', ['admin.users.*']),
+                    $this->item('Организации', 'fa-sitemap', 'admin.organizations.index', ['admin.organizations.*']),
+                    $this->item('Конкурсы', 'fa-trophy', 'admin.contests.index', ['admin.contests.*', 'admin.evaluation.*']),
+                    $this->item('Заявки', 'fa-file-alt', 'admin.applications.index', ['admin.applications.*']),
+                    $this->item('Платежи', 'fa-credit-card', 'admin.payments.index', ['admin.payments.*']),
+                    $this->item('Реестр выплат', 'fa-file-invoice-dollar', 'admin.payout-registries.index', ['admin.payout-registries.*']),
+                    $this->item('Жанры', 'fa-tags', 'admin.platform-categories.index', ['admin.platform-categories.*']),
+                    $this->item('Обложки конкурсов', 'fa-images', 'admin.contest-covers.index', ['admin.contest-covers.*']),
+                    $this->item('Фоны дипломов', 'fa-image', 'admin.diploma-backgrounds.index', ['admin.diploma-backgrounds.*']),
+                    $this->item('Журнал действий', 'fa-list-check', 'admin.action-logs.index', ['admin.action-logs.*']),
+                    $this->item('Общие настройки', 'fa-gear', 'admin.settings.index', ['admin.settings.*']),
+                ],
+            ];
+        }
+
+        $sections[] = [
+            'key'   => 'organizer',
+            'label' => 'Организатор конкурсов',
+            'items' => [
+                $this->item('Конкурсы', 'fa-award', 'dashboard.contests', ['dashboard.contests', 'contests.create', 'contests.edit']),
+                $this->item('Управление организацией', 'fa-sitemap', 'organizations.index', ['organizations.*', 'evaluation.*']),
+            ],
+        ];
+
+        $sections[] = [
+            'key'   => 'participant',
+            'label' => 'Участник конкурсов',
+            'items' => [
+                $this->item('Обзор', 'fa-gauge-high', 'dashboard', ['dashboard']),
+                $this->item('Профиль', 'fa-user-circle', 'profile.edit', ['profile.*']),
+                $this->item('Заявки', 'fa-file-alt', 'dashboard.applications', ['dashboard.applications', 'applications.*']),
+                $this->item('Награды', 'fa-trophy', 'dashboard.diplomas', ['dashboard.diplomas']),
+                $this->item('Участники', 'fa-users', 'participants.index', ['participants.*']),
+                // Stays «Поддержка»: ТЗ 10.1 names this section in the user's cabinet.
+                $this->item('Поддержка', 'fa-headset', 'tickets.index', ['tickets.*'], $this->unreadForUser($user), 'attention'),
+            ],
+        ];
 
         // Staff come here to work: their personal sections start folded so the
         // admin/support menu is visible without scrolling. Users can reopen them.

@@ -54,6 +54,41 @@ class AppSidebarTest extends TestCase
             ->assertDontSee(route('admin.support.categories.index'), false);
     }
 
+    public function test_sections_run_from_most_to_least_important(): void
+    {
+        // The client's order (26.09): Поддержка, Администрирование,
+        // Организатор конкурсов, Участник конкурсов.
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $html = $this->actingAs($admin)->get(route('dashboard'))->assertOk()->getContent();
+
+        $positions = [];
+
+        foreach (['Поддержка', 'Администрирование', 'Организатор конкурсов', 'Участник конкурсов'] as $label) {
+            $at = strpos($html, '>' . $label . '<');
+            $this->assertNotFalse($at, "Раздел «{$label}» не найден в меню.");
+            $positions[$label] = $at;
+        }
+
+        $sorted = $positions;
+        asort($sorted);
+
+        $this->assertSame(array_keys($positions), array_keys($sorted), 'Разделы меню идут не в том порядке.');
+    }
+
+    public function test_helpdesk_links_sit_in_their_own_section_not_under_administration(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $html = $this->actingAs($admin)->get(route('dashboard'))->assertOk()->getContent();
+
+        // Both helpdesk links come before «Администрирование» begins.
+        $administration = strpos($html, '>Администрирование<');
+
+        $this->assertLessThan($administration, strpos($html, route('admin.support.tickets.index')));
+        $this->assertLessThan($administration, strpos($html, route('admin.support.categories.index')));
+    }
+
     public function test_current_page_is_marked_active(): void
     {
         $user = User::factory()->create(['role' => 'participant']);
