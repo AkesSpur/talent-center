@@ -13,6 +13,13 @@
                 </p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
+                {{-- The action log is admin-only; an unguarded link 403s for support. --}}
+                @if(auth()->user()->isAdmin())
+                    <a href="{{ route('admin.action-logs.index', ['ticket' => $ticket->id]) }}"
+                        class="inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-lg border border-primary/20 text-primary hover:bg-primary/5 transition-colors">
+                        <i class="fas fa-list-check" aria-hidden="true"></i>История действий
+                    </a>
+                @endif
                 @if($ticket->isOverdueNow())
                     <span class="inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-red-100 text-red-700">
                         <i class="fas fa-triangle-exclamation"></i>Просрочена

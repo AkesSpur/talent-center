@@ -34,6 +34,21 @@ enum SupportTicketStatus: string
         };
     }
 
+    /**
+     * Hex for the analytics chart. Tailwind classes cannot be handed to a
+     * canvas, and these are the -500 shades of the pills color() returns.
+     */
+    public function chartColor(): string
+    {
+        return match ($this) {
+            self::New                => '#3B82F6',
+            self::InProgress         => '#A67C00',
+            self::NeedsClarification => '#F97316',
+            self::Resolved           => '#22C55E',
+            self::Closed             => '#9CA3AF',
+        };
+    }
+
     /** Open statuses still count against the SLA. */
     public function isOpen(): bool
     {

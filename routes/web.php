@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PayoutRegistryController as AdminPayoutRegistryController;
 use App\Http\Controllers\Admin\Support\SupportCategoryController;
+use App\Http\Controllers\Admin\Support\SupportDashboardController as SupportAnalyticsController;
 use App\Http\Controllers\Admin\Support\SupportTicketController as AdminSupportTicketController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ContestController;
@@ -173,6 +174,9 @@ Route::middleware(['auth', 'verified', 'role:admin,support'])
     Route::get('/tickets/create', [AdminSupportTicketController::class, 'create'])->name('tickets.create');
     Route::post('/tickets', [AdminSupportTicketController::class, 'store'])->name('tickets.store');
     Route::get('/tickets/search-users', [AdminSupportTicketController::class, 'searchUsers'])->name('tickets.search-users');
+    // Literal segments stay above /tickets/{ticket} or the wildcard swallows them.
+    Route::get('/tickets/export', [AdminSupportTicketController::class, 'export'])->name('tickets.export');
+    Route::get('/analytics', SupportAnalyticsController::class)->name('analytics');
     Route::get('/tickets/{ticket}', [AdminSupportTicketController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{ticket}/reply', [AdminSupportTicketController::class, 'reply'])->name('tickets.reply');
     Route::patch('/tickets/{ticket}/status', [AdminSupportTicketController::class, 'updateStatus'])->name('tickets.status');

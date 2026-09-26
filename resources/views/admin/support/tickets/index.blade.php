@@ -103,6 +103,11 @@
                         Применить
                     </button>
                     <a href="{{ route('admin.support.tickets.index') }}" class="text-sm text-warm-gray hover:text-primary transition-colors">Сбросить</a>
+                    {{-- Carries the current filters, so the file matches the screen. --}}
+                    <a href="{{ route('admin.support.tickets.export', request()->except('page')) }}"
+                        class="inline-flex items-center px-4 py-2 border border-primary/20 text-primary rounded-lg hover:bg-primary/5 transition-colors text-sm">
+                        <i class="fas fa-file-csv mr-2" aria-hidden="true"></i>Выгрузить CSV
+                    </a>
                     <label class="flex items-center gap-2 text-sm text-dark cursor-pointer ml-auto">
                         <input type="checkbox" name="overdue" value="1" @checked(request()->boolean('overdue'))
                             class="rounded border-primary/30 text-primary">

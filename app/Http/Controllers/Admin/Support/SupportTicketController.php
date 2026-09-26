@@ -13,11 +13,13 @@ use App\Models\SupportCategory;
 use App\Models\SupportTicket;
 use App\Models\User;
 use App\Services\SupportTicketService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Operator view of the helpdesk. Reachable by the admin and support roles.
@@ -33,15 +35,22 @@ class SupportTicketController extends Controller
     {
     }
 
-    public function index(Request $request): View
+    /**
+     * The filtered, sorted queue. Shared by the screen and the CSV export so the
+     * download always matches what the operator is looking at.
+     *
+     * The `if ($x = ...)` truthiness tests are load-bearing: the «Все» option in
+     * every filter submits an empty string, which must mean «no filter». Do not
+     * tidy them into filled() — that would change what «Все» does.
+     */
+    private function queue(Request $request): Builder
     {
         $sort = in_array($request->query('sort'), self::SORTABLE, true)
             ? $request->query('sort')
             : 'created_at';
         $direction = $request->query('direction') === 'asc' ? 'asc' : 'desc';
 
-        $query = SupportTicket::with(['user', 'category', 'subcategory', 'assignee'])
-            ->withCount('comments');
+        $query = SupportTicket::query();
 
         if ($status = $request->query('status')) {
             $query->where('status', $status);
@@ -69,8 +78,25 @@ class SupportTicketController extends Controller
             $query->overdue();
         }
 
+        // Every sortable column except id has ties, and an unstable sort makes
+        // LIMIT/OFFSET repeat and drop rows — invisible on a screen, corrupting
+        // in a chunked export.
+        return $query->orderBy($sort, $direction)->orderBy('id', 'desc');
+    }
+
+    public function index(Request $request): View
+    {
+        $sort = in_array($request->query('sort'), self::SORTABLE, true)
+            ? $request->query('sort')
+            : 'created_at';
+        $direction = $request->query('direction') === 'asc' ? 'asc' : 'desc';
+
+        $query = $this->queue($request)
+            ->with(['user', 'category', 'subcategory', 'assignee'])
+            ->withCount('comments');
+
         return view('admin.support.tickets.index', [
-            'tickets'    => $query->orderBy($sort, $direction)->paginate(20)->withQueryString(),
+            'tickets'    => $query->paginate(20)->withQueryString(),
             'categories' => SupportCategory::roots()->ordered()->get(),
             'operators'  => $this->operators(),
             'statuses'   => SupportTicketStatus::cases(),
@@ -87,6 +113,82 @@ class SupportTicketController extends Controller
                 'mine'    => SupportTicket::where('assigned_to', $request->user()->id)->open()->count(),
             ],
         ]);
+    }
+
+    /**
+     * GET /admin/support/tickets/export — the current queue as CSV (ТЗ 9.2).
+     *
+     * Streamed, so a large queue never has to fit in memory.
+     */
+    public function export(Request $request): StreamedResponse
+    {
+        $filename = 'support-tickets-' . now()->format('Y-m-d-His') . '.csv';
+
+        $headers = [
+            'Номер', 'Тема', 'Статус', 'Категория', 'Подкатегория',
+            'Пользователь', 'Email', 'Ответственный', 'Создана',
+            'Срок ответа', 'Просрочена', 'Решена', 'Закрыта', 'Оценка', 'Сообщений',
+        ];
+
+        return response()->streamDownload(function () use ($request, $headers): void {
+            $out = fopen('php://output', 'w');
+
+            // Excel reads a CSV as the system codepage unless a BOM says otherwise.
+            fwrite($out, "\xEF\xBB\xBF");
+
+            $this->csvRow($out, $headers);
+
+            $this->queue($request)
+                ->with(['user', 'category', 'subcategory', 'assignee'])
+                ->withCount('comments')
+                // lazy(), not cursor(): cursor() silently skips the eager loads above.
+                ->lazy(500)
+                ->each(function (SupportTicket $ticket) use ($out): void {
+                    $this->csvRow($out, [
+                        $ticket->number,
+                        $ticket->subject,
+                        $ticket->status->label(),
+                        $ticket->category?->name,
+                        $ticket->subcategory?->name,
+                        $ticket->user?->full_name,
+                        $ticket->contact_email,
+                        $ticket->assignee?->full_name,
+                        $this->csvDate($ticket->created_at),
+                        $this->csvDate($ticket->sla_deadline),
+                        $ticket->isOverdueNow() ? 'да' : 'нет',
+                        $this->csvDate($ticket->resolved_at),
+                        $this->csvDate($ticket->closed_at),
+                        $ticket->csat_score,
+                        $ticket->comments_count,
+                    ]);
+                });
+
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    /**
+     * @param  resource  $out
+     * @param  array<int, mixed>  $cells
+     */
+    private function csvRow($out, array $cells): void
+    {
+        // ';' is what Russian Excel expects; escape: '' both silences PHP 8.4's
+        // deprecation and stops backslashes in subjects being mangled.
+        fputcsv($out, array_map($this->csvCell(...), $cells), ';', '"', '', "\r\n");
+    }
+
+    /** Excel executes a cell that opens with =, +, - or @, so defuse it. */
+    private function csvCell(mixed $value): string
+    {
+        $value = (string) ($value ?? '');
+
+        return preg_match('/^[=+\-@]/', $value) === 1 ? "'" . $value : $value;
+    }
+
+    private function csvDate(?\Illuminate\Support\Carbon $at): string
+    {
+        return $at?->timezone('Europe/Moscow')->format('d.m.Y H:i') ?? '';
     }
 
     public function create(): View

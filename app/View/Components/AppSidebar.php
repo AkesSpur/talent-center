@@ -60,6 +60,7 @@ class AppSidebar extends Component
                 'items' => [
                     $this->item('Панель поддержки', 'fa-headset', 'support.dashboard', ['support.dashboard']),
                     $this->item('Заявки поддержки', 'fa-inbox', 'admin.support.tickets.index', ['admin.support.tickets.*'], $this->unreadForStaff(), 'queue'),
+                    $this->item('Аналитика', 'fa-chart-line', 'admin.support.analytics', ['admin.support.analytics']),
                     $this->item('Пользователи', 'fa-users', 'support.users.index', ['support.users.*']),
                     $this->item('Организации', 'fa-sitemap', 'support.organizations.index', ['support.organizations.*']),
                     $this->item('Конкурсы', 'fa-trophy', 'support.contests.index', ['support.contests.*']),
@@ -75,6 +76,7 @@ class AppSidebar extends Component
                 'label' => 'Поддержка',
                 'items' => [
                     $this->item('Заявки поддержки', 'fa-inbox', 'admin.support.tickets.index', ['admin.support.tickets.*'], $this->unreadForStaff(), 'queue'),
+                    $this->item('Аналитика', 'fa-chart-line', 'admin.support.analytics', ['admin.support.analytics']),
                     $this->item('Настройки поддержки', 'fa-sliders', 'admin.support.categories.index', ['admin.support.categories.*']),
                 ],
             ];
