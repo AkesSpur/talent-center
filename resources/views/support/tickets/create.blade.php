@@ -13,6 +13,14 @@
 
             <x-notify />
 
+            @if($hasArticles)
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-gold/20 bg-cream px-4 py-3 text-sm">
+                    <i class="fas fa-lightbulb text-gold" aria-hidden="true"></i>
+                    <span class="text-warm-gray">Возможно, ответ уже есть в базе знаний —</span>
+                    <a href="{{ route('knowledge-base.index') }}" class="font-medium text-primary hover:underline">посмотреть статьи</a>
+                </div>
+            @endif
+
             <x-support.upload-form :action="route('tickets.store')"
                 class="bg-white rounded-xl shadow-sm border border-gold/10 p-6 sm:p-8 space-y-6">
 

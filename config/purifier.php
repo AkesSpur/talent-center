@@ -30,6 +30,35 @@ return [
             'AutoFormat.AutoParagraph' => true,
             'AutoFormat.RemoveEmpty'   => true,
         ],
+        /**
+         * Knowledge-base articles (Quill 1.3.7). The 'default' profile above
+         * allows no headings, so an article written with them would lose its
+         * structure on save — hence a profile of its own.
+         *
+         * Images are not allowed as data: URIs: the editor uploads them and
+         * inserts a URL, so a base64 paste that slipped through would be a
+         * silently bloated row rather than a picture. articles.js refuses to
+         * submit while one is left in the body, so nothing vanishes quietly.
+         */
+        'kb'      => [
+            'HTML.Doctype'             => 'HTML 4.01 Transitional',
+            'HTML.Allowed'             => 'h2[class],h3[class],h4[class],p[class],br,hr,'
+                . 'strong,b,em,i,u,s,sub,sup,'
+                . 'ul,ol,li[class],'
+                . 'a[href|title|target],'
+                . 'blockquote[class],pre[class],code,'
+                . 'img[src|alt|width|height],'
+                . 'span[class]',
+            // Quill writes alignment and indentation as classes. Restricting the
+            // set keeps article text from borrowing the site's own styling.
+            'Attr.AllowedClasses'      => 'ql-align-center,ql-align-right,ql-align-justify,ql-syntax,'
+                . 'ql-indent-1,ql-indent-2,ql-indent-3,ql-indent-4,ql-indent-5,ql-indent-6,ql-indent-7,ql-indent-8',
+            'Attr.AllowedFrameTargets' => '_blank',
+            'URI.AllowedSchemes'       => ['http' => true, 'https' => true, 'mailto' => true],
+            // Quill emits its own <p>; and <p><br></p> is a deliberate blank line.
+            'AutoFormat.AutoParagraph' => false,
+            'AutoFormat.RemoveEmpty'   => false,
+        ],
         'test'    => [
             'Attr.EnableID' => 'true',
         ],

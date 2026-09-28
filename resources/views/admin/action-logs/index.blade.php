@@ -24,6 +24,7 @@
                         <option value="">Все объекты</option>
                         <option value="support_ticket" @selected(request('target_type') === 'support_ticket')>Заявки поддержки</option>
                         <option value="support_category" @selected(request('target_type') === 'support_category')>Категории поддержки</option>
+                        <option value="kb_article" @selected(request('target_type') === 'kb_article')>Статьи базы знаний</option>
                     </select>
                     <button type="submit" class="px-5 py-2.5 gradient-gold text-dark font-semibold rounded-lg hover:opacity-90 transition-opacity">
                         <i class="fas fa-search mr-2"></i>Найти

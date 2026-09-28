@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SiteSettingsController as AdminSiteSettingsContro
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PayoutRegistryController as AdminPayoutRegistryController;
+use App\Http\Controllers\Admin\Support\KbArticleController;
 use App\Http\Controllers\Admin\Support\SupportCategoryController;
 use App\Http\Controllers\Admin\Support\SupportDashboardController as SupportAnalyticsController;
 use App\Http\Controllers\Admin\Support\SupportTicketController as AdminSupportTicketController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\DiplomaController;
 use App\Http\Controllers\DiplomaVerifyController;
 use App\Http\Controllers\EvaluationController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\KnowledgeBaseController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\PaymentController;
@@ -74,6 +76,16 @@ Route::get('/contests/create', [ContestController::class, 'create'])
     ->middleware(['auth', 'verified'])
     ->name('contests.create');
 Route::get('/contests/{contest}', [ContestController::class, 'show'])->name('contests.show');
+
+// Knowledge base — public, no auth (ТЗ 8.6): this is also where someone who
+// cannot log in looks for help. /search and /attachments are declared before
+// /{article:slug}, or the wildcard swallows them.
+Route::get('/knowledge-base', [KnowledgeBaseController::class, 'index'])->name('knowledge-base.index');
+Route::get('/knowledge-base/search', [KnowledgeBaseController::class, 'search'])
+    ->middleware('throttle:30,1')->name('knowledge-base.search');
+Route::get('/knowledge-base/attachments/{token}', [KnowledgeBaseController::class, 'attachment'])
+    ->name('knowledge-base.attachment');
+Route::get('/knowledge-base/{article:slug}', [KnowledgeBaseController::class, 'show'])->name('knowledge-base.show');
 
 // ── Authenticated (any role) ────────────────────────────
 
@@ -177,6 +189,9 @@ Route::middleware(['auth', 'verified', 'role:admin,support'])
     // Literal segments stay above /tickets/{ticket} or the wildcard swallows them.
     Route::get('/tickets/export', [AdminSupportTicketController::class, 'export'])->name('tickets.export');
     Route::get('/analytics', SupportAnalyticsController::class)->name('analytics');
+    // Operators write the replies, so they get the article lookup behind
+    // «Вставить статью» — but not the rest of the knowledge-base admin below.
+    Route::get('/articles/search', [KbArticleController::class, 'search'])->name('articles.search');
     Route::get('/tickets/{ticket}', [AdminSupportTicketController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{ticket}/reply', [AdminSupportTicketController::class, 'reply'])->name('tickets.reply');
     Route::patch('/tickets/{ticket}/status', [AdminSupportTicketController::class, 'updateStatus'])->name('tickets.status');
@@ -193,6 +208,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     Route::post('/categories/{category}/archive', [SupportCategoryController::class, 'toggleArchive'])->name('categories.archive');
     Route::delete('/categories/{category}', [SupportCategoryController::class, 'destroy'])->name('categories.destroy');
     Route::post('/settings', [SupportCategoryController::class, 'updateSettings'])->name('settings.update');
+
+    // База знаний (ТЗ 8.5). No destroy route: articles are archived, never
+    // deleted, so links inside old ticket replies keep working.
+    Route::get('/articles', [KbArticleController::class, 'index'])->name('articles.index');
+    Route::get('/articles/create', [KbArticleController::class, 'create'])->name('articles.create');
+    Route::post('/articles', [KbArticleController::class, 'store'])->name('articles.store');
+    Route::post('/articles/images', [KbArticleController::class, 'image'])->name('articles.image');
+    Route::get('/articles/{article}/edit', [KbArticleController::class, 'edit'])->name('articles.edit');
+    Route::put('/articles/{article}', [KbArticleController::class, 'update'])->name('articles.update');
+    Route::post('/articles/{article}/status', [KbArticleController::class, 'transition'])->name('articles.status');
 });
 
 // ── Admin ───────────────────────────────────────────────

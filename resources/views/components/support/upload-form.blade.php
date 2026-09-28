@@ -1,4 +1,8 @@
-@props(['action'])
+@props([
+    'action',
+    // Which set of limits applies: ticket messages or knowledge-base articles.
+    'profile' => 'ticket',
+])
 
 {{--
     A helpdesk form that can carry attachments (resources/js/support-upload.js).
@@ -7,7 +11,7 @@
     Extra Alpine state belongs on a wrapping element — this one owns x-data.
 --}}
 <form method="POST" action="{{ $action }}" enctype="multipart/form-data"
-    x-data="supportUpload(@js(\App\Services\SupportAttachmentService::pickerConfig()))"
+    x-data="supportUpload(@js(\App\Services\SupportAttachmentService::pickerConfig($profile)))"
     data-upload-drop
     @submit="submit($event)"
     @dragenter="dragEnter($event)"

@@ -2,7 +2,6 @@
 
 @section('title', 'Проверить диплом — Талант-центр')
 
-@section('body-class', 'min-h-screen flex flex-col')
 
 @section('head')
 <style>

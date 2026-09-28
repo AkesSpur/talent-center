@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin\Support;
 
+use App\Enums\KbArticleStatus;
 use App\Http\Controllers\Controller;
+use App\Models\KbArticle;
 use App\Models\SiteSettings;
 use App\Models\SupportCategory;
 use App\Services\ActionLogService;
 use App\Services\SlaService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -69,6 +72,13 @@ class SupportCategoryController extends Controller
             'is_active'   => $request->boolean('is_active'),
         ]);
 
+        // Category names are part of what the knowledge-base search looks
+        // through, so a rename has to be pushed into the articles' index or
+        // the old name keeps matching and the new one never does.
+        if ($old['name'] !== $category->name) {
+            KbArticle::reindexCategory($category);
+        }
+
         ActionLogService::log('support.category.updated', $category, [
             'old' => $old,
             'new' => $category->only(['name', 'sort_order', 'is_active', 'parent_id']),
@@ -82,14 +92,17 @@ class SupportCategoryController extends Controller
     public function toggleArchive(SupportCategory $category): RedirectResponse
     {
         $category->update(['is_active' => ! $category->is_active]);
+        $articles = 0;
 
         if (! $category->is_active) {
             // Archiving a category hides its subcategories from the ticket form too.
             $category->children()->update(['is_active' => false]);
+            $articles = $this->archiveArticlesOf($category);
         }
 
         ActionLogService::log('support.category.archived', $category, [
-            'is_active' => $category->is_active,
+            'is_active'         => $category->is_active,
+            'articles_archived' => $articles,
         ]);
 
         return redirect()->route('admin.support.categories.index')
@@ -143,6 +156,21 @@ class SupportCategoryController extends Controller
 
         return redirect()->route('admin.support.categories.index')
             ->with('status', 'support-settings-updated');
+    }
+
+    /**
+     * ТЗ 8.9: archiving a category archives the knowledge-base articles filed
+     * under it or under one of its subcategories. Restoring the category does
+     * *not* bring them back — whether an article is still correct is a
+     * judgement for the editor, not a side effect of a click.
+     */
+    private function archiveArticlesOf(SupportCategory $category): int
+    {
+        $ids = [$category->id, ...$category->children()->pluck('id')->all()];
+
+        return KbArticle::where('status', '!=', KbArticleStatus::Archived->value)
+            ->where(fn (Builder $q) => $q->whereIn('category_id', $ids)->orWhereIn('subcategory_id', $ids))
+            ->update(['status' => KbArticleStatus::Archived->value]);
     }
 
     /** @return array<string, mixed> */

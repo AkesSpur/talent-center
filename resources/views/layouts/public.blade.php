@@ -30,7 +30,12 @@
 
     @yield('head')
 </head>
-<body class="font-sans antialiased bg-cream text-dark @yield('body-class')">
+{{--
+    min-h-screen + flex column keeps the footer on the bottom edge of the
+    window on short pages (an empty search result, a one-line article) instead
+    of leaving a band of background below it.
+--}}
+<body class="font-sans antialiased bg-cream text-dark min-h-screen flex flex-col @yield('body-class')">
 
     <!-- ========== HEADER ========== -->
     <header class="bg-cream shadow-sm sticky top-0 z-50">
@@ -99,7 +104,12 @@
         </div>
     </header>
 
-    @yield('content')
+    {{-- Takes up the slack, so the footer is pushed down rather than floating
+         in the middle. Also a flex column itself: the diploma pages put their
+         own `flex-1` <main> in here and relied on that. --}}
+    <div class="flex flex-1 flex-col">
+        @yield('content')
+    </div>
 
     @include('layouts.footer')
 

@@ -128,6 +128,58 @@
 
                                     <x-support.file-picker id="admin-files" compact />
 
+                                    {{-- «Вставить статью» (ТЗ 8.7): answer with a link instead of
+                                         retyping the same explanation. --}}
+                                    <div x-data="articlePicker({
+                                            searchUrl: @js(route('admin.support.articles.search')),
+                                            target: '#reply-content',
+                                        })" @keydown.escape.window="close()">
+                                        <button type="button" @click="show()" :disabled="sending"
+                                            class="inline-flex items-center gap-2 px-4 py-2 border border-primary/20 text-warm-gray rounded-lg hover:border-primary/40 hover:text-primary transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <i class="fas fa-book-open" aria-hidden="true"></i>Вставить статью
+                                        </button>
+
+                                        <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-start justify-center p-4 sm:p-8 overflow-y-auto"
+                                            role="dialog" aria-modal="true" aria-labelledby="article-picker-title">
+                                            <div class="fixed inset-0 bg-dark/40" @click="close()" aria-hidden="true"></div>
+
+                                            <div class="relative w-full max-w-lg bg-white rounded-xl shadow-xl border border-gold/10 p-5 mt-8">
+                                                <div class="flex items-start justify-between gap-3">
+                                                    <h4 id="article-picker-title" class="font-serif text-lg font-semibold text-dark">Вставить статью</h4>
+                                                    <button type="button" @click="close()" aria-label="Закрыть"
+                                                        class="w-8 h-8 rounded-full text-warm-gray hover:text-dark hover:bg-cream flex items-center justify-center transition-colors">
+                                                        <i class="fas fa-xmark" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
+
+                                                <label for="article-search" class="sr-only">Поиск статьи</label>
+                                                <input id="article-search" x-ref="search" type="search" x-model="term" @input="queue()"
+                                                    placeholder="Название или слово из текста"
+                                                    class="mt-3 w-full px-4 py-2.5 border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-sm">
+
+                                                <p x-show="searching" x-cloak class="mt-3 text-sm text-warm-gray">
+                                                    <i class="fas fa-circle-notch fa-spin mr-1" aria-hidden="true"></i>Ищем…
+                                                </p>
+                                                <p x-show="error" x-cloak role="alert" class="mt-3 text-sm text-red-600" x-text="error"></p>
+                                                <p x-show="!searching && !error && searched && !results.length" x-cloak class="mt-3 text-sm text-warm-gray">
+                                                    Ничего не нашлось. Ищутся только опубликованные статьи.
+                                                </p>
+
+                                                <ul x-show="results.length" x-cloak class="mt-3 max-h-72 overflow-y-auto divide-y divide-gold/10">
+                                                    <template x-for="article in results" :key="article.url">
+                                                        <li>
+                                                            <button type="button" @click="insert(article)"
+                                                                class="w-full text-left py-3 px-2 rounded-lg hover:bg-cream transition-colors">
+                                                                <span class="block text-sm font-medium text-dark" x-text="article.title"></span>
+                                                                <span class="block text-xs text-warm-gray mt-0.5" x-text="article.category"></span>
+                                                            </button>
+                                                        </li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div>
                                         <label class="inline-flex items-center gap-2 text-sm text-dark cursor-pointer">
                                             <input type="checkbox" name="is_internal" value="1" x-model="internal"

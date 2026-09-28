@@ -77,6 +77,7 @@ class AppSidebar extends Component
                 'items' => [
                     $this->item('Заявки поддержки', 'fa-inbox', 'admin.support.tickets.index', ['admin.support.tickets.*'], $this->unreadForStaff(), 'queue'),
                     $this->item('Аналитика', 'fa-chart-line', 'admin.support.analytics', ['admin.support.analytics']),
+                    $this->item('База знаний', 'fa-book-open', 'admin.support.articles.index', ['admin.support.articles.*']),
                     $this->item('Настройки поддержки', 'fa-sliders', 'admin.support.categories.index', ['admin.support.categories.*']),
                 ],
             ];

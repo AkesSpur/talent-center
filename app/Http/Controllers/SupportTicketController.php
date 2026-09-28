@@ -8,6 +8,7 @@ use App\Enums\SupportTicketStatus;
 use App\Http\Controllers\Concerns\RespondsToUploadForms;
 use App\Http\Requests\Support\StoreSupportTicketRequest;
 use App\Http\Requests\Support\StoreTicketCommentRequest;
+use App\Models\KbArticle;
 use App\Models\SupportCategory;
 use App\Models\SupportTicket;
 use App\Services\SupportTicketService;
@@ -52,6 +53,9 @@ class SupportTicketController extends Controller
         return view('support.tickets.create', [
             'categories' => SupportCategory::active()->roots()->ordered()->get(),
             'selected'   => (int) $request->query('category', 0),
+            // ТЗ 8: point people at the knowledge base before they open a
+            // ticket — but only once there is something there to read.
+            'hasArticles' => KbArticle::published()->exists(),
         ]);
     }
 

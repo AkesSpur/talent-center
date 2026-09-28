@@ -49,6 +49,10 @@
         'support-category-restored' => ['Категория восстановлена', 'success'],
         'support-category-deleted'  => ['Категория удалена', 'success'],
         'support-settings-updated'  => ['Параметры поддержки сохранены', 'success'],
+        // Knowledge base
+        'kb-article-created'        => ['Статья создана', 'success'],
+        'kb-article-updated'        => ['Статья сохранена', 'success'],
+        'kb-article-status-changed' => ['Статус статьи изменён', 'success'],
         // Payout registries
         'payout-registry-created'  => ['Запись реестра выплат создана', 'success'],
         'payout-registry-updated'  => ['Данные перечисления обновлены', 'success'],

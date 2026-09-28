@@ -20,6 +20,19 @@ class SupportAttachmentService
     public const MAX_FILE_KB = 10240;   // 10 MB
     public const MAX_TOTAL_KB = 20480;  // 20 MB
 
+    /**
+     * Knowledge-base articles carry more and larger files than a ticket
+     * message does (ТЗ 8.9). The per-file ceiling is the same 10 MB.
+     */
+    public const KB_MAX_FILES = 10;
+    public const KB_MAX_TOTAL_KB = 51200;  // 50 MB
+
+    /** @var array<string, array{maxFiles: int, maxTotalKb: int}> */
+    public const PROFILES = [
+        'ticket'  => ['maxFiles' => self::MAX_FILES, 'maxTotalKb' => self::MAX_TOTAL_KB],
+        'article' => ['maxFiles' => self::KB_MAX_FILES, 'maxTotalKb' => self::KB_MAX_TOTAL_KB],
+    ];
+
     /** What the picker offers. The server re-checks every file by its content, not its name. */
     public const EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'zip'];
 
@@ -67,26 +80,34 @@ class SupportAttachmentService
 
     // ── Limits actually in force ───────────────────────
 
+    /** How many files this kind of form accepts. */
+    public static function maxFiles(string $profile = 'ticket'): int
+    {
+        return self::PROFILES[$profile]['maxFiles'];
+    }
+
     /**
      * The TZ's 10 MB per file — or less when PHP on this server is set lower,
      * so the form never promises more than the server will accept.
      */
-    public static function maxFileBytes(): int
+    public static function maxFileBytes(string $profile = 'ticket'): int
     {
-        return min(self::MAX_FILE_KB * 1024, self::iniBytes('upload_max_filesize'), self::maxTotalBytes());
+        return min(self::MAX_FILE_KB * 1024, self::iniBytes('upload_max_filesize'), self::maxTotalBytes($profile));
     }
 
-    /** The TZ's 20 MB per message, capped the same way by post_max_size. */
-    public static function maxTotalBytes(): int
+    /** The TZ's per-request ceiling, capped the same way by post_max_size. */
+    public static function maxTotalBytes(string $profile = 'ticket'): int
     {
-        return max(1, min(self::MAX_TOTAL_KB * 1024, self::iniBytes('post_max_size') - self::REQUEST_OVERHEAD_BYTES));
+        $wanted = self::PROFILES[$profile]['maxTotalKb'] * 1024;
+
+        return max(1, min($wanted, self::iniBytes('post_max_size') - self::REQUEST_OVERHEAD_BYTES));
     }
 
     /** «До 5 файлов, до 10 МБ каждый, всего до 20 МБ» */
-    public static function limitsText(): string
+    public static function limitsText(string $profile = 'ticket'): string
     {
-        return 'До ' . self::MAX_FILES . ' файлов, до ' . self::formatBytes(self::maxFileBytes())
-            . ' каждый, всего до ' . self::formatBytes(self::maxTotalBytes());
+        return 'До ' . self::maxFiles($profile) . ' файлов, до ' . self::formatBytes(self::maxFileBytes($profile))
+            . ' каждый, всего до ' . self::formatBytes(self::maxTotalBytes($profile));
     }
 
     /**
@@ -94,12 +115,12 @@ class SupportAttachmentService
      *
      * @return array<string, mixed>
      */
-    public static function pickerConfig(): array
+    public static function pickerConfig(string $profile = 'ticket'): array
     {
         return [
-            'maxFiles'       => self::MAX_FILES,
-            'maxFileBytes'   => self::maxFileBytes(),
-            'maxTotalBytes'  => self::maxTotalBytes(),
+            'maxFiles'       => self::maxFiles($profile),
+            'maxFileBytes'   => self::maxFileBytes($profile),
+            'maxTotalBytes'  => self::maxTotalBytes($profile),
             'extensions'     => self::EXTENSIONS,
             'extensionsText' => self::EXTENSIONS_TEXT,
         ];

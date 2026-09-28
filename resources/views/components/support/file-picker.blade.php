@@ -2,10 +2,13 @@
     'id' => 'files',
     // Reply boxes get a compact button; the new-ticket form a full drop zone.
     'compact' => false,
+    // Must match the profile given to the surrounding upload-form component.
+    // (No component tag in this comment: Blade would compile it.)
+    'profile' => 'ticket',
 ])
 
 @php
-    $limits = \App\Services\SupportAttachmentService::limitsText();
+    $limits = \App\Services\SupportAttachmentService::limitsText($profile);
     $types = \App\Services\SupportAttachmentService::EXTENSIONS_TEXT;
     $accept = collect(\App\Services\SupportAttachmentService::EXTENSIONS)->map(fn ($ext) => '.' . $ext)->implode(',');
 @endphp

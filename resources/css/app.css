@@ -40,6 +40,19 @@
     .rich-content .ql-align-right { text-align: right; }
     .rich-content .ql-align-justify { text-align: justify; }
 
+    /* Knowledge-base articles use the rest of the editor's toolbar (ТЗ 8.5). */
+    .rich-content h4 { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 600; color: #2C2416; margin-top: 0.8rem; margin-bottom: 0.3rem; }
+    .rich-content s { text-decoration: line-through; }
+    .rich-content hr { border: 0; border-top: 1px solid rgba(139,69,19,.15); margin: 1.25rem 0; }
+    .rich-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 0.75rem 0; }
+    .rich-content blockquote { border-left: 3px solid #D4AF37; padding-left: 1rem; margin: 0.75rem 0; color: #5B4A38; font-style: italic; }
+    .rich-content pre { background: #FAF8F5; border: 1px solid rgba(139,69,19,.15); border-radius: 0.5rem; padding: 0.75rem 1rem; margin: 0.75rem 0; overflow-x: auto; font-size: 0.85em; white-space: pre-wrap; }
+    .rich-content code { background: #FAF8F5; border-radius: 0.25rem; padding: 0.1em 0.35em; font-size: 0.9em; }
+    .rich-content .ql-indent-1 { padding-left: 2rem; }
+    .rich-content .ql-indent-2 { padding-left: 4rem; }
+    .rich-content .ql-indent-3 { padding-left: 6rem; }
+    .rich-content .ql-indent-4 { padding-left: 8rem; }
+
     /* Hide browser spinner arrows on number inputs */
     .no-spinner { -moz-appearance: textfield; appearance: textfield; }
     .no-spinner::-webkit-outer-spin-button,

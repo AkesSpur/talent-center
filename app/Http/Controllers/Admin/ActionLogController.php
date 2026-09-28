@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActionLog;
+use App\Models\KbArticle;
 use App\Models\SupportCategory;
 use App\Models\SupportTicket;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class ActionLogController extends Controller
     private const TARGET_TYPES = [
         'support_ticket'   => SupportTicket::class,
         'support_category' => SupportCategory::class,
+        'kb_article'       => KbArticle::class,
     ];
 
     public function index(Request $request): View
